@@ -2,4 +2,195 @@
 
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* KhmerWander Theme Colors */
+  --color-sidebar-dark: #091E14;
+  --color-sidebar-darker: #061510;
+  --color-sidebar-active: #12301F;
+  --color-sidebar-hover: #0E2519;
+  --color-accent-gold: #C8A951;
+  --color-accent-gold-light: #D4BC6A;
+  --color-cream: #FAF8F5;
+  --color-cream-dark: #F0EDE8;
+  --color-ai-teal: #0F4F3F;
+  --color-ai-teal-dark: #0A3D31;
+  --color-weather-border: #E8E4DE;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Animation Keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes kenBurns {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes shimmerGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(27, 107, 90, 0.15), 0 4px 16px rgba(27, 107, 90, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 32px rgba(27, 107, 90, 0.25), 0 8px 24px rgba(27, 107, 90, 0.18);
+  }
+}
+
+@keyframes pulseGold {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(200, 169, 81, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 12px 4px rgba(200, 169, 81, 0.15);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Utility animation classes */
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease both;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Stagger delay utilities */
+.delay-1 {
+  animation-delay: 0.05s;
+}
+
+.delay-2 {
+  animation-delay: 0.1s;
+}
+
+.delay-3 {
+  animation-delay: 0.15s;
+}
+
+.delay-4 {
+  animation-delay: 0.2s;
+}
+
+.delay-5 {
+  animation-delay: 0.25s;
+}
+
+.delay-6 {
+  animation-delay: 0.3s;
+}
+
+.delay-7 {
+  animation-delay: 0.35s;
+}
+
+.delay-8 {
+  animation-delay: 0.4s;
+}
+
+.delay-9 {
+  animation-delay: 0.45s;
+}
+
+.delay-10 {
+  animation-delay: 0.5s;
+}
+
+/* Custom scrollbar for main content */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #d1cdc6;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #b8b3ab;
 }
