@@ -22,6 +22,9 @@
   "devDependencies": {
     "autoprefixer": "^10.5.0",
     "postcss": "^8.5.10",
-    "tailwindcss": "^4.2.2"
+    "tailwindcss": "^4.2.2",
+    "@typescript-eslint/eslint-plugin": "^8.59.0",
+    "@typescript-eslint/parser": "^8.59.0",
+    "typescript-eslint": "^8.57.2"
   }
 }
