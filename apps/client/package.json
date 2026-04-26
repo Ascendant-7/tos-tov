@@ -17,8 +17,11 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.2.3",
+    "@repo/supabase": "workspace:*",
     "esbuild": "0.27.4",
     "pinia": "^3.0.4",
+    "tailwindcss": "^4.2.3",
     "vue": "^3.5.30",
     "vue-router": "^5.0.3"
   },

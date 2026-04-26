@@ -4,4 +4,5 @@ packages:
 allowBuilds:
   '@nestjs/core': true
   esbuild: true
+  supabase: true
   unrs-resolver: true
