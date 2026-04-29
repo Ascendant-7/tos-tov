@@ -1,10 +1,10 @@
 # CUSTOM SETUP
 
-Here, I will only show you how to test supabase connection.
+## API
 
-## 1. ENV
+### ENV
 
-### LOCAL
+#### 1. LOCAL
 
 make sure you're in the `apps/api` directory:
 
@@ -20,7 +20,7 @@ cp .env.example .env
 
 note: don't delete `.env.example`; it's for future reference and source control.
 
-### SUPABASE WEBSITE
+#### 2. SUPABASE WEBSITE
 
 next, go to my supabase organization. if you haven't join, give me your email so I can add you.
 
@@ -33,27 +33,30 @@ as you can see in the `.env.example`, you need two variables:
 
 1. `PROJECT_ID`
 
-sidebar: project settings > general > project id
+  sidebar: project settings > general > project id
 
-2. `SUPABASE_ANON_KEY`
+1. `SUPABASE_ANON_KEY`
 
-sidebar: project settings > api keys > publishable keys > default
+  sidebar: project settings > api keys > publishable keys > default
 
-fill those into your `.env`
+  fill those into your `.env`
 
-## 2. SETUP & STARTUP
+## CLIENT
+
+none at the moment
+
+## DEPENDENCIES
+
+install your dependencies:
 
 ```sh
 pnpm i
-pnpm -F api start:dev`
 ```
 
-### 3. TEST
+## STARTUP
 
-in a separate terminal:
+start up both API and client using my script:
 
 ```sh
-curl http://localhost:3000/test-connection
+pnpm -w dev
 ```
-
-expected: a json with `"msg": "ok"`

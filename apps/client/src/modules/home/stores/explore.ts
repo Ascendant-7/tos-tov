@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import type { ExploreDestination } from '@/components/DestinationCard.vue'
-import { DESTINATIONS } from '@/data/destinations'
+import { DESTINATIONS } from '@/modules/home/data/destinations'
 
 export const useExploreStore = defineStore('explore', () => {
   // --- Search & Filter ---

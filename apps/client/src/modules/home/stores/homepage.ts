@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { DESTINATIONS } from '@/data/destinations'
+import { DESTINATIONS } from '@/modules/home/data/destinations'
 
 export const useHomepageStore = defineStore('homepage', () => {
   // --- Search ---
