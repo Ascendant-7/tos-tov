@@ -18,7 +18,7 @@
           <h1 class="text-[20px] sm:text-[24px] md:text-[28px] font-bold text-white m-0 mb-3 sm:mb-4 leading-tight max-w-[420px]">Where will your next<br/>adventure take you?</h1>
           <div class="relative max-w-[320px] sm:max-w-[380px]">
             <svg class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-white/50" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <input type="text" placeholder="Search destinations, places, experiences..." class="w-full py-2.5 sm:py-3 pl-9 sm:pl-10 pr-4 rounded-xl bg-white/20 backdrop-blur-md border border-white/25 text-xs sm:text-sm text-white placeholder:text-white/60 outline-none transition-all duration-200 focus:bg-white/30 focus:border-white/40" />
+            <input v-model="searchQuery" type="text" placeholder="Search destinations, places, experiences..." class="w-full py-2.5 sm:py-3 pl-9 sm:pl-10 pr-4 rounded-xl bg-white/20 backdrop-blur-md border border-white/25 text-xs sm:text-sm text-white placeholder:text-white/60 outline-none transition-all duration-200 focus:bg-white/30 focus:border-white/40" />
           </div>
         </div>
       </section>
@@ -63,10 +63,10 @@
           <h2 class="text-[14px] sm:text-[15px] font-bold text-slate-800 m-0 flex items-center gap-2">
             <span class="text-base"></span> Trending Destinations
           </h2>
-          <a href="#" class="text-[12px] sm:text-[13px] font-semibold text-sidebar-active no-underline flex items-center gap-1 hover:underline transition-colors duration-200">
+          <RouterLink to="/explore?filter=trending" class="text-[12px] sm:text-[13px] font-semibold text-sidebar-active no-underline flex items-center gap-1 hover:underline transition-colors duration-200">
             View all
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-          </a>
+          </RouterLink>
         </div>
 
         <!-- Filter Tabs -->
@@ -78,6 +78,7 @@
 
         <!-- Destination Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          <TransitionGroup name="card-filter">
           <div v-for="(dest, i) in filteredDestinations" :key="dest.name" class="group bg-white rounded-2xl border border-weather-border overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-slate-300 animate-scale-in" :style="{ animationDelay: `${0.35 + i * 0.06}s` }">
             <div class="w-full h-32 sm:h-36 lg:h-40 bg-cream-dark flex items-center justify-center overflow-hidden">
               <img v-if="dest.image" :src="dest.image" :alt="dest.name" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -97,6 +98,13 @@
               </div>
             </div>
           </div>
+          </TransitionGroup>
+        </div>
+        <!-- Empty state for destinations -->
+        <div v-if="filteredDestinations.length === 0" class="flex flex-col items-center justify-center py-12 text-center animate-fade-in">
+          <div class="w-16 h-16 rounded-2xl bg-cream-dark flex items-center justify-center text-3xl mb-4">🔍</div>
+          <p class="text-[14px] font-semibold text-slate-600 m-0 mb-1">No destinations found</p>
+          <p class="text-[12px] text-slate-400 m-0">Try adjusting your search or filter criteria</p>
         </div>
       </section>
 
@@ -127,7 +135,7 @@
       </section>
 
       <!-- Hidden Gems -->
-      <section class="mt-8 sm:mt-10 animate-fade-in-up delay-8">
+      <section v-if="filteredHiddenGems.length > 0" class="mt-8 sm:mt-10 animate-fade-in-up delay-8">
         <div class="flex justify-between items-center mb-4 sm:mb-5">
           <h2 class="text-[14px] sm:text-[15px] font-bold text-slate-800 m-0 flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> Hidden Gems
@@ -138,7 +146,7 @@
           </a>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-          <div v-for="(gem, i) in hiddenGems" :key="gem.name" class="group bg-white rounded-2xl border border-weather-border overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-slate-300 flex animate-scale-in" :style="{ animationDelay: `${0.45 + i * 0.08}s` }">
+          <div v-for="(gem, i) in filteredHiddenGems" :key="gem.name" class="group bg-white rounded-2xl border border-weather-border overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-slate-300 flex animate-scale-in" :style="{ animationDelay: `${0.45 + i * 0.08}s` }">
             <div class="w-[110px] sm:w-[130px] shrink-0 overflow-hidden">
               <img :src="gem.image" :alt="gem.name" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
             </div>
@@ -155,7 +163,7 @@
       </section>
 
       <!-- Upcoming Events -->
-      <section class="mt-8 sm:mt-10 animate-fade-in-up delay-9">
+      <section v-if="filteredUpcomingEvents.length > 0" class="mt-8 sm:mt-10 animate-fade-in-up delay-9">
         <div class="flex justify-between items-center mb-4 sm:mb-5">
           <h2 class="text-[14px] sm:text-[15px] font-bold text-slate-800 m-0 flex items-center gap-2">
             <span class="text-base"></span> Upcoming Events
@@ -166,7 +174,7 @@
           </a>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-          <div v-for="(evt, i) in upcomingEvents" :key="evt.title" class="group bg-white rounded-2xl border border-weather-border overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-slate-300 animate-scale-in" :style="{ animationDelay: `${0.5 + i * 0.06}s` }">
+          <div v-for="(evt, i) in filteredUpcomingEvents" :key="evt.title" class="group bg-white rounded-2xl border border-weather-border overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-slate-300 animate-scale-in" :style="{ animationDelay: `${0.5 + i * 0.06}s` }">
             <div class="relative h-28 sm:h-32 overflow-hidden">
               <img :src="evt.image" :alt="evt.title" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <div class="absolute top-2.5 left-2.5 bg-white/95 backdrop-blur-sm rounded-lg px-2.5 py-1.5 text-center shadow-sm min-w-[44px]">
@@ -187,12 +195,12 @@
       </section>
 
       <!-- Travel Tips -->
-      <section class="mt-8 sm:mt-10 mb-8 sm:mb-10 animate-fade-in-up delay-10">
+      <section v-if="filteredTravelTips.length > 0" class="mt-8 sm:mt-10 mb-8 sm:mb-10 animate-fade-in-up delay-10">
         <h2 class="text-[14px] sm:text-[15px] font-bold text-slate-800 m-0 mb-4 sm:mb-5 flex items-center gap-2">
           <span class="text-base"></span> Travel Tips
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-          <div v-for="(tip, i) in travelTips" :key="tip.title" class="group bg-white rounded-2xl border border-weather-border p-4 sm:p-5 cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-slate-300 animate-scale-in" :style="{ animationDelay: `${0.55 + i * 0.06}s` }">
+          <div v-for="(tip, i) in filteredTravelTips" :key="tip.title" class="group bg-white rounded-2xl border border-weather-border p-4 sm:p-5 cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-slate-300 animate-scale-in" :style="{ animationDelay: `${0.55 + i * 0.06}s` }">
             <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl mb-3" :class="tip.bgClass">{{ tip.icon }}</div>
             <h4 class="text-[13px] sm:text-[14px] font-semibold text-slate-800 m-0 mb-1.5">{{ tip.title }}</h4>
             <p class="text-[11px] sm:text-[12px] text-slate-500 m-0 leading-snug">{{ tip.description }}</p>
@@ -205,19 +213,20 @@
 </template>
 
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { useHomepageStore } from '@/stores/homepage'
+import { useHomepageStore } from '../stores/homepage'
 
 const homepageStore = useHomepageStore()
 const {
+  searchQuery,
   activeTab,
   tabs,
   weatherData,
-  destinations,
   filteredDestinations,
   ongoingTrips,
-  hiddenGems,
-  upcomingEvents,
-  travelTips,
+  filteredHiddenGems,
+  filteredUpcomingEvents,
+  filteredTravelTips,
 } = storeToRefs(homepageStore)
 </script>
