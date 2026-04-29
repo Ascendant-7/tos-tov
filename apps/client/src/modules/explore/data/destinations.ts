@@ -1,4 +1,4 @@
-import type { ExploreDestination } from '@/components/DestinationCard.vue'
+import type { ExploreDestination } from '@/modules/explore/components/DestinationCard.vue'
 
 export const DESTINATIONS: ExploreDestination[] = [
   {
