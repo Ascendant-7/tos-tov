@@ -19,4 +19,14 @@ export class SupabaseService {
     if (error) return { msg: `error: ${error}` };
     return { msg: `ok` };
   }
+
+  async getUserById(id: number) {
+    const { data, error } = await this.client
+      .from('user')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (error) return { msg: `error: ${error.message}` };
+    return { msg: `ok: ${JSON.stringify(data)}` };
+  }
 }
