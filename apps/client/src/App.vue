@@ -20,8 +20,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import SideBar from './components/SideBar.vue';
-import TopBar from './components/TopBar.vue';
+import SideBar from './core/components/SideBar.vue';
+import TopBar from './core/components/TopBar.vue';
 
 const isMobileSidebarOpen = ref(false)
 </script>

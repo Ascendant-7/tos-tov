@@ -10,37 +10,37 @@ const router = createRouter({
     {
       path: '/home',
       name: 'home',
-      component: () => import('../pages/HomePage.vue'),
+      component: () => import('../modules/home/HomePage.vue'),
     },
     {
       path: '/explore',
       name: 'explore',
-      component: () => import('../pages/ExplorePage.vue'),
+      component: () => import('../modules/explore/ExplorePage.vue'),
     },
     {
       path: '/trip-planner',
       name: 'trip-planner',
-      component: () => import('../pages/TripPlannerPage.vue'),
+      component: () => import('../core/pages/TripPlannerPage.vue'),
     },
     {
       path: '/route-intel',
       name: 'route-intel',
-      component: () => import('../pages/RoutesPage.vue'),
+      component: () => import('../core/pages/RoutesPage.vue'),
     },
     {
       path: '/social',
       name: 'social',
-      component: () => import('../pages/SocialPage.vue'),
+      component: () => import('../core/pages/SocialPage.vue'),
     },
     {
       path: '/community',
       name: 'community',
-      component: () => import('../pages/CommunityPage.vue'),
+      component: () => import('../core/pages/CommunityPage.vue'),
     },
     {
       path: '/profile',
       name: 'profile',
-      component: () => import('../pages/ProfilePage.vue'),
+      component: () => import('../core/pages/ProfilePage.vue'),
     },
     {
       path: '/itinerary',

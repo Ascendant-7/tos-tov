@@ -88,7 +88,7 @@
           <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-3">Province</p>
           <div class="flex gap-2 flex-wrap">
             <button
-              v-for="province in provinces"
+              v-for="province in provinceOptions"
               :key="province"
               @click="selectedProvince = province"
               :class="[
@@ -144,12 +144,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { useExploreStore } from '../stores/explore'
-import SearchFilterBar from '../components/SearchFilterBar.vue'
-import DestinationCard from '../components/DestinationCard.vue'
+import { useExploreStore } from './store/explore'
+import SearchFilterBar from '../../modules/home/components/SearchFilterBar.vue'
+import DestinationCard from './components/DestinationCard.vue'
 
 const route = useRoute()
 const exploreStore = useExploreStore()
@@ -163,6 +163,11 @@ const {
   selectedProvince,
   provinces,
 } = storeToRefs(exploreStore)
+
+const provinceOptions = computed<string[]>(() => {
+  const values = provinces.value
+  return Array.isArray(values) ? values.filter((province): province is string => typeof province === 'string') : []
+})
 
 const showFilters = ref(false)
 
