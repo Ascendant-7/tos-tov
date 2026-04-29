@@ -20,14 +20,6 @@ then you must check if pnpm works by just checking the version.
 
 then install the pnpm dependencies.
 
-### SUPABASE
-
-the supabase package needs to generate the types and be used through the dist/ folder, but since dist/ is ignored, you must run this script to reproduce it yourself:
-
-```sh
-pnpm -F @repo/supabase build
-```
-
 ## API
 
 ### ENV
