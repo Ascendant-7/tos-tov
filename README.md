@@ -1,5 +1,25 @@
 # CUSTOM SETUP
 
+## PNPM
+
+in this project, we're going to use pnpm. make sure to have pnpm in your machine.
+
+```sh
+npm i -g corepack@latest
+corepack enable
+corepack use pnpm@latest
+pnpm -v
+pnpm i
+```
+
+this downloads corepack which is recommended over downloading pnpm directly in npm.
+
+then it enables corepack and use the latest version of pnpm.
+
+then you must check if pnpm works by just checking the version.
+
+then install the pnpm dependencies.
+
 ## API
 
 ### ENV
@@ -44,14 +64,6 @@ as you can see in the `.env.example`, you need two variables:
 ## CLIENT
 
 none at the moment
-
-## DEPENDENCIES
-
-install your dependencies:
-
-```sh
-pnpm i
-```
 
 ## STARTUP
 
