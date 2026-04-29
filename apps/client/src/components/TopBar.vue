@@ -19,10 +19,20 @@
       <div class="relative hidden sm:block">
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         <input
+          v-model="searchQuery"
           type="text"
           placeholder="Search destinations..."
-          class="w-[180px] md:w-[240px] py-2 pl-9 pr-4 rounded-xl border border-weather-border bg-white text-sm text-slate-600 outline-none transition-all duration-200 focus:border-sidebar-active focus:shadow-[0_0_0_3px_rgba(42,90,66,0.08)] placeholder:text-slate-400"
+          class="w-[180px] md:w-[240px] py-2 pl-9 pr-9 rounded-xl border border-weather-border bg-white text-sm text-slate-600 outline-none transition-all duration-200 focus:border-sidebar-active focus:shadow-[0_0_0_3px_rgba(42,90,66,0.08)] placeholder:text-slate-400"
         />
+        <!-- Clear button -->
+        <button
+          v-if="searchQuery"
+          @click="searchQuery = ''"
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors duration-200 cursor-pointer border-none bg-transparent p-1"
+          aria-label="Clear search"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
 
       <!-- Mobile search button (visible on small screens only) -->
@@ -45,12 +55,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useHomepageStore } from '../stores/homepage'
+import { useExploreStore } from '../stores/explore'
 
 defineEmits<{ 'toggle-sidebar': [] }>()
 
 const route = useRoute()
+const homepageStore = useHomepageStore()
+const exploreStore = useExploreStore()
+const { searchQuery } = storeToRefs(homepageStore)
 
 const pageTitles: Record<string, string> = {
   home: 'Dashboard',
@@ -65,5 +81,13 @@ const pageTitles: Record<string, string> = {
 const pageTitle = computed(() => {
   const name = route.name as string
   return pageTitles[name] || 'Dashboard'
+})
+
+// Clear search and reset filters when navigating to explore page
+watch(() => route.name, (newRouteName) => {
+  if (newRouteName === 'explore') {
+    searchQuery.value = ''
+    exploreStore.setTrendingFilter(false)
+  }
 })
 </script>
