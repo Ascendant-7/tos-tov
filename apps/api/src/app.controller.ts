@@ -18,6 +18,7 @@ export class AppController {
   testConnection() {
     return this.supabaseService.testConnection();
   }
+
   @Get('user/:id')
   getUserById(@Param('id', ParseIntPipe) id: number) {
     return this.supabaseService.getUserById(id);
