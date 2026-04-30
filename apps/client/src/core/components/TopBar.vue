@@ -58,8 +58,8 @@
 import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { useHomepageStore } from '../stores/homepage'
-import { useExploreStore } from '../stores/explore'
+import { useHomepageStore } from '../../modules/home/stores/homepage'
+import { useExploreStore } from '../../modules/explore/store/explore'
 
 defineEmits<{ 'toggle-sidebar': [] }>()
 

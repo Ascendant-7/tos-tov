@@ -215,7 +215,7 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { useHomepageStore } from '../stores/homepage'
+import { useHomepageStore } from './stores/homepage'
 
 const homepageStore = useHomepageStore()
 const {

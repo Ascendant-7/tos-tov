@@ -1,0 +1,33 @@
+{
+  "name": "@repo/supabase",
+  "version": "0.0.1",
+  "description": "",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "gen-types": "supabase gen types typescript --project-id uhfjmbvbnuhotlnxdvgj > src/database.types.ts",
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.33.0",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.104.1"
+  },
+  "devDependencies": {
+    "supabase": "^2.95.3",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3"
+  }
+}
