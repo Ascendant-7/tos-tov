@@ -83,16 +83,14 @@ export class MockFriendsRepository implements FriendsRepository {
   async findIncomingRequests(userId: string): Promise<Friendship[]> {
     return this.friendships.filter(
       (item) =>
-        item.friend_id === userId &&
-        item.status === FriendshipStatus.Pending,
+        item.friend_id === userId && item.status === FriendshipStatus.Pending,
     );
   }
 
   async findOutgoingRequests(userId: string): Promise<Friendship[]> {
     return this.friendships.filter(
       (item) =>
-        item.user_id === userId &&
-        item.status === FriendshipStatus.Pending,
+        item.user_id === userId && item.status === FriendshipStatus.Pending,
     );
   }
 }
