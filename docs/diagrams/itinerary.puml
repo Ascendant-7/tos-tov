@@ -1,0 +1,32 @@
+@startuml Intinerary
+
+entity trips {
+  id : uuid
+  title : varchar
+  description : text
+  created_at : timestamp
+}
+
+entity itinerary_days {
+  id : uuid
+  trip_id : uuid
+  day_number : int
+  title : varchar
+}
+
+entity itinerary_items {
+  id : uuid
+  day_id : uuid
+  time : varchar
+  title : varchar
+  category : varchar
+  duration : varchar
+  cost : varchar
+  notes : text
+  position : int
+}
+
+trips ||--o{ itinerary_days
+itinerary_days ||--o{ itinerary_items
+
+@enduml
