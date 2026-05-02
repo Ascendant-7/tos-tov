@@ -5,7 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import {FRIENDS_REPOSITORY} from './repositories/friends.repository.interface';
+import { FRIENDS_REPOSITORY } from './repositories/friends.repository.interface';
 import { FriendshipStatus } from './model/friendship-status.enum';
 import type { FriendsRepository } from './repositories/friends.repository.interface';
 @Injectable()
@@ -28,7 +28,9 @@ export class FriendsService {
     );
 
     if (existingFriendship) {
-      throw new ConflictException('Friendship or friend request already exists');
+      throw new ConflictException(
+        'Friendship or friend request already exists',
+      );
     }
 
     return this.friendsRepository.createFriendRequest(currentUserId, friendId);
