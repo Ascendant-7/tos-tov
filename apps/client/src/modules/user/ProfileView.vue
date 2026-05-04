@@ -1,464 +1,177 @@
 <template>
-	<div class="profile-page">
-		<header class="topbar animate-fade-in">
-			<div class="page-title">My Profile</div>
-			<div class="topbar-actions">
-				<label class="search">
-					<span class="search-icon">&#128269;</span>
-					<input type="text" placeholder="Search destinations..." />
-				</label>
-				<button class="icon-btn" aria-label="Notifications">
-					<span class="dot"></span>
-					&#128276;
-				</button>
-				<div class="avatar-pill">YO</div>
-			</div>
-		</header>
+  <div class="min-h-screen px-6 md:px-8 py-8 bg-[radial-gradient(circle_at_20%_10%,#f7f2ea_0%,#f9f7f3_40%,#f4f1ec_100%)] text-[#1a1a1a]">
 
-		<section class="profile-card animate-scale-in">
-			<div class="cover">
-				<img
-					src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1400&auto=format&fit=crop"
-					alt="Landscape cover"
-				/>
-				<button class="cover-camera" aria-label="Change cover">&#128247;</button>
-			</div>
+    <!-- TOPBAR -->
+    <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 animate-fade-in">
+      <h1 class="text-2xl font-semibold text-[#2b2b2b]">My Profile</h1>
 
-			<div class="profile-body">
-				<div class="profile-row">
-					<div class="avatar">
-						<span>YO</span>
-						<span class="online"></span>
-					</div>
-					<div class="profile-info">
-						<h2>Your Name</h2>
-						<p class="location">Based in Phnom Penh, Cambodia</p>
-						<p class="bio">
-							Passionate explorer, street food lover, and adventure seeker. Cambodia is my forever home base.
-						</p>
-					</div>
-					<button class="edit-btn">Edit Profile</button>
-				</div>
+      <div class="flex items-center gap-3 w-full md:w-auto">
+        <!-- Search -->
+        <div class="flex items-center gap-2 px-4 py-2 rounded-full bg-[#efeae1] text-sm text-[#8b857e] w-full md:w-[260px]">
+          <span>🔍</span>
+          <input
+            type="text"
+            placeholder="Search destinations..."
+            class="bg-transparent outline-none w-full text-[#5a554f]"
+          />
+        </div>
 
-				<div class="stats">
-					<div>
-						<strong>7</strong>
-						<span>Trips Created</span>
-					</div>
-					<div>
-						<strong>12</strong>
-						<span>Places Visited</span>
-					</div>
-					<div>
-						<strong>3</strong>
-						<span>Countries</span>
-					</div>
-					<div>
-						<strong>4.2k</strong>
-						<span>Km Traveled</span>
-					</div>
-				</div>
-			</div>
-		</section>
+        <!-- Notification -->
+        <button class="relative w-9 h-9 rounded-full bg-[#f4f0e9] border border-[#e3ddd3] grid place-items-center hover:scale-105 transition">
+          🔔
+          <span class="absolute top-1 right-1 w-2 h-2 bg-[#f26b5e] rounded-full"></span>
+        </button>
 
-		<div class="tabs animate-fade-in-up">
-			<button class="tab active">Trips</button>
-			<button class="tab">Saved</button>
-			<button class="tab">History</button>
-			<button class="tab">Achievements</button>
-		</div>
+        <!-- Avatar -->
+        <div class="w-9 h-9 rounded-full bg-[#0f4f3f] text-white grid place-items-center font-semibold">
+          YO
+        </div>
+      </div>
+    </header>
 
-		<section class="trip-list">
-			<article class="trip-card animate-fade-in-up delay-2">
-				<img
-					src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=400&auto=format&fit=crop"
-					alt="Koh Rong"
-				/>
-				<div class="trip-info">
-					<h3>Phnom Penh -&gt; Koh Kong -&gt; Koh Rong</h3>
-					<div class="trip-meta">
-						<span>7 days</span>
-						<span class="pill planned">Planned</span>
-					</div>
-				</div>
-				<button class="kebab" aria-label="More">&#8942;</button>
-			</article>
+    <!-- PROFILE CARD -->
+    <section class="bg-white rounded-2xl overflow-hidden shadow-lg border border-[#efe9df] animate-scale-in">
 
-			<article class="trip-card animate-fade-in-up delay-3">
-				<img
-					src="https://images.unsplash.com/photo-1477587458883-47145ed94245?q=80&w=400&auto=format&fit=crop"
-					alt="Siem Reap"
-				/>
-				<div class="trip-info">
-					<h3>Siem Reap Temple Circuit</h3>
-					<div class="trip-meta">
-						<span>4 days</span>
-						<span class="pill completed">Completed</span>
-					</div>
-				</div>
-				<button class="kebab" aria-label="More">&#8942;</button>
-			</article>
+      <!-- Cover -->
+      <div class="relative h-40 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1400"
+          class="w-full h-full object-cover scale-105 hover:scale-110 transition duration-700"
+        />
+        <button class="absolute right-4 bottom-3 w-8 h-8 rounded-lg bg-white/90 border grid place-items-center hover:scale-110 transition">
+          📷
+        </button>
+      </div>
 
-			<article class="trip-card animate-fade-in-up delay-4">
-				<img
-					src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=400&auto=format&fit=crop"
-					alt="Kampot"
-				/>
-				<div class="trip-info">
-					<h3>Secret Kampot Weekend</h3>
-					<div class="trip-meta">
-						<span>3 days</span>
-						<span class="pill draft">Draft</span>
-					</div>
-				</div>
-				<button class="kebab" aria-label="More">&#8942;</button>
-			</article>
-		</section>
-	</div>
+      <!-- Body -->
+      <div class="p-6">
+        <div class="grid md:grid-cols-[auto_1fr_auto] gap-4 items-center text-center md:text-left">
+
+          <!-- Avatar -->
+          <div class="relative w-16 h-16 rounded-xl bg-[#0f4f3f] text-white grid place-items-center font-bold hover:scale-105 transition">
+            YO
+            <span class="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+          </div>
+
+          <!-- Info -->
+          <div>
+            <h2 class="text-lg font-semibold">Your Name</h2>
+            <p class="text-xs text-gray-500">Based in Phnom Penh, Cambodia</p>
+            <p class="text-sm text-gray-600 mt-1">
+              Passionate explorer, street food lover, and adventure seeker.
+            </p>
+          </div>
+
+          <!-- Button -->
+          <button class="px-4 py-2 rounded-full bg-[#f8f4ee] border text-sm font-semibold hover:-translate-y-1 hover:shadow-md transition">
+            Edit Profile
+          </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mt-6 pt-4 border-t">
+          <div class="hover:scale-105 transition">
+            <strong class="block text-lg">7</strong>
+            <span class="text-xs text-gray-500">Trips</span>
+          </div>
+          <div class="hover:scale-105 transition">
+            <strong class="block text-lg">12</strong>
+            <span class="text-xs text-gray-500">Places</span>
+          </div>
+          <div class="hover:scale-105 transition">
+            <strong class="block text-lg">3</strong>
+            <span class="text-xs text-gray-500">Countries</span>
+          </div>
+          <div class="hover:scale-105 transition">
+            <strong class="block text-lg">4.2k</strong>
+            <span class="text-xs text-gray-500">Km</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABS -->
+    <div class="flex gap-2 p-2 bg-[#f1ebe2] rounded-full w-fit mt-6 overflow-x-auto animate-slide-up delay-1">
+      <button class="px-4 py-2 rounded-full bg-white shadow text-sm">Trips</button>
+      <button class="px-4 py-2 rounded-full text-sm text-gray-500 hover:bg-white/60 transition">Saved</button>
+      <button class="px-4 py-2 rounded-full text-sm text-gray-500 hover:bg-white/60 transition">History</button>
+      <button class="px-4 py-2 rounded-full text-sm text-gray-500 hover:bg-white/60 transition">Achievements</button>
+    </div>
+
+    <!-- TRIPS -->
+    <section class="grid gap-4 mt-4">
+
+      <!-- Card 1 -->
+      <div class="grid md:grid-cols-[auto_1fr_auto] gap-4 items-center p-4 bg-white border rounded-xl shadow-sm animate-slide-up delay-2 hover:shadow-md hover:-translate-y-1 transition">
+        <img
+          src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=400"
+          class="w-full md:w-16 h-32 md:h-16 object-cover rounded-xl"
+        />
+        <div>
+          <h3 class="text-sm font-semibold">Phnom Penh → Koh Rong</h3>
+          <div class="flex gap-2 text-xs text-gray-500 mt-1">
+            <span>7 days</span>
+            <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">Planned</span>
+          </div>
+        </div>
+        <button class="w-8 h-8 rounded-lg border bg-[#f8f4ee] hover:scale-110 transition">⋮</button>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="grid md:grid-cols-[auto_1fr_auto] gap-4 items-center p-4 bg-white border rounded-xl shadow-sm animate-slide-up delay-3 hover:shadow-md hover:-translate-y-1 transition">
+        <img
+          src="https://images.unsplash.com/photo-1477587458883-47145ed94245?q=80&w=400"
+          class="w-full md:w-16 h-32 md:h-16 object-cover rounded-xl"
+        />
+        <div>
+          <h3 class="text-sm font-semibold">Siem Reap Temple Circuit</h3>
+          <div class="flex gap-2 text-xs text-gray-500 mt-1">
+            <span>4 days</span>
+            <span class="px-2 py-0.5 rounded-full bg-green-100 text-green-600">Completed</span>
+          </div>
+        </div>
+        <button class="w-8 h-8 rounded-lg border bg-[#f8f4ee] hover:scale-110 transition">⋮</button>
+      </div>
+
+    </section>
+  </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+</script>
 
 <style scoped>
-.profile-page {
-	font-family: var(--font-sans);
-	padding: 28px 32px 64px;
-	min-height: 100vh;
-	background: radial-gradient(circle at 20% 10%, #f7f2ea 0%, #f9f7f3 40%, #f4f1ec 100%);
-	color: #1a1a1a;
+/* ANIMATIONS */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.topbar {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin-bottom: 24px;
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-.page-title {
-	font-size: 26px;
-	color: #2b2b2b;
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.topbar-actions {
-	display: flex;
-	align-items: center;
-	gap: 12px;
+.animate-fade-in {
+  animation: fadeIn 0.6s ease forwards;
 }
 
-.search {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 8px 14px;
-	border-radius: 999px;
-	background: #efeae1;
-	color: #8b857e;
-	min-width: 260px;
+.animate-scale-in {
+  animation: scaleIn 0.6s ease forwards;
 }
 
-.search input {
-	border: none;
-	outline: none;
-	background: transparent;
-	width: 100%;
-	font-size: 14px;
-	color: #5a554f;
+.animate-slide-up {
+  animation: slideUp 0.6s ease forwards;
 }
 
-.search-icon {
-	font-size: 14px;
-}
-
-.icon-btn {
-	position: relative;
-	width: 38px;
-	height: 38px;
-	border-radius: 999px;
-	background: #f4f0e9;
-	border: 1px solid #e3ddd3;
-	display: grid;
-	place-items: center;
-	font-size: 16px;
-}
-
-.icon-btn .dot {
-	position: absolute;
-	top: 6px;
-	right: 6px;
-	width: 8px;
-	height: 8px;
-	background: #f26b5e;
-	border-radius: 50%;
-}
-
-.avatar-pill {
-	width: 38px;
-	height: 38px;
-	border-radius: 50%;
-	background: #0f4f3f;
-	color: #fff;
-	display: grid;
-	place-items: center;
-	font-weight: 600;
-}
-
-.profile-card {
-	background: #fff;
-	border-radius: 20px;
-	overflow: hidden;
-	box-shadow: 0 16px 40px rgba(20, 20, 20, 0.08);
-	border: 1px solid #efe9df;
-}
-
-.cover {
-	position: relative;
-	height: 160px;
-	overflow: hidden;
-}
-
-.cover img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	transform: scale(1.02);
-}
-
-.cover-camera {
-	position: absolute;
-	right: 16px;
-	bottom: 14px;
-	width: 34px;
-	height: 34px;
-	border-radius: 10px;
-	background: rgba(255, 255, 255, 0.9);
-	border: 1px solid #e0d9cf;
-	display: grid;
-	place-items: center;
-}
-
-.profile-body {
-	padding: 22px 28px 20px;
-}
-
-.profile-row {
-	display: grid;
-	grid-template-columns: auto 1fr auto;
-	gap: 18px;
-	align-items: center;
-}
-
-.avatar {
-	width: 64px;
-	height: 64px;
-	border-radius: 18px;
-	background: #0f4f3f;
-	display: grid;
-	place-items: center;
-	color: #fff;
-	font-weight: 700;
-	position: relative;
-}
-
-.avatar .online {
-	position: absolute;
-	right: -2px;
-	bottom: -2px;
-	width: 14px;
-	height: 14px;
-	border-radius: 50%;
-	background: #28c76f;
-	border: 2px solid #fff;
-}
-
-.profile-info h2 {
-	font-size: 20px;
-	margin-bottom: 4px;
-}
-
-.location {
-	font-size: 13px;
-	color: #8a847c;
-	margin-bottom: 6px;
-}
-
-.bio {
-	font-size: 14px;
-	color: #6f6a63;
-}
-
-.edit-btn {
-	border: 1px solid #e1d9ce;
-	background: #f8f4ee;
-	padding: 8px 14px;
-	border-radius: 999px;
-	font-weight: 600;
-	font-size: 13px;
-}
-
-.stats {
-	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: 12px;
-	text-align: center;
-	margin-top: 18px;
-	padding-top: 16px;
-	border-top: 1px solid #f1ece4;
-}
-
-.stats strong {
-	font-size: 18px;
-	display: block;
-	color: #2b2b2b;
-}
-
-.stats span {
-	font-size: 12px;
-	color: #8a847c;
-}
-
-.tabs {
-	display: inline-flex;
-	gap: 12px;
-	padding: 8px;
-	margin: 22px 0;
-	background: #f1ebe2;
-	border-radius: 999px;
-}
-
-.tab {
-	border: none;
-	background: transparent;
-	padding: 8px 18px;
-	font-size: 13px;
-	color: #6f6962;
-	border-radius: 999px;
-}
-
-.tab.active {
-	background: #fff;
-	color: #2c2925;
-	box-shadow: 0 6px 16px rgba(20, 20, 20, 0.08);
-}
-
-.trip-list {
-	display: grid;
-	gap: 14px;
-}
-
-.trip-card {
-	display: grid;
-	grid-template-columns: auto 1fr auto;
-	gap: 16px;
-	align-items: center;
-	padding: 14px 18px;
-	background: #fff;
-	border: 1px solid #eee7de;
-	border-radius: 18px;
-	box-shadow: 0 10px 24px rgba(20, 20, 20, 0.05);
-}
-
-.trip-card img {
-	width: 64px;
-	height: 64px;
-	border-radius: 16px;
-	object-fit: cover;
-}
-
-.trip-info h3 {
-	font-size: 15px;
-	margin-bottom: 6px;
-}
-
-.trip-meta {
-	display: flex;
-	gap: 12px;
-	align-items: center;
-	font-size: 12px;
-	color: #8a847c;
-}
-
-.pill {
-	padding: 4px 10px;
-	border-radius: 999px;
-	font-weight: 600;
-	font-size: 11px;
-}
-
-.pill.planned {
-	background: #e6f3ff;
-	color: #3478f6;
-}
-
-.pill.completed {
-	background: #e5f8ef;
-	color: #2b9f62;
-}
-
-.pill.draft {
-	background: #f8eee1;
-	color: #a86a27;
-}
-
-.kebab {
-	width: 32px;
-	height: 32px;
-	border-radius: 10px;
-	border: 1px solid #ede6dc;
-	background: #f8f4ee;
-	display: grid;
-	place-items: center;
-	font-size: 18px;
-}
-
-@media (max-width: 960px) {
-	.profile-row {
-		grid-template-columns: 1fr;
-		text-align: center;
-	}
-
-	.profile-info {
-		order: 2;
-	}
-
-	.edit-btn {
-		order: 3;
-		justify-self: center;
-	}
-
-	.stats {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-
-	.trip-card {
-		grid-template-columns: 1fr;
-		text-align: left;
-	}
-
-	.trip-card img {
-		width: 100%;
-		height: 140px;
-	}
-}
-
-@media (max-width: 640px) {
-	.profile-page {
-		padding: 20px 16px 48px;
-	}
-
-	.topbar {
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 12px;
-	}
-
-	.search {
-		width: 100%;
-	}
-
-	.tabs {
-		width: 100%;
-		overflow-x: auto;
-	}
-}
+/* delays */
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
 </style>

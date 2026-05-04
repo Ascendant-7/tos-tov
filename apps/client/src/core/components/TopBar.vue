@@ -46,6 +46,14 @@
         <span class="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-2 h-2 bg-red-500 rounded-full"></span>
       </button>
 
+      <!-- Login Button -->
+      <router-link
+        to="/login"
+        class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-sky-700 to-cyan-500 text-white text-sm font-semibold shadow-[0_10px_20px_rgba(14,116,144,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_24px_rgba(14,116,144,0.35)]"
+      >
+        <span>Login</span>
+      </router-link>
+
       <!-- User Avatar -->
       <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-accent-gold flex items-center justify-center text-white text-xs sm:text-sm font-bold cursor-pointer transition-transform duration-200 hover:scale-105 shadow-[0_2px_8px_rgba(200,169,81,0.3)]">
         YO
