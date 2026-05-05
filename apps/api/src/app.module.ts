@@ -3,7 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SupabaseModule } from './supabase/supabase.module';
-import { BudgetModule } from './budget/budget.module';
+import { FriendsModule } from './modules/friends/friends.module';
+import { BudgetModule } from './modules/budget/budget.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { BudgetModule } from './budget/budget.module';
       isGlobal: true,
     }),
     SupabaseModule,
+    FriendsModule,
     BudgetModule,
   ],
   controllers: [AppController],
