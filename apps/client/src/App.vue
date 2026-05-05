@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-screen h-screen overflow-hidden bg-cream">
+  <div v-if="showLayout" class="flex w-screen h-screen overflow-hidden bg-cream">
     <!-- Mobile overlay backdrop -->
     <div
       v-if="isMobileSidebarOpen"
@@ -16,12 +16,21 @@
       <router-view />
     </div>
   </div>
+  <div v-else class="w-screen h-screen overflow-hidden">
+    <router-view />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import SideBar from './core/components/SideBar.vue';
 import TopBar from './core/components/TopBar.vue';
 
+const route = useRoute()
 const isMobileSidebarOpen = ref(false)
+
+const showLayout = computed(() => {
+  return route.meta.showLayout !== false
+})
 </script>
