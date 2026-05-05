@@ -8,45 +8,67 @@ const router = createRouter({
       redirect: '/home',
     },
     {
-      path: '/home',
-      name: 'home',
-      component: () => import('../modules/home/HomePage.vue'),
+      path: '/',
+      component: () => import('../core/layouts/MainLayout.vue'),
+      children: [
+        {
+          path: 'home',
+          name: 'home',
+          component: () => import('../modules/home/HomePage.vue'),
+        },
+        {
+          path: 'explore',
+          name: 'explore',
+          component: () => import('../modules/explore/ExplorePage.vue'),
+        },
+        {
+          path: 'trip-planner',
+          name: 'trip-planner',
+          component: () => import('../core/pages/TripPlannerPage.vue'),
+        },
+        {
+          path: 'route-intel',
+          name: 'route-intel',
+          component: () => import('../core/pages/RoutesPage.vue'),
+        },
+        {
+          path: 'social',
+          name: 'social',
+          component: () => import('../core/pages/SocialPage.vue'),
+        },
+        {
+          path: 'community',
+          name: 'community',
+          component: () => import('../core/pages/CommunityPage.vue'),
+        },
+        {
+          path: 'profile',
+          name: 'profile',
+          component: () => import('../core/pages/ProfilePage.vue'),
+        },
+        {
+          path: 'itinerary',
+          name: 'itinerary',
+          component: () => import('../modules/itinerary/pages/ItineraryPage.vue'),
+        },
+      ],
     },
     {
-      path: '/explore',
-      name: 'explore',
-      component: () => import('../modules/explore/ExplorePage.vue'),
+      path: '/',
+      component: () => import('../core/layouts/AuthLayout.vue'),
+      children: [
+        {
+          path: 'login',
+          name: 'login',
+          component: () => import('../modules/auth/LoginView.vue'),
+        },
+        {
+          path: 'register',
+          name: 'register',
+          component: () => import('../modules/auth/RegisterView.vue'),
+        },
+      ],
     },
-    {
-      path: '/trip-planner',
-      name: 'trip-planner',
-      component: () => import('../core/pages/TripPlannerPage.vue'),
-    },
-    {
-      path: '/route-intel',
-      name: 'route-intel',
-      component: () => import('../core/pages/RoutesPage.vue'),
-    },
-    {
-      path: '/social',
-      name: 'social',
-      component: () => import('../core/pages/SocialPage.vue'),
-    },
-    {
-      path: '/community',
-      name: 'community',
-      component: () => import('../core/pages/CommunityPage.vue'),
-    },
-    {
-      path: '/profile',
-      name: 'profile',
-      component: () => import('../core/pages/ProfilePage.vue'),
-    },
-    {
-      path: '/itinerary',
-      name: 'itinerary',
-      component: () => import('../modules/itinerary/pages/ItineraryPage.vue'),
-    }
   ],
 })
 
