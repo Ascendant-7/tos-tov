@@ -76,25 +76,40 @@
           </button>
         </div>
 
+        <!-- Loading Skeleton -->
+        <div v-if="isLoadingDestinations" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          <div v-for="n in 3" :key="n" class="rounded-2xl border border-weather-border overflow-hidden animate-pulse">
+            <div class="h-32 sm:h-36 lg:h-40 bg-slate-200"></div>
+            <div class="p-4 space-y-2">
+              <div class="h-3 bg-slate-200 rounded-full w-2/3"></div>
+              <div class="h-3 bg-slate-100 rounded-full w-1/2"></div>
+              <div class="flex gap-2 mt-1">
+                <div class="h-4 bg-slate-100 rounded-full w-12"></div>
+                <div class="h-4 bg-slate-100 rounded-full w-12"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Destination Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           <TransitionGroup name="card-filter">
-          <div v-for="(dest, i) in filteredDestinations" :key="dest.name" class="group bg-white rounded-2xl border border-weather-border overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-slate-300 animate-scale-in" :style="{ animationDelay: `${0.35 + i * 0.06}s` }">
+          <div v-for="(dest, i) in filteredDestinations" :key="dest.id ?? dest.name" class="group bg-white rounded-2xl border border-weather-border overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-slate-300 animate-scale-in" :style="{ animationDelay: `${0.35 + i * 0.06}s` }">
             <div class="w-full h-32 sm:h-36 lg:h-40 bg-cream-dark flex items-center justify-center overflow-hidden">
-              <img v-if="dest.image" :src="dest.image" :alt="dest.name" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <img v-if="dest.cover_image_url" :src="dest.cover_image_url" :alt="dest.name" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <svg v-else class="text-slate-300" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
             </div>
             <div class="p-3 sm:p-4">
               <div class="flex justify-between items-start mb-1">
                 <h4 class="text-[13px] sm:text-[14px] font-semibold text-slate-800 m-0">{{ dest.name }}</h4>
-                <span class="text-[11px] sm:text-[12px] font-medium text-amber-500 flex items-center gap-0.5">⭐ {{ dest.rating }}</span>
+                <span v-if="dest.rating != null" class="text-[11px] sm:text-[12px] font-medium text-amber-500 flex items-center gap-0.5">⭐ {{ dest.rating }}</span>
               </div>
               <p class="text-[11px] sm:text-[12px] text-slate-400 m-0 mb-2 sm:mb-2.5 flex items-center gap-1">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                {{ dest.location }}
+                {{ dest.location_name || dest.province }}
               </p>
-              <div class="flex gap-1.5">
-                <span v-for="tag in dest.tags" :key="tag" class="text-[10px] sm:text-[11px] text-slate-500 border border-weather-border px-2 py-0.5 rounded-full">{{ tag }}</span>
+              <div v-if="dest.tags && dest.tags.length > 0" class="flex gap-1.5">
+                <span v-for="tag in dest.tags.slice(0, 3)" :key="tag" class="text-[10px] sm:text-[11px] text-slate-500 border border-weather-border px-2 py-0.5 rounded-full">{{ tag }}</span>
               </div>
             </div>
           </div>
@@ -213,11 +228,15 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useHomepageStore } from './stores/homepage'
+import { useExploreStore } from '@/modules/explore/store/explore'
 
 const homepageStore = useHomepageStore()
+const exploreStore = useExploreStore()
+
 const {
   searchQuery,
   activeTab,
@@ -229,4 +248,13 @@ const {
   filteredUpcomingEvents,
   filteredTravelTips,
 } = storeToRefs(homepageStore)
+
+const { isLoading: isLoadingDestinations } = storeToRefs(exploreStore)
+
+onMounted(async () => {
+  // Load destinations from API if not already loaded
+  if (exploreStore.destinations.length === 0) {
+    await exploreStore.loadDestinations()
+  }
+})
 </script>

@@ -16,6 +16,15 @@
         >
           <template #controls>
             <div class="flex items-center gap-2 shrink-0">
+              <!-- Add Destination Button -->
+              <button
+                @click="showAddModal = true"
+                class="flex items-center gap-2 px-4 py-3 rounded-2xl border border-sidebar-active bg-sidebar-active text-white text-[13px] font-medium cursor-pointer transition-all duration-200 hover:shadow-[0_4px_14px_rgba(42,90,66,0.3)] hover:-translate-y-0.5 shrink-0"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                Add
+              </button>
+
               <!-- Filters Button -->
               <button
                 @click="showFilters = !showFilters"
@@ -104,9 +113,52 @@
         </div>
       </section>
 
+      <!-- Error State -->
+      <div
+        v-if="error && !isLoading"
+        class="mt-6 p-5 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-4 animate-fade-in"
+      >
+        <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center text-red-500 shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-[14px] font-semibold text-red-700 m-0 mb-1">Could not load destinations</p>
+          <p class="text-[12px] text-red-500 m-0 mb-3">{{ error }}</p>
+          <button
+            @click="exploreStore.loadDestinations()"
+            class="px-4 py-1.5 rounded-lg bg-red-600 text-white text-[12px] font-medium border-none cursor-pointer hover:bg-red-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+
       <!-- Destination Cards Grid -->
       <section class="mt-6 sm:mt-8 mb-8 sm:mb-10">
+
+        <!-- Loading Skeleton -->
+        <div v-if="isLoading" class="grid gap-5 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <div
+            v-for="n in 6"
+            :key="n"
+            class="rounded-2xl overflow-hidden border border-weather-border animate-pulse"
+          >
+            <div class="h-[220px] sm:h-[240px] bg-slate-200"></div>
+            <div class="bg-white p-4 space-y-3">
+              <div class="h-3 bg-slate-200 rounded-full w-3/4"></div>
+              <div class="h-3 bg-slate-200 rounded-full w-1/2"></div>
+              <div class="flex gap-2">
+                <div class="h-5 bg-slate-100 rounded-full w-14"></div>
+                <div class="h-5 bg-slate-100 rounded-full w-14"></div>
+                <div class="h-5 bg-slate-100 rounded-full w-14"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cards -->
         <div
+          v-else
           :class="[
             'grid gap-5 sm:gap-6',
             viewMode === 'grid'
@@ -117,7 +169,7 @@
           <TransitionGroup name="card-filter">
             <DestinationCard
               v-for="(dest, i) in filteredDestinations"
-              :key="dest.name"
+              :key="dest.id ?? dest.name"
               :destination="dest"
               :index="i"
               :class="viewMode === 'list' ? 'list-card-layout' : ''"
@@ -126,7 +178,7 @@
         </div>
 
         <!-- Empty State -->
-        <div v-if="filteredDestinations.length === 0" class="flex flex-col items-center justify-center py-16 text-center animate-fade-in">
+        <div v-if="!isLoading && filteredDestinations.length === 0 && !error" class="flex flex-col items-center justify-center py-16 text-center animate-fade-in">
           <div class="w-20 h-20 rounded-2xl bg-cream-dark flex items-center justify-center text-4xl mb-5 shadow-inner">🔍</div>
           <p class="text-[16px] font-semibold text-slate-600 m-0 mb-2">No destinations found</p>
           <p class="text-[13px] text-slate-400 m-0 mb-5 max-w-[300px]">Try adjusting your search query or changing the category filter</p>
@@ -137,9 +189,18 @@
             Clear all filters
           </button>
         </div>
+
+        <!-- Data Seeder (Temporary helper to seed initial data) -->
+        <DataSeeder v-if="destinations.length === 0 && !isLoading && !error" />
       </section>
 
     </div>
+
+    <!-- Add Destination Modal -->
+    <AddDestinationModal
+      v-model="showAddModal"
+      @created="exploreStore.loadDestinations()"
+    />
   </main>
 </template>
 
@@ -150,10 +211,14 @@ import { storeToRefs } from 'pinia'
 import { useExploreStore } from './store/explore'
 import SearchFilterBar from '../../modules/home/components/SearchFilterBar.vue'
 import DestinationCard from './components/DestinationCard.vue'
+import AddDestinationModal from './components/AddDestinationModal.vue'
+import DataSeeder from './components/DataSeeder.vue'
 
 const route = useRoute()
 const exploreStore = useExploreStore()
 const {
+  isLoading,
+  error,
   searchQuery,
   activeTab,
   viewMode,
@@ -170,9 +235,13 @@ const provinceOptions = computed<string[]>(() => {
 })
 
 const showFilters = ref(false)
+const showAddModal = ref(false)
 
-onMounted(() => {
-  // Check if we should show trending only
+onMounted(async () => {
+  // Fetch destinations from the backend
+  await exploreStore.loadDestinations()
+
+  // Check if we should show trending only (from query param)
   if (route.query.filter === 'trending') {
     exploreStore.setTrendingFilter(true)
   }

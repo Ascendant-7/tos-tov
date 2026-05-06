@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { DESTINATIONS } from '@/modules/explore/data/destinations'
+import { useExploreStore } from '@/modules/explore/store/explore'
 
 export const useHomepageStore = defineStore('homepage', () => {
   // --- Search ---
@@ -24,21 +24,18 @@ export const useHomepageStore = defineStore('homepage', () => {
     { city: 'Kampot', temp: 28, condition: 'Breezy', icon: '🍃', bgClass: 'bg-green-50' },
   ])
 
-  // --- Destinations (Trending from shared data) ---
-  const allDestinations = DESTINATIONS
-  const destinations = computed(
-    () =>
-      allDestinations
-        .filter((d) => d.badge === 'Trending')
-        .map((d) => ({
-          name: d.name,
-          location: d.location,
-          rating: d.rating,
-          tags: d.tags,
-          category: d.category,
-          image: d.image,
-        }))
-        .slice(0, 6), // Show top 6 trending
+  // --- Destinations (Top-rated from the explore store / backend API) ---
+  const exploreStore = useExploreStore()
+
+  /**
+   * Top 6 destinations sorted by rating (highest first).
+   * Data comes from the explore store which fetches from /destinations.
+   */
+  const destinations = computed(() =>
+    [...exploreStore.destinations]
+      .filter((d) => d.rating != null)
+      .sort((a, b) => Number(b.rating) - Number(a.rating))
+      .slice(0, 6),
   )
 
   const filteredDestinations = computed(() => {
@@ -46,15 +43,18 @@ export const useHomepageStore = defineStore('homepage', () => {
     let results = destinations.value
     if (activeTab.value !== 'All') {
       results = results.filter(
-        (d) => d.category === activeTab.value || d.tags.includes(activeTab.value),
+        (d) =>
+          d.category === activeTab.value ||
+          (d.tags ?? []).some((t) => t.toLowerCase() === activeTab.value.toLowerCase()),
       )
     }
     if (q) {
       results = results.filter(
         (d) =>
           d.name.toLowerCase().includes(q) ||
-          d.location.toLowerCase().includes(q) ||
-          d.tags.some((t) => t.toLowerCase().includes(q)),
+          (d.location_name ?? '').toLowerCase().includes(q) ||
+          d.province.toLowerCase().includes(q) ||
+          (d.tags ?? []).some((t) => t.toLowerCase().includes(q)),
       )
     }
     return results
