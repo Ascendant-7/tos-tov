@@ -7,6 +7,7 @@ import { FriendsModule } from './modules/friends/friends.module';
 import { BudgetModule } from './modules/budget/budget.module';
 import { DestinationsModule } from './modules/destinations/destinations.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { ItineraryModule } from './modules/itinerary/itinerary.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     BudgetModule,
     DestinationsModule,
     ReviewsModule,
+    ItineraryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
