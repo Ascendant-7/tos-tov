@@ -190,8 +190,6 @@
           </button>
         </div>
 
-        <!-- Data Seeder (Temporary helper to seed initial data) -->
-        <DataSeeder v-if="destinations.length === 0 && !isLoading && !error" />
       </section>
 
     </div>
@@ -212,7 +210,6 @@ import { useExploreStore } from './store/explore'
 import SearchFilterBar from '../../modules/home/components/SearchFilterBar.vue'
 import DestinationCard from './components/DestinationCard.vue'
 import AddDestinationModal from './components/AddDestinationModal.vue'
-import DataSeeder from './components/DataSeeder.vue'
 
 const route = useRoute()
 const exploreStore = useExploreStore()
