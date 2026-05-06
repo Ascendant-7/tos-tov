@@ -14,6 +14,89 @@ export type Database = {
   };
   public: {
     Tables: {
+      destinations: {
+        Row: {
+          avg_rating: number | null
+          budget_max: number | null
+          budget_min: number | null
+          category: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          description: string | null
+          duration_max: number | null
+          duration_min: number | null
+          id: string
+          is_hidden_gem: boolean | null
+          is_trending: boolean | null
+          location_name: string | null
+          name: string
+          province: string
+        }
+        Insert: {
+          avg_rating?: number | null
+          budget_max?: number | null
+          budget_min?: number | null
+          category?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_max?: number | null
+          duration_min?: number | null
+          id?: string
+          is_hidden_gem?: boolean | null
+          is_trending?: boolean | null
+          location_name?: string | null
+          name: string
+          province: string
+        }
+        Update: {
+          avg_rating?: number | null
+          budget_max?: number | null
+          budget_min?: number | null
+          category?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_max?: number | null
+          duration_min?: number | null
+          id?: string
+          is_hidden_gem?: boolean | null
+          is_trending?: boolean | null
+          location_name?: string | null
+          name?: string
+          province?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          created_at: string | null
+          destination_id: string | null
+          id: string
+          rating: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          destination_id?: string | null
+          id?: string
+          rating?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          destination_id?: string | null
+          id?: string
+          rating?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       itinerary_days: {
         Row: {
           created_at: string | null;

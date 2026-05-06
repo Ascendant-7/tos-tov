@@ -5,6 +5,12 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Allow requests from the Vite dev server and any local origin
+  app.enableCors({
+    origin: true, // reflect request origin; restrict to specific URL in production
+    credentials: true,
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
