@@ -58,20 +58,6 @@ export const getItinerary = async (tripId = DEFAULT_TRIP_ID): Promise<ItineraryR
   }
 }
 
-export const createTrip = async (title: string, description?: string) => {
-  const response = await fetch(`${API_BASE_URL}/itinerary/trips`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, description: description || null }),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to create trip (${response.status})`)
-  }
-
-  return await response.json()
-}
-
 export const createDay = async (tripId: string, title?: string) => {
   const response = await fetch(`${API_BASE_URL}/itinerary/${encodeURIComponent(tripId)}/days`, {
     method: 'POST',
