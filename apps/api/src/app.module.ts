@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { SupabaseModule } from './supabase/supabase.module';
 import { FriendsModule } from './modules/friends/friends.module';
 import { BudgetModule } from './modules/budget/budget.module';
+import { ItineraryModule } from './modules/itinerary/itinerary.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { BudgetModule } from './modules/budget/budget.module';
     SupabaseModule,
     FriendsModule,
     BudgetModule,
+    ItineraryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
