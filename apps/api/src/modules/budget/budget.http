@@ -1,0 +1,26 @@
+### CREATE Budget
+POST http://localhost:3000/budget
+Content-Type: application/json
+
+{
+  "hotel": 100,
+  "transport": 50,
+  "food": 30
+}
+
+### GET All Budgets
+GET http://localhost:3000/budget
+
+### GET Budget by ID
+GET http://localhost:3000/budget/1
+
+### UPDATE Budget
+PATCH http://localhost:3000/budget/1
+Content-Type: application/json
+
+{
+  "food": 100
+}
+
+### DELETE Budget
+DELETE http://localhost:3000/budget/1
