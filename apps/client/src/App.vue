@@ -13,7 +13,9 @@
     />
     <div class="flex-1 flex flex-col overflow-hidden min-w-0">
       <TopBar @toggle-sidebar="isMobileSidebarOpen = !isMobileSidebarOpen" />
-      <router-view />
+      <div class="min-h-0 flex-1 overflow-y-auto">
+        <router-view />
+      </div>
     </div>
   </div>
   <div v-else class="w-screen h-screen overflow-hidden">
