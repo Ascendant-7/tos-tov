@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "pnpm -r --parallel --filter \"./apps/*\" run \"/^dev|start:dev$/\"",
+    "dev": "pnpm -F @repo/supabase build && pnpm -r --parallel --filter \"./apps/*\" run \"/^dev|start:dev$/\"",
+    "db:gen-types": "pnpm -F @repo/supabase gen-types",
     "db:new": "pnpm -F @repo/supabase exec supabase migration new"
   },
   "keywords": [],
