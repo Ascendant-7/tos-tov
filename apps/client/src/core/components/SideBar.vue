@@ -94,14 +94,6 @@ const ExploreIcon: FunctionalComponent = () =>
     h('polygon', { points: '16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76' }),
   ])
 
-const TripIcon: FunctionalComponent = () =>
-  h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', class: 'w-[18px] h-[18px]' }, [
-    h('rect', { width: '18', height: '18', x: '3', y: '4', rx: '2', ry: '2' }),
-    h('line', { x1: '16', x2: '16', y1: '2', y2: '6' }),
-    h('line', { x1: '8', x2: '8', y1: '2', y2: '6' }),
-    h('line', { x1: '3', x2: '21', y1: '10', y2: '10' }),
-  ])
-
 const RouteIntelIcon: FunctionalComponent = () =>
   h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', class: 'w-[18px] h-[18px]' }, [
     h('polygon', { points: '3 11 22 2 13 21 11 13 3 11' }),
@@ -140,7 +132,6 @@ const CreatePostIcon: FunctionalComponent = () =>
 const navItems = [
   { to: '/home', label: 'Home', icon: DashboardIcon },
   { to: '/explore', label: 'Explore', icon: ExploreIcon },
-  { to: '/trip-planner', label: 'Trip Planner', icon: TripIcon },
   { to: '/route-intel', label: 'Route Intel', icon: RouteIntelIcon },
   { to: '/social', label: 'Social Travel', icon: SocialIcon },
   { to: '/community', label: 'Community', icon: CommunityIcon },
