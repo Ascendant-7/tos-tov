@@ -14,7 +14,7 @@
     }
   },
   "scripts": {
-    "gen-types": "supabase gen types typescript --project-id uhfjmbvbnuhotlnxdvgj > src/database.types.ts && pnpm build",
+    "gen-types": "supabase gen types typescript --project-id uhfjmbvbnuhotlnxdvgj > /tmp/tos-tov-database.types.ts && mv /tmp/tos-tov-database.types.ts src/database.types.ts && pnpm build",
     "build": "tsup",
     "dev": "tsup --watch"
   },
