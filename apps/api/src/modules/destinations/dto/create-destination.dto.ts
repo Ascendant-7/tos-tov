@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsInt, IsUrl } from 'class-validator';
+import { IsString, IsOptional, IsInt } from 'class-validator';
 
 export class CreateDestinationDto {
   @IsString()
@@ -19,7 +19,7 @@ export class CreateDestinationDto {
   category: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsString()
   cover_image_url?: string;
 
   @IsOptional()
