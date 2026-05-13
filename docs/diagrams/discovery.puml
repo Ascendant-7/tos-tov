@@ -1,0 +1,27 @@
+@startuml Discovery
+
+entity destinations {
+  id : uuid
+  name : varchar
+  description : text
+  province : varchar
+  location_name : varchar
+  category : varchar
+  avg_rating : float
+  duration_min : int
+  duration_max : int
+  budget_min : int
+  budget_max : int
+  is_trending : boolean
+  is_hidden_gem : boolean
+}
+
+entity reviews {
+  id : uuid
+  destination_id : uuid
+  rating : int
+}
+
+destinations ||--o{ reviews
+
+@enduml
