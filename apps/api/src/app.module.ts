@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SupabaseModule } from './supabase/supabase.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { FriendsModule } from './modules/friends/friends.module';
 import { DestinationsModule } from './modules/destinations/destinations.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
@@ -15,6 +16,7 @@ import { BudgetModule } from './modules/budget/budget.module';
       isGlobal: true,
     }),
     SupabaseModule,
+    AuthModule,
     FriendsModule,
     BudgetModule,
     DestinationsModule,
