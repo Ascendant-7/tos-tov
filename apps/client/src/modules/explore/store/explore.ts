@@ -1,7 +1,10 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import type { ExploreDestination } from '@/modules/explore/components/DestinationCard.vue'
-import { fetchDestinations, type DestinationApiResponse } from '@/modules/explore/services/destinationsApi'
+import {
+  fetchDestinations,
+  type DestinationApiResponse,
+} from '@/modules/explore/services/destinationsApi'
 
 // ─── Mapping helper ──────────────────────────────────────────────────────────
 
@@ -11,6 +14,7 @@ import { fetchDestinations, type DestinationApiResponse } from '@/modules/explor
 function mapDestination(raw: DestinationApiResponse): ExploreDestination {
   return {
     id: raw.id,
+    created_at: raw.created_at,
     name: raw.name,
     description: raw.description,
     province: raw.province,

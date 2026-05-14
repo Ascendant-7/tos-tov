@@ -32,6 +32,12 @@ const router = createRouter({
       meta: { showLayout: true },
     },
     {
+      path: '/explore/:id',
+      name: 'destination-detail',
+      component: () => import('../modules/explore/pages/DestinationDetailPage.vue'),
+      meta: { showLayout: true },
+    },
+    {
       path: '/trip-planner',
       name: 'trip-planner',
       component: () => import('../core/pages/TripPlannerPage.vue'),

@@ -28,13 +28,23 @@ export const useHomepageStore = defineStore('homepage', () => {
   const exploreStore = useExploreStore()
 
   /**
-   * Top 6 destinations sorted by rating (highest first).
+   * Top 6 destinations. Prioritizes newest destinations if they exist,
+   * otherwise falls back to highest-rated destinations.
    * Data comes from the explore store which fetches from /destinations.
    */
   const destinations = computed(() =>
     [...exploreStore.destinations]
-      .filter((d) => d.rating != null)
-      .sort((a, b) => Number(b.rating) - Number(a.rating))
+      .sort((a, b) => {
+        // Sort by created_at descending if available
+        if (a.created_at && b.created_at) {
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        }
+        if (a.created_at) return -1
+        if (b.created_at) return 1
+        
+        // Fallback to sorting by rating descending
+        return (Number(b.rating) || 0) - (Number(a.rating) || 0)
+      })
       .slice(0, 6),
   )
 

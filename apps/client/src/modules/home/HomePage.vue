@@ -94,7 +94,7 @@
         <!-- Destination Cards -->
         <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           <TransitionGroup name="card-filter">
-          <div v-for="(dest, i) in filteredDestinations" :key="dest.id ?? dest.name" class="group bg-white rounded-2xl border border-weather-border overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-slate-300 animate-scale-in" :style="{ animationDelay: `${0.35 + i * 0.06}s` }">
+          <router-link v-for="(dest, i) in filteredDestinations" :key="dest.id ?? dest.name" :to="`/explore/${dest.id}`" class="group bg-white rounded-2xl border border-weather-border overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-slate-300 animate-scale-in" :style="{ animationDelay: `${0.35 + i * 0.06}s` }" style="text-decoration: none;">
             <div class="w-full h-32 sm:h-36 lg:h-40 bg-cream-dark flex items-center justify-center overflow-hidden">
               <img v-if="dest.cover_image_url" :src="dest.cover_image_url" :alt="dest.name" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
               <svg v-else class="text-slate-300" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
@@ -112,7 +112,7 @@
                 <span v-for="tag in dest.tags.slice(0, 3)" :key="tag" class="text-[10px] sm:text-[11px] text-slate-500 border border-weather-border px-2 py-0.5 rounded-full">{{ tag }}</span>
               </div>
             </div>
-          </div>
+          </router-link>
           </TransitionGroup>
         </div>
         <!-- Empty state for destinations -->

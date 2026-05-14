@@ -1,6 +1,7 @@
 <template>
-  <div
-    class="group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)] animate-scale-in"
+  <router-link
+    :to="`/explore/${destination.id}`"
+    class="group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)] animate-scale-in block"
     :style="{ animationDelay: `${0.1 + index * 0.06}s` }"
   >
     <!-- Image Section -->
@@ -77,11 +78,12 @@
         </span>
       </div>
     </div>
-  </div>
+  </router-link>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 /**
  * Normalized destination shape used across the Explore UI.
@@ -89,6 +91,7 @@ import { computed } from 'vue'
  */
 export interface ExploreDestination {
   id?: string
+  created_at?: string
   name: string
   description?: string
   province: string
