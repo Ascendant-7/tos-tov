@@ -250,7 +250,7 @@ const handleSubmit = async () => {
 
     loading.value = true;
 
-    await axios.post(
+    const response = await axios.post(
       "http://localhost:3000/auth/register",
       {
         firstName: form.firstName,
@@ -260,13 +260,36 @@ const handleSubmit = async () => {
       }
     );
 
+    const data = response.data;
+
+    if (data?.session?.access_token) {
+      localStorage.setItem(
+        "access_token",
+        data.session.access_token
+      );
+    }
+
+    if (data?.user) {
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.user)
+      );
+    }
+
+    if (data?.profile) {
+      localStorage.setItem(
+        "profile",
+        JSON.stringify(data.profile)
+      );
+    }
+
     successMessage.value =
       "Account created successfully!";
 
-    // redirect to login
+    // redirect to home
     setTimeout(() => {
 
-      router.push("/login");
+      router.push("/home");
 
     }, 1500);
 

@@ -9,11 +9,13 @@ import { DestinationsModule } from './modules/destinations/destinations.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { ItineraryModule } from './modules/itinerary/itinerary.module';
 import { BudgetModule } from './modules/budget/budget.module';
+import { ProfilesModule } from './modules/profiles/profiles.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
     }),
     SupabaseModule,
     AuthModule,
@@ -22,6 +24,7 @@ import { BudgetModule } from './modules/budget/budget.module';
     DestinationsModule,
     ReviewsModule,
     ItineraryModule,
+    ProfilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

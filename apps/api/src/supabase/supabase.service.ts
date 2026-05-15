@@ -1,14 +1,22 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Database, SupabaseClient, createSupabaseClient } from '@repo/supabase';
 
 @Injectable()
 export class SupabaseService {
-  public readonly client: SupabaseClient<Database>;
+  public client: SupabaseClient<Database>;
 
-  constructor() {
-    const supabaseUrl = process.env.SUPABASE_URL!;
+  constructor(private configService: ConfigService) {
+    const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
     const supabaseKey =
-      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY!;
+      this.configService.get<string>('SUPABASE_SERVICE_ROLE_KEY') ||
+      this.configService.get<string>('SUPABASE_ANON_KEY');
+
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error(
+        'Missing Supabase credentials. Please set SUPABASE_URL and SUPABASE_ANON_KEY in your .env file',
+      );
+    }
 
     this.client = createSupabaseClient(supabaseUrl, supabaseKey);
   }
