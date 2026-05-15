@@ -9,7 +9,12 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() authDto: AuthDto): Promise<any> {
-    return this.authService.register(authDto.email, authDto.password);
+    return this.authService.register(
+      authDto.email,
+      authDto.password,
+      authDto.firstName,
+      authDto.lastName,
+    );
   }
 
   @Post('login')

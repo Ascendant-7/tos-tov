@@ -257,7 +257,7 @@ const handleSubmit = async () => {
     successMessage.value = "Login successful!";
 
     setTimeout(() => {
-      router.push("/");
+      router.push("/home");
     }, 1000);
 
   } catch (error: unknown) {

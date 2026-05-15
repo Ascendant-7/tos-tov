@@ -24,7 +24,7 @@
 
         <!-- Avatar -->
         <div class="w-9 h-9 rounded-full bg-[#0f4f3f] text-white grid place-items-center font-semibold">
-          YO
+          {{ initials }}
         </div>
       </div>
     </header>
@@ -49,14 +49,14 @@
 
           <!-- Avatar -->
           <div class="relative w-16 h-16 rounded-xl bg-[#0f4f3f] text-white grid place-items-center font-bold hover:scale-105 transition">
-            YO
+            {{ initials }}
             <span class="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
           </div>
 
           <!-- Info -->
           <div>
-            <h2 class="text-lg font-semibold">Your Name</h2>
-            <p class="text-xs text-gray-500">Based in Phnom Penh, Cambodia</p>
+            <h2 class="text-lg font-semibold">{{ displayName }}</h2>
+            <p class="text-xs text-gray-500">{{ emailText }}</p>
             <p class="text-sm text-gray-600 mt-1">
               Passionate explorer, street food lover, and adventure seeker.
             </p>
@@ -138,6 +138,53 @@
 </template>
 
 <script setup lang="ts">
+import { computed, ref } from "vue";
+
+type StoredProfile = {
+  first_name?: string | null;
+  last_name?: string | null;
+  email?: string | null;
+};
+
+type StoredUser = {
+  email?: string | null;
+};
+
+const profile = ref<StoredProfile | null>(null);
+const user = ref<StoredUser | null>(null);
+
+const loadStoredProfile = () => {
+  const rawProfile = localStorage.getItem("profile");
+  const rawUser = localStorage.getItem("user");
+
+  profile.value = rawProfile ? JSON.parse(rawProfile) : null;
+  user.value = rawUser ? JSON.parse(rawUser) : null;
+};
+
+loadStoredProfile();
+
+const displayName = computed(() => {
+  const firstName = profile.value?.first_name?.trim();
+  const lastName = profile.value?.last_name?.trim();
+
+  if (firstName || lastName) {
+    return [firstName, lastName].filter(Boolean).join(" ");
+  }
+
+  return "Traveler";
+});
+
+const emailText = computed(() => {
+  return profile.value?.email || user.value?.email || "Email not set";
+});
+
+const initials = computed(() => {
+  const parts = displayName.value.split(" ").filter(Boolean);
+  const first = parts[0]?.[0] || "T";
+  const second = parts[1]?.[0] || "R";
+
+  return `${first}${second}`.toUpperCase();
+});
 </script>
 
 <style scoped>
