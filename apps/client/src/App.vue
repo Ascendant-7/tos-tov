@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showLayout" class="flex w-screen h-screen overflow-hidden bg-cream">
+  <div v-if="showLayout" class="flex h-screen w-screen overflow-hidden bg-cream">
     <!-- Mobile overlay backdrop -->
     <div
       v-if="isMobileSidebarOpen"
@@ -11,12 +11,14 @@
       :mobile-open="isMobileSidebarOpen"
       @close-mobile="isMobileSidebarOpen = false"
     />
-    <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <TopBar @toggle-sidebar="isMobileSidebarOpen = !isMobileSidebarOpen" />
-      <router-view />
+      <main class="min-h-0 flex-1 overflow-y-auto bg-cream custom-scrollbar">
+        <router-view />
+      </main>
     </div>
   </div>
-  <div v-else class="w-screen h-screen overflow-hidden">
+  <div v-else class="min-h-screen w-screen overflow-y-auto bg-cream custom-scrollbar">
     <router-view />
   </div>
 </template>
