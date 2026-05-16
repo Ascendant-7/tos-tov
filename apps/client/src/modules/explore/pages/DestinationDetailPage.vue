@@ -125,14 +125,18 @@
         </div>
       </section>
 
-      <!-- Add to Trip Button -->
       <button
         @click="addToTrip"
-        class="w-full py-4 px-6 bg-gradient-to-r from-sidebar-active to-sidebar-active/90 text-white text-[16px] font-bold rounded-2xl border-none cursor-pointer transition-all duration-200 hover:shadow-[0_12px_30px_rgba(42,90,66,0.35)] hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2"
+        class="w-full rounded-2xl bg-gradient-to-r from-green-900 to-green-800 px-6 py-5 text-lg font-semibold text-white shadow-lg transition hover:opacity-95"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"/></svg>
         Add to Trip
       </button>
+
+        <AddToTripModal
+          :open="showAddToTripModal"
+          :destination="destination"
+          @close="showAddToTripModal = false"
+        />
     </div>
   </main>
   <main v-else class="min-h-screen bg-cream flex items-center justify-center">
@@ -147,10 +151,12 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { ExploreDestination } from '@/modules/explore/components/DestinationCard.vue'
 import { useExploreStore } from '@/modules/explore/store/explore'
+import AddToTripModal from '@/modules/itinerary/components/AddToTripModal.vue'
 
 const route = useRoute()
 const router = useRouter()
 const exploreStore = useExploreStore()
+const showAddToTripModal = ref(false)
 
 const destination = ref<ExploreDestination | null>(null)
 const isFavorited = ref(false)
@@ -200,8 +206,8 @@ function shareDestination() {
 }
 
 function addToTrip() {
-  // TODO: Implement add to trip functionality
-  console.log('Add to trip:', destination.value?.name)
+  showAddToTripModal.value = true
+  // console.log('Add to trip:', destination.value?.name)
 }
 </script>
 

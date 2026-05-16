@@ -68,8 +68,8 @@ const router = createRouter({
       meta: { showLayout: true },
     },
     {
-      path: '/itinerary',
-      name: 'itinerary',
+      path: '/trips/:tripId',
+      name: 'trip-itinerary',
       component: () => import('../modules/itinerary/pages/ItineraryPage.vue'),
       meta: { showLayout: true },
     }

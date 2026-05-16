@@ -1,11 +1,21 @@
 export interface ItineraryItem {
   id: string
-  title: string
-  time: string
-  category: string
+  title?: string
+  time?: string
+  category?: string
   duration?: string
   cost?: string
   notes?: string
+
+  destination_id?: string | null
+
+  destination?: {
+    id: string
+    name: string
+    cover_image_url?: string
+    province?: string
+    category?: string
+  } | null
 }
 
 export interface ItineraryDay {
