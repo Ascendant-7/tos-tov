@@ -1,0 +1,13 @@
+@startuml budget_diagram
+
+entity budgets {
+  * id : uuid
+  --
+  hotel : numeric
+  transport : numeric
+  food : numeric
+  total_budget : numeric
+  created_at : timestamp
+}
+
+@enduml
