@@ -28,7 +28,10 @@ export class ItineraryController {
   }
 
   @Post(':tripId/days')
-  createDay(@Param('tripId') tripId: string, @Body() dto: CreateItineraryDayDto) {
+  createDay(
+    @Param('tripId') tripId: string,
+    @Body() dto: CreateItineraryDayDto,
+  ) {
     return this.itineraryService.createDay(tripId, dto);
   }
 

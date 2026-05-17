@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { User } from '@supabase/auth-js';
+import { User } from '@repo/supabase';
 import { Request } from 'express';
 import { SupabaseService } from '../../supabase/supabase.service';
 
@@ -19,7 +19,7 @@ export class AuthGuard implements CanActivate {
     if (!token) return false;
 
     const { data, error } =
-      await this.supabaseService.client.auth.getUser(token);
+      await this.supabaseService.anonClient.auth.getUser(token);
 
     if (error) return false;
 

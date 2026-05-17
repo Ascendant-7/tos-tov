@@ -4,9 +4,27 @@ import { Database, SupabaseClient, createSupabaseClient } from '@repo/supabase';
 
 @Injectable()
 export class SupabaseService {
-  public client: SupabaseClient<Database>;
+  public anonClient: SupabaseClient<Database>;
+  public adminClient: SupabaseClient<Database>;
 
   constructor(private configService: ConfigService) {
+    const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
+    const supabaseAnonKey = this.configService.get<string>('SUPABASE_ANON_KEY');
+    const supabaseAdminKey = this.configService.get<string>(
+      'SUPABASE_SERVICE_ROLE_KEY',
+    );
+
+    if (!supabaseUrl || !supabaseAnonKey || !supabaseAdminKey) {
+      throw new Error(
+        'Missing Supabase credentials. Please set SUPABASE_URL, SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY in your .env file',
+      );
+    }
+
+    this.anonClient = createSupabaseClient(supabaseUrl, supabaseAnonKey);
+    this.adminClient = createSupabaseClient(supabaseUrl, supabaseAdminKey);
+  }
+
+  createUserClient(userJwt: string) {
     const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
     const supabaseKey =
       this.configService.get<string>('SUPABASE_SERVICE_ROLE_KEY') ||
@@ -18,17 +36,21 @@ export class SupabaseService {
       );
     }
 
-    this.client = createSupabaseClient(supabaseUrl, supabaseKey);
+    return createSupabaseClient(supabaseUrl, supabaseKey, {
+      global: {
+        headers: `Bearer ${userJwt}`,
+      },
+    });
   }
 
   async testConnection() {
-    const { error } = await this.client.auth.getSession();
+    const { error } = await this.anonClient.auth.getSession();
     if (error) return { msg: `error: ${error}` };
     return { msg: `ok` };
   }
 
   async getUserById(id: number) {
-    const { data, error } = await this.client
+    const { data, error } = await this.anonClient
       .from('user')
       .select('*')
       .eq('id', id)

@@ -11,7 +11,7 @@ export class ProfilesService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
   async getById(id: string) {
-    const { data, error } = await this.supabaseService.client
+    const { data, error } = await this.supabaseService.anonClient
       .from('profiles')
       .select('*')
       .eq('id', id)

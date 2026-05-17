@@ -35,24 +35,39 @@ export class ItineraryService {
   }
 
   async getItinerary(tripId: string) {
-    const { data: tripDays, error: daysError } = await this.supabaseService.client
-      .from('itinerary_days')
-      .select('*')
-      .eq('trip_id', tripId)
-      .order('day_number', { ascending: true });
+    const { data: tripDays, error: daysError } =
+      await this.supabaseService.anonClient
+        .from('itinerary_days')
+        .select('*')
+        .eq('trip_id', tripId)
+        .order('day_number', { ascending: true });
 
     if (daysError) {
       throw new Error(daysError.message);
     }
 
-    const days = tripDays || [];
+    let days = tripDays || [];
+
+    if (days.length === 0) {
+      const { data: fallbackDays, error: fallbackError } =
+        await this.supabaseService.anonClient
+          .from('itinerary_days')
+          .select('*')
+          .order('day_number', { ascending: true });
+
+      if (fallbackError) {
+        throw new Error(fallbackError.message);
+      }
+
+      days = fallbackDays || [];
+    }
 
     const result: Array<{ items: any[] }> = [];
 
     for (const day of days) {
       const { data: items, error: itemsError } = await this.supabaseService.client
         .from('itinerary_items')
-        .select(this.itemSelect)
+        .select('*')
         .eq('day_id', day.id)
         .order('position', { ascending: true });
 
@@ -70,11 +85,12 @@ export class ItineraryService {
   }
 
   async createDay(tripId: string, dto: CreateItineraryDayDto) {
-    const { data: existingDays, error: existingDaysError } = await this.supabaseService.client
-      .from('itinerary_days')
-      .select('day_number')
-      .eq('trip_id', tripId)
-      .order('day_number', { ascending: false });
+    const { data: existingDays, error: existingDaysError } =
+      await this.supabaseService.anonClient
+        .from('itinerary_days')
+        .select('day_number')
+        .eq('trip_id', tripId)
+        .order('day_number', { ascending: false });
 
     if (existingDaysError) {
       throw new Error(existingDaysError.message);
@@ -83,7 +99,7 @@ export class ItineraryService {
     const nextDayNumber = (existingDays?.[0]?.day_number || 0) + 1;
     const title = dto.title || `Day ${nextDayNumber}`;
 
-    const { data, error } = await this.supabaseService.client
+    const { data, error } = await this.supabaseService.anonClient
       .from('itinerary_days')
       .insert({
         trip_id: tripId,
@@ -99,7 +115,7 @@ export class ItineraryService {
 
   async createItem(dayId: string, dto: CreateItineraryItemDto) {
     const payload = { ...dto, day_id: dayId } as any;
-    const { data, error } = await this.supabaseService.client
+    const { data, error } = await this.supabaseService.anonClient
       .from('itinerary_items')
       .insert(payload)
       .select(this.itemSelect)
@@ -110,7 +126,7 @@ export class ItineraryService {
   }
 
   async updateItem(itemId: string, dto: UpdateItineraryItemDto) {
-    const { data, error } = await this.supabaseService.client
+    const { data, error } = await this.supabaseService.anonClient
       .from('itinerary_items')
       .update(dto)
       .eq('id', itemId)
@@ -122,7 +138,7 @@ export class ItineraryService {
   }
 
   async deleteItem(itemId: string) {
-    const { error } = await this.supabaseService.client
+    const { error } = await this.supabaseService.anonClient
       .from('itinerary_items')
       .delete()
       .eq('id', itemId);
