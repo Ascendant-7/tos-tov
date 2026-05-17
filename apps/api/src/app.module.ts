@@ -10,6 +10,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
 import { ItineraryModule } from './modules/itinerary/itinerary.module';
 import { BudgetModule } from './modules/budget/budget.module';
 import { ProfilesModule } from './modules/profiles/profiles.module';
+import { CommunityModule } from './modules/community/community.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ProfilesModule } from './modules/profiles/profiles.module';
     ReviewsModule,
     ItineraryModule,
     ProfilesModule,
+    CommunityModule
   ],
   controllers: [AppController],
   providers: [AppService],
