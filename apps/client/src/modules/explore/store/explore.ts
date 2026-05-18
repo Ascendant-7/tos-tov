@@ -114,7 +114,7 @@ export const useExploreStore = defineStore('explore', () => {
       destinations.value = raw.map(mapDestination)
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load destinations'
-      console.error('[ExploreStore] loadDestinations error:', err)
+      // console.error('[ExploreStore] loadDestinations error:', err)
     } finally {
       isLoading.value = false
     }
