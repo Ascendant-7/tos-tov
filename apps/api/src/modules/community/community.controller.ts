@@ -4,8 +4,8 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -18,10 +18,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { User } from '@repo/supabase';
 import { CommunityService } from './community.service';
-import { CreatePostDto } from './dto/create-post.dto';
+import { CreateDraftPostDto } from './dto/create-draft-post.dto';
+import { UpdateDraftPostDto } from './dto/update-draft-post.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { SupabaseService } from '../../supabase/supabase.service';
+import { CreatePostDto } from './dto/create-post.dto';
 
 interface AuthenticatedRequest extends Request {
   user: User;

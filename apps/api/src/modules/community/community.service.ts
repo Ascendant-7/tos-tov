@@ -4,8 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+<<<<<<< HEAD
+=======
+import type { Multer } from 'multer';
+import type { Database } from '@repo/supabase';
+>>>>>>> 62f821d (feat/Community: posts,comments,likes,saves,drafting and published posts)
 import { SupabaseService } from '../../supabase/supabase.service';
-import { CreatePostDto } from './dto/create-post.dto';
+import { CreateDraftPostDto } from './dto/create-draft-post.dto';
+import { UpdateDraftPostDto } from './dto/update-draft-post.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Injectable()
@@ -14,6 +20,7 @@ export class CommunityService {
 
   constructor(private readonly supabaseService: SupabaseService) {}
 
+<<<<<<< HEAD
   private db() {
     return this.supabaseService.adminClient;
   }
@@ -94,6 +101,95 @@ async createPost(userId: string, dto: CreatePostDto) {
 
     if (postError || !post) {
       throw new NotFoundException('Post not found or not owned by user');
+=======
+  async createDraftPost(dto: CreateDraftPostDto) {
+    const { data, error } = await this.supabaseService.client
+      .from('community_posts')
+      .insert({
+        user_id: dto.userId,
+        destination_id: dto.destinationId ?? null,
+        title: dto.title,
+        content: dto.content,
+        visit_status: dto.visitStatus ?? 'visited',
+        visibility: dto.visibility ?? 'public',
+        status: 'draft',
+      })
+      .select()
+      .single();
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    return data;
+  }
+
+  async updateDraftPost(
+    postId: string,
+    userId: string,
+    dto: UpdateDraftPostDto,
+  ) {
+    const updateData: Database['public']['Tables']['community_posts']['Update'] = {};
+
+    if (dto.destinationId !== undefined) {
+      updateData.destination_id = dto.destinationId;
+    }
+
+    if (dto.title !== undefined) {
+      updateData.title = dto.title;
+    }
+
+    if (dto.content !== undefined) {
+      updateData.content = dto.content;
+    }
+
+    if (dto.visitStatus !== undefined) {
+      updateData.visit_status = dto.visitStatus;
+    }
+
+    if (dto.visibility !== undefined) {
+      updateData.visibility = dto.visibility;
+    }
+
+    updateData.updated_at = new Date().toISOString();
+
+    const { data, error } = await this.supabaseService.client
+      .from('community_posts')
+      .update(updateData)
+      .eq('id', postId)
+      .eq('user_id', userId)
+      .eq('status', 'draft')
+      .select()
+      .single();
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    return data;
+  }
+
+  async uploadPostMedia(
+    postId: string,
+    userId: string,
+      file: Express.Multer.File,
+    position: number,
+  ) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+
+    const { data: post, error: postError } = await this.supabaseService.client
+      .from('community_posts')
+      .select('id, user_id, status')
+      .eq('id', postId)
+      .eq('user_id', userId)
+      .eq('status', 'draft')
+      .single();
+
+    if (postError || !post) {
+      throw new NotFoundException('Draft post not found');
+>>>>>>> 62f821d (feat/Community: posts,comments,likes,saves,drafting and published posts)
     }
 
     const allowedMimeTypes = [
@@ -114,11 +210,26 @@ async createPost(userId: string, dto: CreatePostDto) {
       throw new BadRequestException('File size must be less than 20MB');
     }
 
+<<<<<<< HEAD
     const extension = file.originalname.split('.').pop()?.toLowerCase() || 'bin';
     const fileName = `${Date.now()}-${randomUUID()}.${extension}`;
     const filePath = `${postId}/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
+=======
+    if (position < 0) {
+      throw new BadRequestException(
+        'Position must be greater than or equal to 0',
+      );
+    }
+
+    const extension = file.originalname.split('.').pop();
+    const safeExtension = extension ? extension.toLowerCase() : 'bin';
+    const fileName = `${Date.now()}-${randomUUID()}.${safeExtension}`;
+    const filePath = `${postId}/${fileName}`;
+
+    const { error: uploadError } = await this.supabaseService.client.storage
+>>>>>>> 62f821d (feat/Community: posts,comments,likes,saves,drafting and published posts)
       .from(this.bucketName)
       .upload(filePath, file.buffer, {
         contentType: file.mimetype,
@@ -127,6 +238,7 @@ async createPost(userId: string, dto: CreatePostDto) {
 
     if (uploadError) {
       throw new BadRequestException(uploadError.message);
+<<<<<<< HEAD
     }
 
     const { data: publicUrlData } = supabase.storage
@@ -429,6 +541,51 @@ async createPost(userId: string, dto: CreatePostDto) {
       )
       .eq('post_id', postId)
       .order('created_at', { ascending: true });
+=======
+    }
+
+    const { data: publicUrlData } = this.supabaseService.client.storage
+      .from(this.bucketName)
+      .getPublicUrl(filePath);
+
+    const mediaType = file.mimetype.startsWith('image/') ? 'image' : 'video';
+
+    const { data, error } = await this.supabaseService.client
+      .from('post_media')
+      .insert({
+        post_id: postId,
+        bucket_name: this.bucketName,
+        file_path: filePath,
+        public_url: publicUrlData.publicUrl,
+        media_type: mediaType,
+        position,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      await this.supabaseService.client.storage
+        .from(this.bucketName)
+        .remove([filePath]);
+
+      throw new BadRequestException(error.message);
+    }
+
+    return data;
+  }
+
+  async publishPost(postId: string, userId: string) {
+    const { data, error } = await this.supabaseService.client
+      .from('community_posts')
+      .update({
+        status: 'published',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', postId)
+      .eq('user_id', userId)
+      .eq('status', 'draft')
+      .select()
+      .single();
 
     if (error) {
       throw new BadRequestException(error.message);
@@ -437,20 +594,204 @@ async createPost(userId: string, dto: CreatePostDto) {
     return data;
   }
 
-  async createComment(
-    userId: string,
-    postId: string,
-    dto: CreateCommentDto,
-  ) {
-    const supabase = this.db();
+  async discardDraftPost(postId: string, userId: string) {
+    const { data: post, error: postError } = await this.supabaseService.client
+      .from('community_posts')
+      .select('id, user_id, status')
+      .eq('id', postId)
+      .eq('user_id', userId)
+      .eq('status', 'draft')
+      .single();
 
+    if (postError || !post) {
+      throw new NotFoundException('Draft post not found');
+    }
+
+    const { data: mediaRows, error: mediaError } =
+      await this.supabaseService.client
+        .from('post_media')
+        .select('bucket_name, file_path')
+        .eq('post_id', postId);
+
+    if (mediaError) {
+      throw new BadRequestException(mediaError.message);
+    }
+
+    const filesByBucket = new Map<string, string[]>();
+
+    for (const media of mediaRows ?? []) {
+      if (!filesByBucket.has(media.bucket_name)) {
+        filesByBucket.set(media.bucket_name, []);
+      }
+
+      filesByBucket.get(media.bucket_name)!.push(media.file_path);
+    }
+
+    for (const [bucketName, filePaths] of filesByBucket.entries()) {
+      if (filePaths.length > 0) {
+        const { error: storageError } =
+          await this.supabaseService.client.storage
+            .from(bucketName)
+            .remove(filePaths);
+
+        if (storageError) {
+          throw new BadRequestException(storageError.message);
+        }
+      }
+    }
+
+    const { error: deleteError } = await this.supabaseService.client
+      .from('community_posts')
+      .delete()
+      .eq('id', postId)
+      .eq('user_id', userId)
+      .eq('status', 'draft');
+
+    if (deleteError) {
+      throw new BadRequestException(deleteError.message);
+    }
+
+    return {
+      message: 'Draft post discarded successfully',
+    };
+  }
+
+  async findPublishedPosts() {
+    const { data, error } = await this.supabaseService.client
+      .from('community_posts')
+      .select(
+        `
+        *,
+        profiles:user_id (
+          id,
+          first_name,
+          last_name
+        ),
+        destinations:destination_id (
+          id,
+          name,
+          province,
+          cover_image_url
+        ),
+        post_media (
+          id,
+          bucket_name,
+          file_path,
+          public_url,
+          media_type,
+          position
+        ),
+        post_comments (
+          id,
+          content,
+          created_at,
+          profiles:user_id (
+            id,
+            first_name,
+            last_name
+          )
+        ),
+        post_likes (
+          id,
+          user_id
+        ),
+        saved_posts (
+          id,
+          user_id
+        )
+      `,
+      )
+      .eq('status', 'published')
+      .eq('visibility', 'public')
+      .order('created_at', { ascending: false });
+>>>>>>> 62f821d (feat/Community: posts,comments,likes,saves,drafting and published posts)
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    return data;
+  }
+
+  async findPostById(postId: string) {
+    const { data, error } = await this.supabaseService.client
+      .from('community_posts')
+      .select(
+        `
+        *,
+        profiles:user_id (
+          id,
+          first_name,
+          last_name
+        ),
+        destinations:destination_id (
+          id,
+          name,
+          province,
+          cover_image_url
+        ),
+        post_media (
+          id,
+          bucket_name,
+          file_path,
+          public_url,
+          media_type,
+          position
+        ),
+        post_comments (
+          id,
+          content,
+          created_at,
+          profiles:user_id (
+            id,
+            first_name,
+            last_name
+          )
+        ),
+        post_likes (
+          id,
+          user_id
+        ),
+        saved_posts (
+          id,
+          user_id
+        )
+      `,
+      )
+      .eq('id', postId)
+      .eq('status', 'published')
+      .single();
+
+<<<<<<< HEAD
     await this.ensurePostExists(postId);
 
     const { data, error } = await supabase
+=======
+    if (error) {
+      throw new NotFoundException('Post not found');
+    }
+
+    return data;
+  }
+
+  async createComment(postId: string, dto: CreateCommentDto) {
+    const { data: post, error: postError } = await this.supabaseService.client
+      .from('community_posts')
+      .select('id, status')
+      .eq('id', postId)
+      .eq('status', 'published')
+      .single();
+
+    if (postError || !post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    const { data, error } = await this.supabaseService.client
+>>>>>>> 62f821d (feat/Community: posts,comments,likes,saves,drafting and published posts)
       .from('post_comments')
       .insert({
         post_id: postId,
-        user_id: userId,
+        user_id: dto.userId,
         content: dto.content,
       })
       .select(
@@ -477,19 +818,55 @@ async createPost(userId: string, dto: CreatePostDto) {
     return data;
   }
 
-  async getTrendingTags() {
-    const supabase = this.db();
+  async toggleLike(postId: string, userId: string) {
+    const { data: existingLike, error: findError } =
+      await this.supabaseService.client
+        .from('post_likes')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_id', userId)
+        .maybeSingle();
 
+<<<<<<< HEAD
     const { data, error } = await supabase
       .from('community_posts')
       .select('content')
       .eq('status', 'published')
       .eq('visibility', 'public');
+=======
+    if (findError) {
+      throw new BadRequestException(findError.message);
+    }
+
+    if (existingLike) {
+      const { error } = await this.supabaseService.client
+        .from('post_likes')
+        .delete()
+        .eq('post_id', postId)
+        .eq('user_id', userId);
+
+      if (error) {
+        throw new BadRequestException(error.message);
+      }
+
+      return {
+        liked: false,
+      };
+    }
+
+    const { error } = await this.supabaseService.client
+      .from('post_likes')
+      .insert({
+        post_id: postId,
+        user_id: userId,
+      });
+>>>>>>> 62f821d (feat/Community: posts,comments,likes,saves,drafting and published posts)
 
     if (error) {
       throw new BadRequestException(error.message);
     }
 
+<<<<<<< HEAD
     const tagMap = new Map<string, number>();
 
     for (const post of data || []) {
@@ -559,6 +936,56 @@ async createPost(userId: string, dto: CreatePostDto) {
     }
 
     return data;
+=======
+    return {
+      liked: true,
+    };
+  }
+
+  async toggleSave(postId: string, userId: string) {
+    const { data: existingSave, error: findError } =
+      await this.supabaseService.client
+        .from('saved_posts')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_id', userId)
+        .maybeSingle();
+
+    if (findError) {
+      throw new BadRequestException(findError.message);
+    }
+
+    if (existingSave) {
+      const { error } = await this.supabaseService.client
+        .from('saved_posts')
+        .delete()
+        .eq('post_id', postId)
+        .eq('user_id', userId);
+
+      if (error) {
+        throw new BadRequestException(error.message);
+      }
+
+      return {
+        saved: false,
+      };
+    }
+
+    const { error } = await this.supabaseService.client
+      .from('saved_posts')
+      .insert({
+        post_id: postId,
+        user_id: userId,
+      });
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    return {
+      saved: true,
+    };
+>>>>>>> 62f821d (feat/Community: posts,comments,likes,saves,drafting and published posts)
   }
 
   private postSelectQuery() {
