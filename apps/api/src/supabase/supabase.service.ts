@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Database, SupabaseClient, createSupabaseClient } from '@repo/supabase';
 
 @Injectable()
@@ -7,36 +6,32 @@ export class SupabaseService {
   public anonClient: SupabaseClient<Database>;
   public adminClient: SupabaseClient<Database>;
 
-  constructor(private configService: ConfigService) {
-    const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
-    const supabaseAnonKey = this.configService.get<string>('SUPABASE_ANON_KEY');
-    const supabaseAdminKey = this.configService.get<string>(
-      'SUPABASE_SERVICE_ROLE_KEY',
-    );
+  constructor() {
+    const url = process.env.SUPABASE_URL;
+    const anonKey = process.env.SUPABASE_ANON_KEY;
+    const adminKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!supabaseUrl || !supabaseAnonKey || !supabaseAdminKey) {
+    if (!url || !anonKey || !adminKey) {
       throw new Error(
         'Missing Supabase credentials. Please set SUPABASE_URL, SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY in your .env file',
       );
     }
 
-    this.anonClient = createSupabaseClient(supabaseUrl, supabaseAnonKey);
-    this.adminClient = createSupabaseClient(supabaseUrl, supabaseAdminKey);
+    this.anonClient = createSupabaseClient(url, anonKey);
+    this.adminClient = createSupabaseClient(url, adminKey);
   }
 
   createUserClient(userJwt: string) {
-    const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
-    const supabaseKey =
-      this.configService.get<string>('SUPABASE_SERVICE_ROLE_KEY') ||
-      this.configService.get<string>('SUPABASE_ANON_KEY');
+    const url = process.env.SUPABASE_URL;
+    const anonKey = process.env.SUPABASE_ANON_KEY;
 
-    if (!supabaseUrl || !supabaseKey) {
+    if (!url || !anonKey) {
       throw new Error(
         'Missing Supabase credentials. Please set SUPABASE_URL and SUPABASE_ANON_KEY in your .env file',
       );
     }
 
-    return createSupabaseClient(supabaseUrl, supabaseKey, {
+    return createSupabaseClient(url, anonKey, {
       headers: `Bearer ${userJwt}`,
     } as Record<string, string>);
   }
