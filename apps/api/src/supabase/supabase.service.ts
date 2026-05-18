@@ -37,10 +37,8 @@ export class SupabaseService {
     }
 
     return createSupabaseClient(supabaseUrl, supabaseKey, {
-      global: {
-        headers: `Bearer ${userJwt}`,
-      },
-    });
+      headers: `Bearer ${userJwt}`,
+    } as Record<string, string>);
   }
 
   async testConnection() {

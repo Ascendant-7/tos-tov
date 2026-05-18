@@ -9,8 +9,8 @@ export class AuthDto {
   password!: string;
 
   @IsString()
-  firstName?: string;
+  firstName!: string;
 
   @IsString()
-  lastName?: string;
+  lastName!: string;
 }
