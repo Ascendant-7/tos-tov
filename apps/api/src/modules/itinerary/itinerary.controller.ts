@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { CreateTripDto } from './dto/create-trip.dto';
 import { CreateItineraryDayDto } from './dto/create-itinerary-day.dto';
 import { CreateItineraryItemDto } from './dto/create-itinerary-item.dto';
 import { UpdateItineraryItemDto } from './dto/update-itinerary-item.dto';
@@ -16,13 +17,21 @@ import { ItineraryService } from './itinerary.service';
 export class ItineraryController {
   constructor(private readonly itineraryService: ItineraryService) {}
 
+  @Post('trips')
+  createTrip(@Body() dto: CreateTripDto) {
+    return this.itineraryService.createTrip(dto);
+  }
+
   @Get(':tripId')
   getItinerary(@Param('tripId') tripId: string) {
     return this.itineraryService.getItinerary(tripId);
   }
 
   @Post(':tripId/days')
-  createDay(@Param('tripId') tripId: string, @Body() dto: CreateItineraryDayDto) {
+  createDay(
+    @Param('tripId') tripId: string,
+    @Body() dto: CreateItineraryDayDto,
+  ) {
     return this.itineraryService.createDay(tripId, dto);
   }
 

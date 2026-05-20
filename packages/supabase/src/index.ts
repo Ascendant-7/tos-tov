@@ -1,3 +1,3 @@
 export * from './database.types.js'
 export { createSupabaseClient } from './client.js'
-export { SupabaseClient } from '@supabase/supabase-js'
+export type { SupabaseClient, AuthResponse, User } from '@supabase/supabase-js'

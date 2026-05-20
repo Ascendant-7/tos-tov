@@ -16,7 +16,7 @@ export class BudgetController {
   constructor(private readonly budgetService: BudgetService) {}
 
   @Post()
-  receiveBudget(@Body() createBudgetDto: CreateBudgetDto) {
+  receiveBudget(@Body() createBudgetDto: any) {
     return this.budgetService.receiveBudget(createBudgetDto);
   }
 

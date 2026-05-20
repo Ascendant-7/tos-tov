@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
+import { getDestinations } from '../services/destination.service'
+
+const destinations = ref<any[]>([])
+const selectedDestinationId = ref('')
 
 const props = defineProps<{
   item?: any
@@ -23,7 +27,7 @@ const durationMinuteOptions = ['00', '15', '30', '45']
 
 const parseTime = (timeStr: string) => {
   if (!timeStr) return { hours: '', minutes: '00', ampm: 'AM' }
-  
+
   const match = timeStr.match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)?/i)
   if (!match) return { hours: '', minutes: '00', ampm: 'AM' }
 
@@ -80,6 +84,7 @@ const formattedDuration = computed(() => {
 
 watch(() => props.item, (val) => {
   if (val) {
+    selectedDestinationId.value = val.destination_id || val.destination?.id || ''
     name.value = val.title || ''
     const parsed = parseTime(val.time ?? '')
     hours.value = parsed.hours
@@ -91,6 +96,7 @@ watch(() => props.item, (val) => {
     durationMinutes.value = parsedDuration.minutes
     cost.value = val.cost || ''
   } else {
+    selectedDestinationId.value = ''
     name.value = ''
     hours.value = ''
     minutes.value = '00'
@@ -114,9 +120,47 @@ const handleSubmit = () => {
     duration: formattedDuration.value || null,
     cost: cost.value || null,
     notes: props.item?.notes || '',
-    position: props.item?.position ?? 0
+    position: props.item?.position ?? 0,
+    destination_id: selectedDestinationId.value || null,
   })
 }
+
+onMounted(async () => {
+  try {
+    destinations.value = await getDestinations()
+
+    if (selectedDestinationId.value) {
+      const destination = destinations.value.find(
+        (d) => d.id === selectedDestinationId.value,
+      )
+
+      if (destination) {
+        name.value = destination.name
+        category.value = destination.category || 'activity'
+      }
+    }
+  } catch (error) {
+    console.error(error)
+  }
+})
+
+watch(selectedDestinationId, (value) => {
+  if (!value) {
+    name.value = ''
+    category.value = 'activity'
+    return
+  }
+
+  const destination = destinations.value.find(
+    (d) => d.id === value,
+  )
+
+  if (!destination) return
+
+  name.value = destination.name
+  category.value =
+    destination.category || 'activity'
+})
 </script>
 
 <template>
@@ -134,11 +178,27 @@ const handleSubmit = () => {
       <div class="space-y-4 px-6 py-6">
         <div class="space-y-2">
           <label class="block text-sm font-semibold text-gray-700">
-            Place name <span class="text-red-500">*</span>
+            Destination <span class="text-red-500">*</span>
+          </label>
+          <select
+            v-model="selectedDestinationId"
+            :disabled="loading"
+            class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-50 disabled:opacity-60"
+          >
+            <option value="">Custom activity</option>
+            <option v-for="destination in destinations" :key="destination.id" :value="destination.id">
+              {{ destination.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-semibold text-gray-700">
+            Activity Name <span class="text-red-500">*</span>
           </label>
           <input
             v-model="name"
-            :disabled="loading"
+            :disabled="loading || !!selectedDestinationId"
             placeholder="e.g., Angkor Wat"
             class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition duration-200 placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-50 disabled:opacity-60"
           />

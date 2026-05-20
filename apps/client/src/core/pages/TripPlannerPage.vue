@@ -41,7 +41,7 @@
                 Add to Day
               </button>
               <button
-                @click="itineraryStore.removePendingDestination(dest.id)"
+                @click="dest.id && itineraryStore.removePendingDestination(dest.id)"
                 class="px-3 py-1.5 bg-slate-200 text-slate-600 rounded-lg text-[13px] font-medium hover:bg-slate-300 transition-colors"
               >
                 Dismiss
@@ -101,6 +101,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useItineraryStore } from '@/modules/itinerary/stores/itineraryStore'
+import { createTrip } from '@/modules/itinerary/services/itinerary.service'
 import type { ExploreDestination } from '@/modules/explore/components/DestinationCard.vue'
 
 const router = useRouter()
@@ -117,23 +118,24 @@ async function createAndNavigateToTrip() {
 
   isCreatingTrip.value = true
   try {
-    // Generate a simple trip ID (in a real app, this would come from the backend)
-    const tripId = `trip-${Date.now()}`
-    itineraryStore.setCurrentTripId(tripId)
+    const trip = await createTrip({
+      title: tripName.value.trim(),
+      description: tripDescription.value.trim() || undefined,
+    })
+    itineraryStore.setCurrentTripId(trip.id)
 
-    // Navigate to itinerary page with the trip ID
-    await router.push(`/itinerary?tripId=${encodeURIComponent(tripId)}`)
+    await router.push(`/trips/${encodeURIComponent(trip.id)}`)
   } finally {
     isCreatingTrip.value = false
   }
 }
 
 function handleAddDestinationToDay(destination: ExploreDestination) {
+  if (!destination.id) return
+
   if (itineraryStore.currentTripId) {
-    // Navigate to itinerary with the destination context
-    router.push(`/itinerary?tripId=${encodeURIComponent(itineraryStore.currentTripId)}&addDestination=${destination.id}`)
+    router.push(`/trips/${encodeURIComponent(itineraryStore.currentTripId)}?addDestination=${destination.id}`)
   } else {
-    // Create a trip first
     tripName.value = `Trip - ${destination.name}`
     createAndNavigateToTrip()
   }
@@ -161,4 +163,3 @@ main {
   animation: fadeIn 0.5s ease-out;
 }
 </style>
-

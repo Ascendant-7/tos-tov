@@ -11,7 +11,7 @@ import { UpdateDestinationDto } from './dto/update-destination.dto';
 export class DestinationsService {
   constructor(private readonly supabaseService: SupabaseService) {}
   async create(createDestinationDto: CreateDestinationDto) {
-    const { data, error } = await this.supabaseService.client
+    const { data, error } = await this.supabaseService.anonClient
       .from('destinations')
       .insert(createDestinationDto)
       .select();
@@ -24,7 +24,7 @@ export class DestinationsService {
   }
 
   async findAll() {
-    const { data, error } = await this.supabaseService.client
+    const { data, error } = await this.supabaseService.anonClient
       .from('destinations')
       .select('*');
 
@@ -36,7 +36,7 @@ export class DestinationsService {
   }
 
   async findOne(id: string) {
-    const { data, error } = await this.supabaseService.client
+    const { data, error } = await this.supabaseService.anonClient
       .from('destinations')
       .select('*')
       .eq('id', id)
@@ -50,7 +50,7 @@ export class DestinationsService {
   }
 
   async update(id: string, updateDestinationDto: UpdateDestinationDto) {
-    const { data, error } = await this.supabaseService.client
+    const { data, error } = await this.supabaseService.anonClient
       .from('destinations')
       .update(updateDestinationDto)
       .eq('id', id)
@@ -64,7 +64,7 @@ export class DestinationsService {
   }
 
   async remove(id: string) {
-    const { error } = await this.supabaseService.client
+    const { error } = await this.supabaseService.anonClient
       .from('destinations')
       .delete()
       .eq('id', id);

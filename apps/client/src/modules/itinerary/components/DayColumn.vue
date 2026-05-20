@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import ActivityCard from './ActivityCard.vue'
 import AddActivityModal from './AddActivityModal.vue'
-import { createItem, updateItem, deleteItem } from '../services/itineraryService'
+import { createItem, updateItem, deleteItem } from '../services/itinerary.service'
 
 const props = defineProps<{
   day: any

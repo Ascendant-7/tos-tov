@@ -1,0 +1,69 @@
+@startuml classes
+
+' Itinerary Module by Sengleang
+
+package itinerary {
+
+  entity trip {
+    * id: uuid <<PK>>
+    --
+    * title: varchar(50)
+    * destination_id: <<FK>>
+    description: text
+    created_at: timestamp
+  }
+
+  entity trip_day {
+    * id: uuid <<PK>>
+    --
+    trip_id: uuid <<FK>>
+    day_number: int
+    title: text
+    created_at: timestamp
+  }
+
+  entity trip_item {
+    * id: uuid <<PK>>
+    --
+    trip_day_id: uuid <<FK>>
+    title: varchar(50)
+    attraction_category_id: uuid <<FK>>
+    arrival_time: timestamp
+    duration: int
+    cost: int
+    notes: text
+    position: int
+    created_at: timestamp
+  }
+
+  trip -- trip_day
+  trip_day -- trip_item
+
+}
+
+package discovery {
+  entity destinations
+}
+
+' entity profile {
+'   * id : uuid <<PK>>
+'   --
+'   username : varchar(50)
+'   full_name : varchar(50)
+'   profile_url : text
+'   bio : text
+'   created_at : timestamptz
+' }
+
+' class category 
+' class location
+' class trip
+' class attraction
+' class friendship
+' class stop
+' class media
+' class trip_participant
+' class post
+' class review
+
+@enduml

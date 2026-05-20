@@ -95,14 +95,20 @@ export interface ExploreDestination {
   name: string
   description?: string
   province: string
+  /** Legacy sample-data field. Prefer backend field `location_name` in new code. */
+  location?: string
   /** City / locality from backend field `location_name` */
   location_name?: string
   category: string
+  /** Legacy sample-data field. Prefer backend field `cover_image_url` in new code. */
+  image?: string
   cover_image_url?: string
   duration_min?: number
   duration_max?: number
+  duration?: string
   budget_min?: number
   budget_max?: number
+  budget?: string
   rating?: number | string
   badge?: string
   tags?: string[]

@@ -1,13 +1,24 @@
 import type { ItineraryResponse } from '../types/itineraryItem.types'
+import { API_BASE_URL } from './api'
 
 interface ItineraryApiItem {
   id: string
-  title: string
-  time: string
+  title?: string
+  time?: string
   category?: string | null
   duration?: string | null
   cost?: string | null
   notes?: string | null
+
+  destination_id?: string | null
+
+  destination?: {
+    id: string
+    name: string
+    cover_image_url?: string | null
+    province?: string | null
+    category?: string | null
+  } | null
 }
 
 interface ItineraryApiDay {
@@ -21,16 +32,31 @@ interface ItineraryApiResponse {
   days: ItineraryApiDay[]
 }
 
-const API_BASE_URL =
-  (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ||
-  'http://localhost:3000'
+interface TripApiResponse {
+  id: string
+  title: string
+  description?: string | null
+  created_at?: string
+}
 
-const DEFAULT_TRIP_ID = import.meta.env.VITE_ITINERARY_TRIP_ID as string | undefined
+export const createTrip = async (trip: { title: string; description?: string }): Promise<TripApiResponse> => {
+  const response = await fetch(`${API_BASE_URL}/itinerary/trips`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      title: trip.title,
+      description: trip.description || null,
+    }),
+  })
 
-export const getItinerary = async (tripId = DEFAULT_TRIP_ID): Promise<ItineraryResponse> => {
-  if (!tripId) {
-    throw new Error('Missing trip id. Pass tripId or set VITE_ITINERARY_TRIP_ID.')
+  if (!response.ok) {
+    throw new Error(`Failed to create trip (${response.status})`)
   }
+
+  return await response.json()
+}
+
+export const getItinerary = async (tripId: string): Promise<ItineraryResponse> => {
 
   const response = await fetch(`${API_BASE_URL}/itinerary/${encodeURIComponent(tripId)}`)
 
@@ -47,12 +73,28 @@ export const getItinerary = async (tripId = DEFAULT_TRIP_ID): Promise<ItineraryR
       title: day.title || `Day ${day.day_number}`,
       items: (day.items || []).map((item) => ({
         id: item.id,
-        title: item.title,
+        title:
+          item.destination?.name ||
+          item.title ||
+          'Untitled',
         time: item.time,
-        category: item.category || 'activity',
+        category:
+          item.destination?.category ||
+          item.category ||
+          'activity',
         duration: item.duration || undefined,
         cost: item.cost || undefined,
         notes: item.notes || undefined,
+        destination_id: item.destination_id || undefined,
+        destination: item.destination
+          ? {
+              id: item.destination.id,
+              name: item.destination.name,
+              cover_image_url: item.destination.cover_image_url || undefined,
+              province: item.destination.province || undefined,
+              category: item.destination.category || undefined,
+            }
+          : undefined
       })),
     })),
   }
@@ -78,6 +120,7 @@ export const createItem = async (dayId: string, item: any) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       title: item.title,
+      destination_id: item.destination_id || null,
       time: item.time,
       category: item.category,
       duration: item.duration || null,
@@ -100,6 +143,7 @@ export const updateItem = async (itemId: string, item: any) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       title: item.title,
+      destination_id: item.destination_id || null,
       time: item.time,
       category: item.category,
       duration: item.duration || null,
