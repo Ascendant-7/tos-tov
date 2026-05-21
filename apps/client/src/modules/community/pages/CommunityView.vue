@@ -73,12 +73,25 @@
 
     <!-- Posts Feed -->
     <section class="animate-fade-in-up delay-4">
-      <div v-if="communityStore.filteredPosts.length > 0" class="space-y-4 sm:space-y-6">
+      <div v-if="communityStore.feedbackMessage" :class="[
+        'mb-4 rounded-xl border px-4 py-3 text-[13px] font-medium',
+        feedbackClass
+      ]">
+        {{ communityStore.feedbackMessage }}
+      </div>
+
+      <div v-if="communityStore.isLoading" class="flex flex-col items-center justify-center py-12 text-center">
+        <p class="m-0 text-[14px] font-semibold text-slate-600">Loading posts...</p>
+      </div>
+
+      <div v-else-if="communityStore.filteredPosts.length > 0" class="space-y-4 sm:space-y-6">
         <div v-for="(post, i) in communityStore.filteredPosts" :key="post.id">
           <CommunityPostCard :post="post" :expanded="activeCommentPostId === post.id"
             :comment-draft="activeCommentPostId === post.id ? commentDraft : ''"
+            :can-delete="post.userId === communityStore.currentUserId"
             @like="communityStore.toggleLike(post.id)" @bookmark="communityStore.toggleBookmark(post.id)"
             @share="emit('share-post', post)" @comment="emit('toggle-comments', post)"
+            @delete="emit('request-delete', post)"
             @update:comment-draft="emit('update:new-comment', $event)" @submit-comment="emit('submit-comment')"
             :style="{ animationDelay: `${0.1 + i * 0.05}s` }" class="animate-fade-in-up" />
         </div>
@@ -104,7 +117,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faArrowTrendUp, faCamera, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { useCommunityStore } from '../store/community'
@@ -122,11 +135,26 @@ const emit = defineEmits<{
   'create-post': []
   'share-post': [post: Post]
   'toggle-comments': [post: Post]
+  'request-delete': [post: Post]
   'update:new-comment': [value: string]
   'submit-comment': []
 }>()
 
 const commentDraft = computed(() => props.newComment)
+const feedbackClass = computed(() => {
+  const classes = {
+    success: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+    info: 'border-sky-200 bg-sky-50 text-sky-700',
+    warning: 'border-amber-200 bg-amber-50 text-amber-800',
+    error: 'border-red-200 bg-red-50 text-red-700',
+  }
+
+  return classes[communityStore.feedbackType]
+})
+
+onMounted(() => {
+  void communityStore.loadCommunity()
+})
 </script>
 
 <style scoped>

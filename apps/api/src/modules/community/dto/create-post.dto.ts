@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -23,9 +24,17 @@ class CreatePostMediaDto {
 }
 
 export class CreatePostDto {
+  @IsOptional()
+  @IsString()
+  title?: string;
+
   @IsString()
   @IsNotEmpty()
   content: string;
+
+  @IsOptional()
+  @IsUUID()
+  destinationId?: string;
 
   @IsOptional()
   @IsString()

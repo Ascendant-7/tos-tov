@@ -17,10 +17,22 @@
           </p>
         </div>
       </div>
-      <button class="p-2 hover:bg-cream rounded-lg transition-colors cursor-pointer border-none bg-transparent shrink-0"
-        aria-label="More options">
-        <FontAwesomeIcon :icon="faEllipsis" class="h-4 w-4 text-slate-400" />
-      </button>
+      <div v-if="canDelete" class="relative shrink-0">
+        <button class="p-2 hover:bg-cream rounded-lg transition-colors cursor-pointer border-none bg-transparent"
+          aria-label="Post options" @click="showMenu = !showMenu">
+          <FontAwesomeIcon :icon="faEllipsis" class="h-4 w-4 text-slate-400" />
+        </button>
+
+        <div v-if="showMenu"
+          class="absolute right-0 top-full z-20 mt-1 min-w-28 overflow-hidden rounded-lg border border-weather-border bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+          <button
+            class="flex w-full items-center gap-2 border-none bg-white px-3 py-2 text-left text-[12px] font-semibold text-red-500 hover:bg-red-50"
+            @click="handleDelete">
+            <FontAwesomeIcon :icon="faTrash" class="h-3.5 w-3.5" />
+            Delete
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Post Images Gallery -->
@@ -66,7 +78,7 @@
 
     <!-- Post Content -->
     <div class="p-4 sm:p-5">
-      <h4 class="text-[14px] sm:text-[15px] font-bold text-slate-800 m-0 mb-2">{{ post.title }}</h4>
+      <h4 v-if="post.title" class="text-[14px] sm:text-[15px] font-bold text-slate-800 m-0 mb-2">{{ post.title }}</h4>
       <p class="text-[12px] sm:text-[13px] text-slate-700 m-0 mb-3 leading-relaxed">{{ post.description }}</p>
 
       <!-- Hashtags -->
@@ -77,58 +89,37 @@
         </span>
       </div>
 
-      <!-- Comment Preview -->
-      <div v-if="post.comments.length > 0 && !expanded" class="mb-4 space-y-2">
-        <div v-for="comment in post.comments.slice(0, 2)" :key="comment.id"
-          class="flex gap-3 rounded-xl bg-cream/70 px-3 py-2">
-          <div
-            class="w-7 h-7 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
-            {{ comment.userInitials }}
-          </div>
-          <div class="min-w-0 flex-1">
-            <p class="text-[11px] sm:text-[12px] font-semibold text-slate-800 m-0 leading-tight">
-              {{ comment.userName }}
-            </p>
-            <p class="text-[11px] sm:text-[12px] text-slate-600 m-0 mt-0.5 leading-relaxed line-clamp-2">
-              {{ comment.text }}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Expanded Comments -->
-      <div v-if="expanded"
-        class="mb-4 rounded-2xl border border-weather-border bg-white p-4 sm:p-5 shadow-[0_6px_20px_rgba(0,0,0,0.04)]">
-        <div v-if="post.comments.length > 0" class="space-y-3">
-          <div v-for="comment in post.comments" :key="comment.id" class="flex gap-3">
+      <div v-if="post.comments.length > 0 || expanded" class="mb-4 space-y-3">
+        <div v-if="post.comments.length > 0" class="space-y-2">
+          <div v-for="comment in visibleComments" :key="comment.id" class="flex gap-2.5">
             <div
-              class="w-8 h-8 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 text-white flex items-center justify-center text-xs font-bold shrink-0">
+              class="w-7 h-7 rounded-full bg-slate-700 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
               {{ comment.userInitials }}
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[12px] sm:text-[13px] font-semibold text-slate-800 m-0">{{ comment.userName }}</p>
-              <p class="text-[11px] sm:text-[12px] text-slate-600 m-0 mt-0.5 leading-relaxed">
+              <p class="text-[12px] text-slate-700 m-0 leading-relaxed">
+                <span class="font-semibold text-slate-800">{{ comment.userName }}</span>
                 {{ comment.text }}
               </p>
             </div>
           </div>
         </div>
 
-        <div v-else class="py-2 text-center text-[13px] text-slate-400">
+        <div v-else class="py-1 text-[13px] text-slate-400">
           Be the first to comment.
         </div>
 
-        <div class="mt-4 pt-4 border-t border-weather-border flex items-center gap-3">
+        <div v-if="expanded" class="flex items-center gap-2.5">
           <div
-            class="w-8 h-8 rounded-full bg-cream-dark text-sidebar-active flex items-center justify-center text-[11px] font-bold shrink-0">
+            class="w-7 h-7 rounded-full bg-cream-dark text-sidebar-active flex items-center justify-center text-[10px] font-bold shrink-0">
             YO
           </div>
           <input :value="commentDraft" type="text" placeholder="Add a comment..."
-            class="flex-1 px-4 py-3 border border-weather-border rounded-xl text-[13px] sm:text-[14px] text-slate-800 placeholder:text-slate-400 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20"
+            class="flex-1 px-3 py-2.5 border border-weather-border rounded-full text-[13px] text-slate-800 placeholder:text-slate-400 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20"
             @input="$emit('update:comment-draft', ($event.target as HTMLInputElement).value)"
             @keydown.enter.prevent="$emit('submit-comment')" />
           <button @click="$emit('submit-comment')"
-            class="px-4 py-3 rounded-xl bg-sidebar-active text-white font-semibold text-[13px] sm:text-[14px] cursor-pointer hover:bg-sidebar-active/90 transition-all duration-200 border-none">
+            class="px-4 py-2.5 rounded-full bg-sidebar-active text-white font-semibold text-[12px] cursor-pointer hover:bg-sidebar-active/90 transition-all duration-200 border-none">
             Reply
           </button>
         </div>
@@ -176,12 +167,13 @@
         </button>
 
         <button @click="$emit('bookmark')" :class="[
-          'flex items-center justify-center py-2.5 px-3 rounded-lg text-[12px] sm:text-[13px] font-medium cursor-pointer transition-all duration-200 border-none',
+          'flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg text-[12px] sm:text-[13px] font-semibold cursor-pointer transition-all duration-200 border-none',
           post.bookmarked
-            ? 'text-sidebar-active bg-sidebar-active/10 hover:bg-sidebar-active/20'
+            ? 'text-white bg-sidebar-active hover:bg-sidebar-active/90 shadow-[0_2px_8px_rgba(42,90,66,0.2)]'
             : 'text-slate-600 bg-cream hover:bg-cream-dark'
-        ]" title="Bookmark">
-          <FontAwesomeIcon :icon="faBookmark" class="h-4 w-4" :class="post.bookmarked ? 'text-sidebar-active' : ''" />
+        ]" :title="post.bookmarked ? 'Saved' : 'Save post'">
+          <FontAwesomeIcon :icon="faBookmark" class="h-4 w-4" :class="post.bookmarked ? 'text-white' : ''" />
+          <span class="hidden sm:inline">{{ post.bookmarked ? 'Saved' : 'Save' }}</span>
         </button>
       </div>
     </div>
@@ -189,27 +181,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faBookmark, faCircleCheck, faCommentDots, faEllipsis, faHeart, faLocationDot, faShareNodes, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons'
+import { faBookmark, faCircleCheck, faCommentDots, faEllipsis, faHeart, faLocationDot, faShareNodes, faChevronLeft, faChevronRight, faTrash } from '@fortawesome/free-solid-svg-icons'
 import type { Post } from '../store/community'
 
-defineProps<{
+const props = defineProps<{
   post: Post
   expanded?: boolean
   commentDraft?: string
+  canDelete?: boolean
 }>()
 
-defineEmits<{
+const currentImageIndex = ref(0)
+const showMenu = ref(false)
+
+const visibleComments = computed(() => {
+  return props.expanded ? props.post.comments : props.post.comments.slice(0, 2)
+})
+
+const emit = defineEmits<{
   like: []
   comment: []
   share: []
   bookmark: []
+  delete: []
   'update:comment-draft': [value: string]
   'submit-comment': []
 }>()
 
-const currentImageIndex = ref(0)
+const handleDelete = () => {
+  showMenu.value = false
+  emit('delete')
+}
 
 const formatNumber = (num: number): string => {
   if (num >= 1000) {

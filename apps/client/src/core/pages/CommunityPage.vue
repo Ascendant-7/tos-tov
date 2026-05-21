@@ -2,7 +2,7 @@
   <main class="flex-1 h-screen overflow-y-auto bg-cream box-border font-sans custom-scrollbar">
     <CommunityView :active-comment-post-id="activeCommentPostId" :new-comment="newComment"
       @create-post="showCreatePostModal = true" @share-post="sharePost" @toggle-comments="toggleComments"
-      @update:new-comment="newComment = $event" @submit-comment="addComment" />
+      @request-delete="requestDeletePost" @update:new-comment="newComment = $event" @submit-comment="addComment" />
 
     <div v-if="showCreatePostModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div class="w-full max-w-[500px] max-h-[80vh] overflow-y-auto rounded-2xl bg-white">
@@ -16,9 +16,91 @@
         </div>
 
         <div class="space-y-4 p-5 sm:p-6">
-          <textarea v-model="newPostText"
-            placeholder="Share your Cambodia travel experience, tips, memories, hashtags... #AngkorWat #Adventure"
+          <div class="space-y-2">
+            <label class="text-[12px] font-semibold text-slate-700">Destination</label>
+            <div v-if="selectedDestination"
+              class="flex items-center justify-between gap-3 rounded-xl border border-weather-border bg-cream/60 px-4 py-3">
+              <div class="min-w-0">
+                <p class="m-0 truncate text-[13px] font-semibold text-slate-800">{{ selectedDestination.name }}</p>
+                <p class="m-0 truncate text-[12px] text-slate-500">
+                  {{ [selectedDestination.province, selectedDestination.locationName].filter(Boolean).join(' - ') }}
+                </p>
+              </div>
+              <button class="text-[12px] font-semibold text-sidebar-active" @click="clearSelectedDestination">
+                Change
+              </button>
+            </div>
+
+            <div v-else class="relative">
+              <div class="relative">
+                <FontAwesomeIcon :icon="faLocationDot"
+                  class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input v-model="destinationQuery" type="search" placeholder="Search destination..."
+                  class="w-full rounded-xl border border-weather-border py-3 pl-10 pr-4 text-[13px] text-slate-800 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20 sm:text-[14px]"
+                  @focus="isDestinationSearchFocused = true"
+                  @blur="hideDestinationDropdown" />
+              </div>
+
+              <div v-if="showDestinationDropdown"
+                class="absolute z-10 mt-2 max-h-56 w-full overflow-y-auto rounded-xl border border-weather-border bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+                <button v-for="destination in communityStore.destinationResults" :key="destination.id"
+                  class="flex w-full items-center gap-3 border-none bg-white px-4 py-3 text-left transition-colors hover:bg-cream"
+                  @click="selectDestination(destination)">
+                  <img :src="destination.coverImageUrl || fallbackDestinationImage" :alt="destination.name"
+                    class="h-10 w-10 rounded-lg object-cover" />
+                  <span class="min-w-0">
+                    <span class="block truncate text-[13px] font-semibold text-slate-800">{{ destination.name }}</span>
+                    <span class="block truncate text-[12px] text-slate-500">
+                      {{ [destination.province, destination.locationName].filter(Boolean).join(' - ') || 'Cambodia' }}
+                    </span>
+                  </span>
+                </button>
+
+                <div v-if="communityStore.isSearchingDestinations" class="px-4 py-3 text-[12px] text-slate-500">
+                  Searching...
+                </div>
+                <div v-else-if="communityStore.destinationResults.length === 0"
+                  class="px-4 py-3 text-[12px] text-slate-500">
+                  No destinations found.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <label class="space-y-2">
+              <span class="text-[12px] font-semibold text-slate-700">Trip status</span>
+              <select v-model="visitStatus"
+                class="w-full rounded-xl border border-weather-border bg-white px-4 py-3 text-[13px] text-slate-800 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20">
+                <option value="visited">Visited</option>
+                <option value="want_to_go">Want to go</option>
+              </select>
+            </label>
+
+            <label class="space-y-2">
+              <span class="text-[12px] font-semibold text-slate-700">Visibility</span>
+              <select v-model="visibility"
+                class="w-full rounded-xl border border-weather-border bg-white px-4 py-3 text-[13px] text-slate-800 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20">
+                <option value="public">Public</option>
+                <option value="friends">Friends</option>
+                <option value="private">Private</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="space-y-2">
+            <span class="text-[12px] font-semibold text-slate-700">Title <span class="font-normal text-slate-400">(optional)</span></span>
+            <input v-model="newPostTitle" type="text" maxlength="120"
+              placeholder="Add a short title..."
+              class="w-full rounded-xl border border-weather-border px-4 py-3 text-[13px] text-slate-800 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20 sm:text-[14px]" />
+          </label>
+
+          <label class="space-y-2">
+            <span class="text-[12px] font-semibold text-slate-700">Caption</span>
+            <textarea v-model="newPostText"
+            placeholder="Write a caption... #AngkorWat #Adventure"
             class="h-24 w-full resize-none rounded-xl border border-weather-border p-4 text-[13px] text-slate-800 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20 sm:text-[14px]" />
+          </label>
 
           <div class="space-y-3 rounded-xl border border-dashed border-weather-border bg-cream/60 p-4">
             <div class="flex items-center justify-between gap-3">
@@ -91,9 +173,37 @@
               Cancel
             </button>
             <button
-              class="flex-1 rounded-xl border-none bg-sidebar-active px-4 py-2.5 text-[13px] font-semibold text-white transition-all duration-200 hover:bg-sidebar-active/90 sm:text-[14px]"
+              class="flex-1 rounded-xl border-none bg-sidebar-active px-4 py-2.5 text-[13px] font-semibold text-white transition-all duration-200 hover:bg-sidebar-active/90 disabled:cursor-not-allowed disabled:opacity-60 sm:text-[14px]"
+              :disabled="communityStore.isSubmitting"
               @click="createPost">
-              Post
+              {{ communityStore.isSubmitting ? 'Posting...' : 'Post' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="postPendingDelete" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div class="w-full max-w-[420px] rounded-2xl bg-white shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
+        <div class="border-b border-weather-border px-5 py-4">
+          <h3 class="m-0 text-[16px] font-bold text-slate-800">Delete post?</h3>
+        </div>
+
+        <div class="space-y-4 px-5 py-4">
+          <p class="m-0 text-[13px] leading-relaxed text-slate-600">
+            This post and its media/comments will be removed. This cannot be undone.
+          </p>
+
+          <div class="flex justify-end gap-3">
+            <button
+              class="rounded-xl border border-weather-border px-4 py-2.5 text-[13px] font-semibold text-slate-600 transition-colors hover:bg-cream"
+              @click="postPendingDelete = null">
+              Cancel
+            </button>
+            <button
+              class="rounded-xl border-none bg-red-500 px-4 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-red-600"
+              @click="confirmDeletePost">
+              Delete
             </button>
           </div>
         </div>
@@ -103,22 +213,37 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faArrowUpFromBracket, faImage, faXmark, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons'
+import { faArrowUpFromBracket, faImage, faXmark, faChevronLeft, faChevronRight, faLocationDot } from '@fortawesome/free-solid-svg-icons'
 import { useCommunityStore } from '@/modules/community/store/community'
 import CommunityView from '@/modules/community/pages/CommunityView.vue'
-import type { Post } from '@/modules/community/store/community'
+import type { DestinationOption, Post } from '@/modules/community/store/community'
 
 const communityStore = useCommunityStore()
 
 const showCreatePostModal = ref(false)
 const activeCommentPostId = ref<string | null>(null)
+const newPostTitle = ref('')
 const newPostText = ref('')
 const selectedImages = ref<string[]>([])
+const selectedFiles = ref<File[]>([])
 const currentImageIndex = ref(0)
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const newComment = ref('')
+const postPendingDelete = ref<Post | null>(null)
+const destinationQuery = ref('')
+const selectedDestination = ref<DestinationOption | null>(null)
+const isDestinationSearchFocused = ref(false)
+const visitStatus = ref<'visited' | 'want_to_go'>('visited')
+const visibility = ref<'public' | 'friends' | 'private'>('public')
+const fallbackDestinationImage =
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=120&h=120&fit=crop'
+const showDestinationDropdown = computed(() => {
+  return isDestinationSearchFocused.value && destinationQuery.value.trim().length >= 2
+})
+
+let destinationSearchTimer: ReturnType<typeof window.setTimeout> | null = null
 
 const handleImageUpload = (event: Event) => {
   const input = event.target as HTMLInputElement
@@ -133,6 +258,7 @@ const handleImageUpload = (event: Event) => {
     const file = files[i]
     if (file) {
       const objectUrl = URL.createObjectURL(file)
+      selectedFiles.value.push(file)
       selectedImages.value.push(objectUrl)
     }
   }
@@ -146,6 +272,7 @@ const removeImage = (index: number) => {
   }
 
   selectedImages.value.splice(index, 1)
+  selectedFiles.value.splice(index, 1)
 
   if (currentImageIndex.value >= selectedImages.value.length && selectedImages.value.length > 0) {
     currentImageIndex.value = selectedImages.value.length - 1
@@ -165,6 +292,7 @@ const clearAllImages = () => {
   })
 
   selectedImages.value = []
+  selectedFiles.value = []
   currentImageIndex.value = 0
 
   if (fileInputRef.value) {
@@ -174,7 +302,34 @@ const clearAllImages = () => {
 
 const closeCreatePostModal = () => {
   clearAllImages()
+  resetPostForm()
   showCreatePostModal.value = false
+}
+
+const resetPostForm = () => {
+  newPostText.value = ''
+  newPostTitle.value = ''
+  destinationQuery.value = ''
+  selectedDestination.value = null
+  visitStatus.value = 'visited'
+  visibility.value = 'public'
+  communityStore.destinationResults = []
+}
+
+const selectDestination = (destination: DestinationOption) => {
+  selectedDestination.value = destination
+  destinationQuery.value = ''
+  communityStore.destinationResults = []
+}
+
+const clearSelectedDestination = () => {
+  selectedDestination.value = null
+}
+
+const hideDestinationDropdown = () => {
+  window.setTimeout(() => {
+    isDestinationSearchFocused.value = false
+  }, 150)
 }
 
 const toggleComments = (post: Post) => {
@@ -192,23 +347,67 @@ const sharePost = (post: Post) => {
   }
 }
 
-const createPost = () => {
+const requestDeletePost = (post: Post) => {
+  postPendingDelete.value = post
+}
+
+const confirmDeletePost = async () => {
+  if (!postPendingDelete.value) {
+    return
+  }
+
+  const postId = postPendingDelete.value.id
+  postPendingDelete.value = null
+
+  await communityStore.deletePost(postId)
+}
+
+const createPost = async () => {
   if (newPostText.value.trim()) {
     const hashtags = newPostText.value
       .split(' ')
       .filter((tag) => tag.startsWith('#'))
       .slice(0, 5)
 
-    communityStore.addPost(newPostText.value, hashtags, selectedImages.value.length > 0 ? selectedImages.value : undefined)
-    newPostText.value = ''
-    closeCreatePostModal()
+    try {
+      await communityStore.addPost(
+        {
+          content: newPostText.value,
+          title: newPostTitle.value.trim() || undefined,
+          hashtags,
+          destinationId: selectedDestination.value?.id,
+          destinationName: selectedDestination.value?.name,
+          province: selectedDestination.value?.province,
+          isVisited: visitStatus.value === 'visited',
+          visibility: visibility.value,
+        },
+        selectedFiles.value,
+      )
+      closeCreatePostModal()
+    } catch {
+      // The store owns the user-facing error message.
+    }
   }
 }
 
-const addComment = () => {
+const addComment = async () => {
   if (newComment.value.trim() && activeCommentPostId.value) {
-    communityStore.addComment(activeCommentPostId.value, newComment.value)
-    newComment.value = ''
+    try {
+      await communityStore.addComment(activeCommentPostId.value, newComment.value)
+      newComment.value = ''
+    } catch {
+      // The store owns the user-facing error message.
+    }
   }
 }
+
+watch(destinationQuery, (query) => {
+  if (destinationSearchTimer) {
+    window.clearTimeout(destinationSearchTimer)
+  }
+
+  destinationSearchTimer = window.setTimeout(() => {
+    void communityStore.searchDestinations(query)
+  }, 250)
+})
 </script>
