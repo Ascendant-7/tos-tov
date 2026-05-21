@@ -21,7 +21,7 @@ export class ItineraryService {
   `;
 
   async createTrip(dto: CreateTripDto) {
-    const { data, error } = await this.supabaseService.client
+    const { data, error } = await this.supabaseService.anonClient
       .from('trips')
       .insert({
         title: dto.title,
@@ -65,7 +65,7 @@ export class ItineraryService {
     const result: Array<{ items: any[] }> = [];
 
     for (const day of days) {
-      const { data: items, error: itemsError } = await this.supabaseService.client
+      const { data: items, error: itemsError } = await this.supabaseService.anonClient
         .from('itinerary_items')
         .select('*')
         .eq('day_id', day.id)
