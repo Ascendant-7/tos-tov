@@ -141,6 +141,8 @@ const navItems = [
   { to: '/home', label: 'Home', icon: DashboardIcon },
   { to: '/explore', label: 'Explore', icon: ExploreIcon },
   { to: '/trip-planner', label: 'Trip Planner', icon: TripIcon },
+  { to: '/trips', label: 'My Trips', icon: SavedIcon },
+  { to: '/shared-trips', label: 'Shared Trips', icon: CommunityIcon },
   { to: '/route-intel', label: 'Route Intel', icon: RouteIntelIcon },
   { to: '/social', label: 'Social Travel', icon: SocialIcon },
   { to: '/community', label: 'Community', icon: CommunityIcon },
