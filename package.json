@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "pnpm -F @repo/supabase gen-types && pnpm -r --parallel --filter \"./apps/*\" run \"/^dev|start:dev$/\"",
-    "db:new": "pnpm -F @repo/supabase exec supabase migration new"
+    "db:new": "pnpm -F @repo/supabase exec supabase migration new",
+    "lint": "pnpm -r --parallel lint",
+    "format": "pnpm -r --parallel format"
   },
   "keywords": [],
   "author": "",
