@@ -26,7 +26,7 @@ import { CommunityModule } from './modules/community/community.module';
     ReviewsModule,
     ItineraryModule,
     ProfilesModule,
-    CommunityModule
+    CommunityModule,
   ],
   controllers: [AppController],
   providers: [AppService],

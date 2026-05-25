@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   Param,
   Patch,
   Post,
@@ -13,17 +14,17 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { Multer } from 'multer';
+import 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { User } from '@repo/supabase';
 import { CommunityService } from './community.service';
-import { CreateDraftPostDto } from './dto/create-draft-post.dto';
-import { UpdateDraftPostDto } from './dto/update-draft-post.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { SupabaseService } from '../../supabase/supabase.service';
 import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostVisibilityDto } from './dto/update-post-visibility.dto';
+import { UploadPostMediaDto } from './dto/upload-post-media.dto';
 
 interface AuthenticatedRequest extends Request {
   user: User;
@@ -63,10 +64,7 @@ export class CommunityController {
 
   @Post('posts')
   @UseGuards(AuthGuard)
-  createPost(
-    @Req() req: AuthenticatedRequest,
-    @Body() dto: CreatePostDto,
-  ) {
+  createPost(@Req() req: AuthenticatedRequest, @Body() dto: CreatePostDto) {
     return this.communityService.createPost(requireUserId(req), dto);
   }
 
@@ -76,14 +74,14 @@ export class CommunityController {
   uploadPostMedia(
     @Req() req: AuthenticatedRequest,
     @Param('postId') postId: string,
-    @Query('position') position: string,
+    @Query() query: UploadPostMediaDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.communityService.uploadPostMedia(
       requireUserId(req),
       postId,
       file,
-      Number(position ?? 0),
+      Number(query.position ?? 0),
     );
   }
 
@@ -119,10 +117,7 @@ export class CommunityController {
 
   @Post('posts/:postId/like')
   @UseGuards(AuthGuard)
-  likePost(
-    @Req() req: AuthenticatedRequest,
-    @Param('postId') postId: string,
-  ) {
+  likePost(@Req() req: AuthenticatedRequest, @Param('postId') postId: string) {
     return this.communityService.likePost(requireUserId(req), postId);
   }
 
@@ -137,10 +132,7 @@ export class CommunityController {
 
   @Post('posts/:postId/save')
   @UseGuards(AuthGuard)
-  savePost(
-    @Req() req: AuthenticatedRequest,
-    @Param('postId') postId: string,
-  ) {
+  savePost(@Req() req: AuthenticatedRequest, @Param('postId') postId: string) {
     return this.communityService.savePost(requireUserId(req), postId);
   }
 
@@ -162,9 +154,28 @@ export class CommunityController {
     return this.communityService.deletePost(requireUserId(req), postId);
   }
 
+  @Patch('posts/:postId/visibility')
+  @UseGuards(AuthGuard)
+  updatePostVisibility(
+    @Req() req: AuthenticatedRequest,
+    @Param('postId') postId: string,
+    @Body() dto: UpdatePostVisibilityDto,
+  ) {
+    return this.communityService.updatePostVisibility(
+      requireUserId(req),
+      postId,
+      dto.visibility,
+    );
+  }
+
   @Get('posts/:postId/comments')
-  getComments(@Param('postId') postId: string) {
-    return this.communityService.getComments(postId);
+  async getComments(
+    @Headers('authorization') authorization: string | undefined,
+    @Param('postId') postId: string,
+  ) {
+    const userId = await this.getOptionalUserId(authorization);
+
+    return this.communityService.getComments(postId, userId);
   }
 
   @Post('posts/:postId/comments')
@@ -174,10 +185,6 @@ export class CommunityController {
     @Param('postId') postId: string,
     @Body() dto: CreateCommentDto,
   ) {
-    return this.communityService.createComment(
-      requireUserId(req),
-      postId,
-      dto,
-    );
+    return this.communityService.createComment(requireUserId(req), postId, dto);
   }
 }

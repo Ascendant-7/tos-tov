@@ -92,6 +92,7 @@
             @like="communityStore.toggleLike(post.id)" @bookmark="communityStore.toggleBookmark(post.id)"
             @share="emit('share-post', post)" @comment="emit('toggle-comments', post)"
             @delete="emit('request-delete', post)"
+            @update-privacy="communityStore.updatePostVisibility(post.id, $event)"
             @update:comment-draft="emit('update:new-comment', $event)" @submit-comment="emit('submit-comment')"
             :style="{ animationDelay: `${0.1 + i * 0.05}s` }" class="animate-fade-in-up" />
         </div>

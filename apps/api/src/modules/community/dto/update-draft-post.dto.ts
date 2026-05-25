@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { IsIn, IsOptional, IsString, IsUUID } from 'class-validator';
-=======
-import { IsIn, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
->>>>>>> 62f821d (feat/Community: posts,comments,likes,saves,drafting and published posts)
 
 export class UpdateDraftPostDto {
   @IsOptional()
@@ -11,18 +7,10 @@ export class UpdateDraftPostDto {
 
   @IsOptional()
   @IsString()
-<<<<<<< HEAD
-=======
-  @IsNotEmpty()
->>>>>>> 62f821d (feat/Community: posts,comments,likes,saves,drafting and published posts)
   title?: string;
 
   @IsOptional()
   @IsString()
-<<<<<<< HEAD
-=======
-  @IsNotEmpty()
->>>>>>> 62f821d (feat/Community: posts,comments,likes,saves,drafting and published posts)
   content?: string;
 
   @IsOptional()

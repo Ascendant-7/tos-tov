@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  IsUrl,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -13,6 +14,7 @@ import { Type } from 'class-transformer';
 class CreatePostMediaDto {
   @IsString()
   @IsNotEmpty()
+  @IsUrl({ require_tld: false })
   mediaUrl: string;
 
   @IsIn(['image', 'video'])
@@ -54,6 +56,7 @@ export class CreatePostDto {
 
   @IsOptional()
   @IsArray()
+  @IsString({ each: true })
   hashtags?: string[];
 
   @IsOptional()

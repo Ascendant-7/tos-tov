@@ -485,33 +485,24 @@ export type Database = {
           description: string | null
           id: string
           title: string
-<<<<<<< HEAD
           user_id: string | null
           visibility: string | null
-=======
->>>>>>> 62f821d (feat/Community: posts,comments,likes,saves,drafting and published posts)
         }
         Insert: {
           created_at?: string | null
           description?: string | null
           id?: string
           title: string
-<<<<<<< HEAD
           user_id?: string | null
           visibility?: string | null
-=======
->>>>>>> 62f821d (feat/Community: posts,comments,likes,saves,drafting and published posts)
         }
         Update: {
           created_at?: string | null
           description?: string | null
           id?: string
           title?: string
-<<<<<<< HEAD
           user_id?: string | null
           visibility?: string | null
-=======
->>>>>>> 62f821d (feat/Community: posts,comments,likes,saves,drafting and published posts)
         }
         Relationships: []
       }

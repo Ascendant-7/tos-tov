@@ -106,58 +106,68 @@
             <div class="flex items-center justify-between gap-3">
               <div class="flex items-center gap-2 text-slate-700">
                 <FontAwesomeIcon :icon="faImage" class="h-4 w-4" />
-                <span class="text-[13px] font-semibold sm:text-[14px]">Upload photos</span>
-                <span v-if="selectedImages.length > 0" class="text-[12px] text-slate-500">({{ selectedImages.length
+                <span class="text-[13px] font-semibold sm:text-[14px]">Upload media</span>
+                <span v-if="selectedMedia.length > 0" class="text-[12px] text-slate-500">({{ selectedMedia.length
                 }})</span>
               </div>
-              <button v-if="selectedImages.length > 0"
+              <button v-if="selectedMedia.length > 0"
                 class="text-[12px] font-medium text-slate-500 transition-colors hover:text-red-500"
-                @click="clearAllImages">
+                @click="clearAllMedia">
                 Clear All
               </button>
             </div>
 
             <label
               class="flex cursor-pointer items-center justify-center rounded-xl border border-weather-border bg-white px-4 py-3 text-[13px] font-medium text-slate-600 transition-colors hover:bg-cream sm:text-[14px]">
-              <input ref="fileInputRef" type="file" multiple accept="image/*" class="hidden"
-                @change="handleImageUpload" />
+              <input ref="fileInputRef" type="file" multiple accept="image/*,video/mp4,video/webm" class="hidden"
+                @change="handleMediaUpload" />
               <span class="flex items-center gap-2">
                 <FontAwesomeIcon :icon="faArrowUpFromBracket" class="h-4 w-4" />
-                Choose images
+                Choose media
               </span>
             </label>
 
-            <div v-if="selectedImages.length > 0" class="space-y-2">
+            <div v-if="selectedMedia.length > 0" class="space-y-2">
               <div class="relative overflow-hidden rounded-xl border border-weather-border bg-white group">
-                <img :src="selectedImages[currentImageIndex]" alt="Selected upload preview"
+                <video v-if="selectedMedia[currentMediaIndex]?.type === 'video'"
+                  :src="selectedMedia[currentMediaIndex]?.url"
+                  class="h-48 w-full object-cover"
+                  controls
+                  muted />
+                <img v-else :src="selectedMedia[currentMediaIndex]?.url" alt="Selected upload preview"
                   class="h-48 w-full object-cover" />
-                <div v-if="selectedImages.length > 1" class="absolute inset-0 flex items-center justify-between px-2">
-                  <button v-if="currentImageIndex > 0" @click.stop="currentImageIndex--"
-                    class="rounded-full bg-black/40 p-2 text-white transition-all hover:bg-black/60">
+                <div v-if="selectedMedia.length > 1" class="absolute inset-0 flex items-center justify-between px-2 pointer-events-none">
+                  <button v-if="currentMediaIndex > 0" @click.stop="currentMediaIndex--"
+                    class="pointer-events-auto rounded-full bg-black/40 p-2 text-white transition-all hover:bg-black/60">
                     <FontAwesomeIcon :icon="faChevronLeft" class="h-4 w-4" />
                   </button>
-                  <button v-if="currentImageIndex < selectedImages.length - 1" @click.stop="currentImageIndex++"
-                    class="ml-auto rounded-full bg-black/40 p-2 text-white transition-all hover:bg-black/60">
+                  <button v-if="currentMediaIndex < selectedMedia.length - 1" @click.stop="currentMediaIndex++"
+                    class="pointer-events-auto ml-auto rounded-full bg-black/40 p-2 text-white transition-all hover:bg-black/60">
                     <FontAwesomeIcon :icon="faChevronRight" class="h-4 w-4" />
                   </button>
                 </div>
-                <div v-if="selectedImages.length > 1"
+                <div v-if="selectedMedia.length > 1"
                   class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[12px] font-medium text-white bg-black/40 px-3 py-1 rounded-full">
-                  {{ currentImageIndex + 1 }} / {{ selectedImages.length }}
+                  {{ currentMediaIndex + 1 }} / {{ selectedMedia.length }}
                 </div>
-                <button @click.stop="removeImage(currentImageIndex)"
+                <button @click.stop="removeMedia(currentMediaIndex)"
                   class="absolute top-2 right-2 rounded-full bg-red-500 text-white p-2 transition-all hover:bg-red-600 shadow-lg">
                   <FontAwesomeIcon :icon="faXmark" class="h-5 w-5" />
                 </button>
               </div>
 
               <div class="flex gap-2 overflow-x-auto pb-2">
-                <div v-for="(image, index) in selectedImages" :key="index"
+                <div v-for="(media, index) in selectedMedia" :key="media.url"
                   class="relative flex-shrink-0 rounded-lg border-2 overflow-hidden cursor-pointer transition-all"
-                  :class="currentImageIndex === index ? 'border-sidebar-active ring-2 ring-sidebar-active/30' : 'border-weather-border hover:border-slate-400'"
-                  @click="currentImageIndex = index">
-                  <img :src="image" :alt="`Thumbnail ${index + 1}`" class="h-20 w-20 object-cover" />
-                  <button @click.stop="removeImage(index)"
+                  :class="currentMediaIndex === index ? 'border-sidebar-active ring-2 ring-sidebar-active/30' : 'border-weather-border hover:border-slate-400'"
+                  @click="currentMediaIndex = index">
+                  <video v-if="media.type === 'video'" :src="media.url" class="h-20 w-20 object-cover" muted />
+                  <img v-else :src="media.url" :alt="`Thumbnail ${index + 1}`" class="h-20 w-20 object-cover" />
+                  <span v-if="media.type === 'video'"
+                    class="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                    Video
+                  </span>
+                  <button @click.stop="removeMedia(index)"
                     class="absolute top-1 right-1 rounded-full bg-red-500 text-white p-1 transition-all hover:bg-red-600 shadow-md">
                     <FontAwesomeIcon :icon="faXmark" class="h-3 w-3" />
                   </button>
@@ -222,13 +232,18 @@ import type { DestinationOption, Post } from '@/modules/community/store/communit
 
 const communityStore = useCommunityStore()
 
+type SelectedMedia = {
+  url: string
+  type: 'image' | 'video'
+}
+
 const showCreatePostModal = ref(false)
 const activeCommentPostId = ref<string | null>(null)
 const newPostTitle = ref('')
 const newPostText = ref('')
-const selectedImages = ref<string[]>([])
+const selectedMedia = ref<SelectedMedia[]>([])
 const selectedFiles = ref<File[]>([])
-const currentImageIndex = ref(0)
+const currentMediaIndex = ref(0)
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const newComment = ref('')
 const postPendingDelete = ref<Post | null>(null)
@@ -245,7 +260,7 @@ const showDestinationDropdown = computed(() => {
 
 let destinationSearchTimer: ReturnType<typeof window.setTimeout> | null = null
 
-const handleImageUpload = (event: Event) => {
+const handleMediaUpload = (event: Event) => {
   const input = event.target as HTMLInputElement
   const files = input.files
 
@@ -253,47 +268,51 @@ const handleImageUpload = (event: Event) => {
     return
   }
 
-  // Process each selected file
   for (let i = 0; i < files.length; i++) {
     const file = files[i]
-    if (file) {
+    const isSupportedMedia = file?.type.startsWith('image/') || ['video/mp4', 'video/webm'].includes(file?.type ?? '')
+
+    if (file && isSupportedMedia) {
       const objectUrl = URL.createObjectURL(file)
       selectedFiles.value.push(file)
-      selectedImages.value.push(objectUrl)
+      selectedMedia.value.push({
+        url: objectUrl,
+        type: file.type.startsWith('video/') ? 'video' : 'image',
+      })
     }
   }
 
-  currentImageIndex.value = selectedImages.value.length - 1
+  currentMediaIndex.value = selectedMedia.value.length - 1
 }
 
-const removeImage = (index: number) => {
-  if (selectedImages.value[index]) {
-    URL.revokeObjectURL(selectedImages.value[index])
+const removeMedia = (index: number) => {
+  if (selectedMedia.value[index]) {
+    URL.revokeObjectURL(selectedMedia.value[index].url)
   }
 
-  selectedImages.value.splice(index, 1)
+  selectedMedia.value.splice(index, 1)
   selectedFiles.value.splice(index, 1)
 
-  if (currentImageIndex.value >= selectedImages.value.length && selectedImages.value.length > 0) {
-    currentImageIndex.value = selectedImages.value.length - 1
+  if (currentMediaIndex.value >= selectedMedia.value.length && selectedMedia.value.length > 0) {
+    currentMediaIndex.value = selectedMedia.value.length - 1
   }
 
-  if (selectedImages.value.length === 0) {
-    currentImageIndex.value = 0
+  if (selectedMedia.value.length === 0) {
+    currentMediaIndex.value = 0
     if (fileInputRef.value) {
       fileInputRef.value.value = ''
     }
   }
 }
 
-const clearAllImages = () => {
-  selectedImages.value.forEach((image) => {
-    URL.revokeObjectURL(image)
+const clearAllMedia = () => {
+  selectedMedia.value.forEach((media) => {
+    URL.revokeObjectURL(media.url)
   })
 
-  selectedImages.value = []
+  selectedMedia.value = []
   selectedFiles.value = []
-  currentImageIndex.value = 0
+  currentMediaIndex.value = 0
 
   if (fileInputRef.value) {
     fileInputRef.value.value = ''
@@ -301,7 +320,7 @@ const clearAllImages = () => {
 }
 
 const closeCreatePostModal = () => {
-  clearAllImages()
+  clearAllMedia()
   resetPostForm()
   showCreatePostModal.value = false
 }

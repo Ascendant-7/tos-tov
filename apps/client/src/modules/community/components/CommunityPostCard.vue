@@ -10,11 +10,18 @@
         </div>
         <div class="min-w-0">
           <h3 class="text-[13px] sm:text-[14px] font-semibold text-slate-800 m-0">{{ post.userName }}</h3>
-          <p class="text-[11px] sm:text-[12px] text-slate-500 m-0 flex items-center gap-1.5">
-            <FontAwesomeIcon :icon="faLocationDot" class="h-3 w-3" />
-            <span>{{ post.location }}</span>
+          <div class="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] text-slate-500 sm:text-[12px]">
+            <span class="flex min-w-0 items-center gap-1.5">
+              <FontAwesomeIcon :icon="faLocationDot" class="h-3 w-3 shrink-0" />
+              <span class="truncate">{{ post.location }}</span>
+            </span>
             <span class="text-slate-400">{{ post.timeAgo }}</span>
-          </p>
+            <span
+              class="inline-flex items-center gap-1 rounded-full bg-cream px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+              <FontAwesomeIcon :icon="visibilityIcon" class="h-2.5 w-2.5" />
+              {{ visibilityLabel }}
+            </span>
+          </div>
         </div>
       </div>
       <div v-if="canDelete" class="relative shrink-0">
@@ -24,7 +31,21 @@
         </button>
 
         <div v-if="showMenu"
-          class="absolute right-0 top-full z-20 mt-1 min-w-28 overflow-hidden rounded-lg border border-weather-border bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+          class="absolute right-0 top-full z-20 mt-1 min-w-40 overflow-hidden rounded-lg border border-weather-border bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+          <div class="border-b border-weather-border/70 px-3 py-2">
+            <p class="m-0 mb-1 text-[11px] font-semibold text-slate-500">Privacy</p>
+            <div class="grid gap-1">
+              <button v-for="option in visibilityOptions" :key="option.value"
+                class="flex w-full items-center gap-2 rounded-md border-none px-2 py-1.5 text-left text-[12px] font-semibold transition-colors"
+                :class="post.visibility === option.value
+                  ? 'bg-sidebar-active/10 text-sidebar-active'
+                  : 'bg-white text-slate-600 hover:bg-cream'"
+                @click="handlePrivacyUpdate(option.value)">
+                <FontAwesomeIcon :icon="option.icon" class="h-3.5 w-3.5" />
+                {{ option.label }}
+              </button>
+            </div>
+          </div>
           <button
             class="flex w-full items-center gap-2 border-none bg-white px-3 py-2 text-left text-[12px] font-semibold text-red-500 hover:bg-red-50"
             @click="handleDelete">
@@ -35,28 +56,31 @@
       </div>
     </div>
 
-    <!-- Post Images Gallery -->
+    <!-- Post Media Gallery -->
     <div class="relative w-full bg-cream-dark overflow-hidden">
-      <img :src="post.images[currentImageIndex]" :alt="post.title"
+      <video v-if="currentMedia?.type === 'video'" :src="currentMedia.url"
+        class="w-full aspect-square sm:aspect-video object-cover bg-black"
+        controls
+        playsinline />
+      <img v-else :src="currentMedia?.url" :alt="post.title"
         class="w-full aspect-square sm:aspect-video object-cover transition-transform duration-500 group-hover:scale-105" />
       
       <!-- Navigation Arrows -->
-      <div v-if="post.images.length > 1" class="absolute inset-0 flex items-center justify-between px-2">
-        <button @click.stop="currentImageIndex = currentImageIndex > 0 ? currentImageIndex - 1 : post.images.length - 1"
-          class="rounded-full bg-black/40 p-2 text-white transition-all hover:bg-black/60">
+      <div v-if="post.media.length > 1" class="pointer-events-none absolute inset-0 flex items-center justify-between px-2">
+        <button @click.stop="currentMediaIndex = currentMediaIndex > 0 ? currentMediaIndex - 1 : post.media.length - 1"
+          class="pointer-events-auto rounded-full bg-black/40 p-2 text-white transition-all hover:bg-black/60">
           <FontAwesomeIcon :icon="faChevronLeft" class="h-4 w-4" />
         </button>
-        <button @click.stop="currentImageIndex = currentImageIndex < post.images.length - 1 ? currentImageIndex + 1 : 0"
-          class="ml-auto rounded-full bg-black/40 p-2 text-white transition-all hover:bg-black/60">
+        <button @click.stop="currentMediaIndex = currentMediaIndex < post.media.length - 1 ? currentMediaIndex + 1 : 0"
+          class="pointer-events-auto ml-auto rounded-full bg-black/40 p-2 text-white transition-all hover:bg-black/60">
           <FontAwesomeIcon :icon="faChevronRight" class="h-4 w-4" />
         </button>
       </div>
-
       <!-- Image Counter & Visited Badge -->
       <div class="absolute top-3 sm:top-4 right-3 sm:right-4 flex flex-col gap-2 items-end">
-        <div v-if="post.images.length > 1"
+        <div v-if="post.media.length > 1"
           class="bg-black/40 backdrop-blur-sm text-white text-[10px] sm:text-[11px] font-semibold px-3 py-1.5 rounded-full">
-          {{ currentImageIndex + 1 }} / {{ post.images.length }}
+          {{ currentMediaIndex + 1 }} / {{ post.media.length }}
         </div>
         <div
           class="bg-slate-800/70 backdrop-blur-sm text-white text-[10px] sm:text-[11px] font-semibold px-3 py-1.5 rounded-full">
@@ -66,12 +90,13 @@
       </div>
 
       <!-- Thumbnail Gallery -->
-      <div v-if="post.images.length > 1" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 flex gap-2 overflow-x-auto">
-        <button v-for="(image, index) in post.images" :key="index"
-          @click="currentImageIndex = index"
+      <div v-if="post.media.length > 1" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 flex gap-2 overflow-x-auto">
+        <button v-for="(media, index) in post.media" :key="media.url"
+          @click="currentMediaIndex = index"
           class="flex-shrink-0 rounded-md border-2 overflow-hidden transition-all"
-          :class="currentImageIndex === index ? 'border-white ring-2 ring-white' : 'border-white/40 hover:border-white/70'">
-          <img :src="image" :alt="`Image ${index + 1}`" class="h-12 w-12 object-cover" />
+          :class="currentMediaIndex === index ? 'border-white ring-2 ring-white' : 'border-white/40 hover:border-white/70'">
+          <video v-if="media.type === 'video'" :src="media.url" class="h-12 w-12 object-cover" muted />
+          <img v-else :src="media.url" :alt="`Media ${index + 1}`" class="h-12 w-12 object-cover" />
         </button>
       </div>
     </div>
@@ -183,8 +208,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faBookmark, faCircleCheck, faCommentDots, faEllipsis, faHeart, faLocationDot, faShareNodes, faChevronLeft, faChevronRight, faTrash } from '@fortawesome/free-solid-svg-icons'
-import type { Post } from '../store/community'
+import { faBookmark, faCircleCheck, faCommentDots, faEllipsis, faHeart, faLocationDot, faShareNodes, faChevronLeft, faChevronRight, faTrash, faGlobe, faLock, faUserGroup } from '@fortawesome/free-solid-svg-icons'
+import type { Post, PostVisibility } from '../store/community'
 
 const props = defineProps<{
   post: Post
@@ -193,8 +218,26 @@ const props = defineProps<{
   canDelete?: boolean
 }>()
 
-const currentImageIndex = ref(0)
+const currentMediaIndex = ref(0)
 const showMenu = ref(false)
+type VisibilityOption = {
+  value: PostVisibility
+  label: string
+  icon: typeof faGlobe
+}
+
+const visibilityOptions: [VisibilityOption, VisibilityOption, VisibilityOption] = [
+  { value: 'public', label: 'Public', icon: faGlobe },
+  { value: 'friends', label: 'Friends', icon: faUserGroup },
+  { value: 'private', label: 'Private', icon: faLock },
+] 
+
+const currentMedia = computed(() => props.post.media[currentMediaIndex.value] ?? props.post.media[0])
+const visibilityOption = computed(() =>
+  visibilityOptions.find((option) => option.value === props.post.visibility) ?? visibilityOptions[0],
+)
+const visibilityIcon = computed(() => visibilityOption.value.icon)
+const visibilityLabel = computed(() => visibilityOption.value.label)
 
 const visibleComments = computed(() => {
   return props.expanded ? props.post.comments : props.post.comments.slice(0, 2)
@@ -206,6 +249,7 @@ const emit = defineEmits<{
   share: []
   bookmark: []
   delete: []
+  'update-privacy': [visibility: PostVisibility]
   'update:comment-draft': [value: string]
   'submit-comment': []
 }>()
@@ -213,6 +257,14 @@ const emit = defineEmits<{
 const handleDelete = () => {
   showMenu.value = false
   emit('delete')
+}
+
+const handlePrivacyUpdate = (visibility: PostVisibility) => {
+  showMenu.value = false
+
+  if (visibility !== props.post.visibility) {
+    emit('update-privacy', visibility)
+  }
 }
 
 const formatNumber = (num: number): string => {

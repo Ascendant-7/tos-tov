@@ -18,6 +18,7 @@ export interface Post {
   timeAgo: string
   image: string
   images: string[]
+  media: PostMedia[]
   title: string
   description: string
   likes: number
@@ -25,6 +26,14 @@ export interface Post {
   hashtags: string[]
   liked: boolean
   bookmarked: boolean
+  visibility: PostVisibility
+}
+
+export type PostVisibility = 'public' | 'friends' | 'private'
+
+export interface PostMedia {
+  url: string
+  type: 'image' | 'video'
 }
 
 export interface CommunityUser {
@@ -79,6 +88,12 @@ interface CommunityPostRow {
   saved_posts?: { user_id?: string | null }[] | null
   liked_by_viewer?: boolean
   saved_by_viewer?: boolean
+  visibility?: PostVisibility | null
+}
+
+interface FriendOverviewRow {
+  friendshipId: string
+  profile: ProfileRow
 }
 
 interface TrendingTagRow {
@@ -105,20 +120,12 @@ export interface CreatePostInput {
   destinationName?: string
   province?: string
   isVisited?: boolean
-  visibility?: 'public' | 'friends' | 'private'
+  visibility?: PostVisibility
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api'
 const FALLBACK_IMAGE =
   'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=500&fit=crop'
-
-const MOCK_COMMUNITY_USERS: CommunityUser[] = [
-  { id: '1', name: 'Sophia L', initials: 'SL', hasStory: true },
-  { id: '2', name: 'Marcus C', initials: 'MC', hasStory: false },
-  { id: '3', name: 'Aiko Y', initials: 'AY', hasStory: false },
-  { id: '4', name: 'Dara K', initials: 'DK', hasStory: true },
-  { id: '5', name: 'Elena R', initials: 'ER', hasStory: false },
-]
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -127,7 +134,7 @@ const api = axios.create({
 let messageTimer: ReturnType<typeof window.setTimeout> | null = null
 
 const authHeaders = () => {
-  const token = localStorage.getItem('access_token')
+  const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken')
 
   return token ? { Authorization: `Bearer ${token}` } : undefined
 }
@@ -198,11 +205,19 @@ const mapPost = (row: CommunityPostRow): Post => {
   const destination = firstRelation(row.destinations)
   const userName = displayNameFor(profile)
   const content = row.content ?? ''
-  const images =
+  const media =
     row.post_media
-      ?.filter((media) => media.media_type === 'image' && media.public_url)
+      ?.filter((media) => ['image', 'video'].includes(media.media_type ?? '') && media.public_url)
       .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
-      .map((media) => media.public_url as string) ?? []
+      .map<PostMedia>((media) => ({
+        url: media.public_url as string,
+        type: media.media_type === 'video' ? 'video' : 'image',
+      })) ?? []
+  const images = media.filter((item) => item.type === 'image').map((item) => item.url)
+  const fallbackMedia: PostMedia = {
+    url: destination?.cover_image_url ?? FALLBACK_IMAGE,
+    type: 'image',
+  }
 
   const location = [destination?.name, destination?.province].filter(Boolean).join(', ') || 'Cambodia'
 
@@ -213,8 +228,9 @@ const mapPost = (row: CommunityPostRow): Post => {
     userInitials: initialsFor(userName),
     location,
     timeAgo: timeAgo(row.created_at),
-    image: images[0] ?? destination?.cover_image_url ?? FALLBACK_IMAGE,
+    image: images[0] ?? media[0]?.url ?? destination?.cover_image_url ?? FALLBACK_IMAGE,
     images: images.length > 0 ? images : [destination?.cover_image_url ?? FALLBACK_IMAGE],
+    media: media.length > 0 ? media : [fallbackMedia],
     title: row.title?.trim() ?? '',
     description: content,
     likes: row.post_likes?.length ?? 0,
@@ -233,6 +249,7 @@ const mapPost = (row: CommunityPostRow): Post => {
     hashtags: extractHashtags(content),
     liked: row.liked_by_viewer ?? false,
     bookmarked: row.saved_by_viewer ?? false,
+    visibility: row.visibility ?? 'public',
   }
 }
 
@@ -260,6 +277,17 @@ const mapComment = (row: CommentRow): Comment => {
     userName,
     userInitials: initialsFor(userName),
     text: row.content ?? '',
+  }
+}
+
+const mapCommunityUser = (friend: FriendOverviewRow): CommunityUser => {
+  const name = displayNameFor(friend.profile)
+
+  return {
+    id: friend.profile.id ?? friend.friendshipId,
+    name,
+    initials: initialsFor(name),
+    hasStory: false,
   }
 }
 
@@ -302,7 +330,7 @@ export const useCommunityStore = defineStore('community', () => {
     '#HiddenGems',
     '#CambodiaTravelTips',
   ])
-  const communityUsers = ref<CommunityUser[]>(MOCK_COMMUNITY_USERS)
+  const communityUsers = ref<CommunityUser[]>([])
   const posts = ref<Post[]>([])
   const destinationResults = ref<DestinationOption[]>([])
 
@@ -354,8 +382,27 @@ export const useCommunityStore = defineStore('community', () => {
     }
   }
 
+  const loadCommunityUsers = async () => {
+    const headers = authHeaders()
+
+    if (!headers) {
+      communityUsers.value = []
+      return
+    }
+
+    try {
+      const response = await api.get<{ friends?: FriendOverviewRow[] }>('/friends/overview', {
+        headers,
+      })
+
+      communityUsers.value = (response.data.friends ?? []).map(mapCommunityUser)
+    } catch {
+      communityUsers.value = []
+    }
+  }
+
   const loadCommunity = async () => {
-    await Promise.all([loadPosts(), loadTrendingTags()])
+    await Promise.all([loadPosts(), loadTrendingTags(), loadCommunityUsers()])
   }
 
   const setActiveFilter = (filter: string) => {
@@ -492,7 +539,7 @@ export const useCommunityStore = defineStore('community', () => {
 
       await loadPosts()
       void loadTrendingTags()
-      showFeedback(files.length > 0 ? 'Post created with photos.' : 'Post created.', 'success')
+      showFeedback(files.length > 0 ? 'Post created with media.' : 'Post created.', 'success')
 
       return posts.value.find((post) => post.id === response.data.id) ?? mapPost(response.data)
     } catch (error) {
@@ -552,6 +599,45 @@ export const useCommunityStore = defineStore('community', () => {
     }
   }
 
+  const updatePostVisibility = async (postId: string, visibility: PostVisibility) => {
+    const post = posts.value.find((item) => item.id === postId)
+    const previousVisibility = post?.visibility
+
+    if (post) {
+      post.visibility = visibility
+    }
+
+    try {
+      clearMessages()
+
+      const response = await api.patch<CommunityPostRow>(
+        `/community/posts/${postId}/visibility`,
+        { visibility },
+        { headers: requireAuthHeaders() },
+      )
+      const updatedPost = mapPost(response.data)
+      const index = posts.value.findIndex((item) => item.id === postId)
+
+      if (index >= 0) {
+        posts.value[index] = updatedPost
+      }
+
+      showFeedback('Post privacy updated.', 'success')
+    } catch (error) {
+      if (post && previousVisibility) {
+        post.visibility = previousVisibility
+      }
+
+      showError(
+        axios.isAxiosError(error)
+          ? error.response?.data?.message || 'Failed to update privacy.'
+          : 'Failed to update privacy.',
+      )
+
+      throw error
+    }
+  }
+
   return {
     activeFilter,
     selectedTag,
@@ -575,6 +661,7 @@ export const useCommunityStore = defineStore('community', () => {
     addPost,
     addComment,
     deletePost,
+    updatePostVisibility,
     setActiveFilter,
     setSelectedTag,
   }
