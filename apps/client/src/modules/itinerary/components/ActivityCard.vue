@@ -17,6 +17,7 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 const props = defineProps<{
   item: any
   disabled?: boolean
+  isEditing?: boolean
 }>()
 
 const emit = defineEmits(['delete', 'edit'])
@@ -125,7 +126,10 @@ const displayTime = computed(() => {
           </div>
         </div>
 
-        <div class="flex items-center gap-1 px-3 bg-gray-50 border-l border-gray-200">
+        <div
+          v-if="isEditing"
+          class="flex items-center gap-1 px-3 bg-gray-50 border-l border-gray-200"
+        >
           <button
             class="p-1.5 rounded-lg text-gray-400 transition-all duration-200 hover:bg-blue-100 hover:text-blue-600 active:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
             :title="disabled ? 'Working...' : 'Edit'"

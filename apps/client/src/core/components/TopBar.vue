@@ -26,9 +26,9 @@
           <line x1="4" x2="20" y1="18" y2="18" />
         </svg>
       </button>
-      <h2 class="text-base sm:text-lg font-semibold text-slate-800 m-0 whitespace-nowrap">
+      <!-- <h2 class="text-base sm:text-lg font-semibold text-slate-800 m-0 whitespace-nowrap">
         {{ pageTitle }}
-      </h2>
+      </h2> -->
     </div>
 
     <!-- Right Section -->
