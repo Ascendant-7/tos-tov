@@ -1,11 +1,7 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
-import { SupabaseService } from '../../supabase/supabase.service';
-import { CreateDestinationDto } from './dto/create-destination.dto';
-import { UpdateDestinationDto } from './dto/update-destination.dto';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
+import { SupabaseService } from '../../supabase/supabase.service'
+import { CreateDestinationDto } from './dto/create-destination.dto'
+import { UpdateDestinationDto } from './dto/update-destination.dto'
 
 @Injectable()
 export class DestinationsService {
@@ -14,25 +10,23 @@ export class DestinationsService {
     const { data, error } = await this.supabaseService.anonClient
       .from('destinations')
       .insert(createDestinationDto)
-      .select();
+      .select()
 
     if (error) {
-      throw new InternalServerErrorException(error.message);
+      throw new InternalServerErrorException(error.message)
     }
 
-    return data;
+    return data
   }
 
   async findAll() {
-    const { data, error } = await this.supabaseService.anonClient
-      .from('destinations')
-      .select('*');
+    const { data, error } = await this.supabaseService.anonClient.from('destinations').select('*')
 
     if (error) {
-      throw new InternalServerErrorException(error.message);
+      throw new InternalServerErrorException(error.message)
     }
 
-    return data;
+    return data
   }
 
   async findOne(id: string) {
@@ -40,13 +34,13 @@ export class DestinationsService {
       .from('destinations')
       .select('*')
       .eq('id', id)
-      .single();
+      .single()
 
     if (error) {
-      throw new NotFoundException(`Destination with id ${id} not found`);
+      throw new NotFoundException(`Destination with id ${id} not found`)
     }
 
-    return data;
+    return data
   }
 
   async update(id: string, updateDestinationDto: UpdateDestinationDto) {
@@ -54,27 +48,27 @@ export class DestinationsService {
       .from('destinations')
       .update(updateDestinationDto)
       .eq('id', id)
-      .select();
+      .select()
 
     if (error) {
-      throw new InternalServerErrorException(error.message);
+      throw new InternalServerErrorException(error.message)
     }
 
-    return data;
+    return data
   }
 
   async remove(id: string) {
     const { error } = await this.supabaseService.anonClient
       .from('destinations')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
 
     if (error) {
-      throw new InternalServerErrorException(error.message);
+      throw new InternalServerErrorException(error.message)
     }
 
     return {
       message: 'Destination deleted successfully',
-    };
+    }
   }
 }

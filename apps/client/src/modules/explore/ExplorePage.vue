@@ -1,7 +1,6 @@
 <template>
   <main class="flex-1 h-screen overflow-y-auto bg-cream box-border font-sans custom-scrollbar">
     <div class="py-5 px-4 sm:py-6 sm:px-6 md:py-8 md:px-8 max-w-[1100px] mx-auto">
-
       <!-- Search & Filter Bar -->
       <section class="animate-fade-in-up">
         <SearchFilterBar
@@ -21,7 +20,20 @@
                 @click="showAddModal = true"
                 class="flex items-center gap-2 px-4 py-3 rounded-2xl border border-sidebar-active bg-sidebar-active text-white text-[13px] font-medium cursor-pointer transition-all duration-200 hover:shadow-[0_4px_14px_rgba(42,90,66,0.3)] hover:-translate-y-0.5 shrink-0"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 12h14" />
+                  <path d="M12 5v14" />
+                </svg>
                 Add
               </button>
 
@@ -32,10 +44,30 @@
                   'flex items-center gap-2 px-4 py-3 rounded-2xl border text-[13px] font-medium cursor-pointer transition-all duration-200',
                   showFilters
                     ? 'bg-sidebar-active text-white border-sidebar-active'
-                    : 'bg-white text-slate-600 border-weather-border hover:border-slate-300 hover:text-slate-700'
+                    : 'bg-white text-slate-600 border-weather-border hover:border-slate-300 hover:text-slate-700',
                 ]"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="21" x2="14" y1="4" y2="4" />
+                  <line x1="10" x2="3" y1="4" y2="4" />
+                  <line x1="21" x2="12" y1="12" y2="12" />
+                  <line x1="8" x2="3" y1="12" y2="12" />
+                  <line x1="21" x2="16" y1="20" y2="20" />
+                  <line x1="12" x2="3" y1="20" y2="20" />
+                  <line x1="14" x2="14" y1="2" y2="6" />
+                  <line x1="8" x2="8" y1="10" y2="14" />
+                  <line x1="16" x2="16" y1="18" y2="22" />
+                </svg>
                 Filters
               </button>
 
@@ -47,11 +79,26 @@
                     'p-2.5 cursor-pointer transition-all duration-200 border-none',
                     viewMode === 'grid'
                       ? 'bg-sidebar-active text-white'
-                      : 'bg-white text-slate-400 hover:text-slate-600'
+                      : 'bg-white text-slate-400 hover:text-slate-600',
                   ]"
                   aria-label="Grid view"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect width="7" height="7" x="3" y="3" rx="1" />
+                    <rect width="7" height="7" x="14" y="3" rx="1" />
+                    <rect width="7" height="7" x="14" y="14" rx="1" />
+                    <rect width="7" height="7" x="3" y="14" rx="1" />
+                  </svg>
                 </button>
                 <button
                   @click="viewMode = 'list'"
@@ -59,11 +106,24 @@
                     'p-2.5 cursor-pointer transition-all duration-200 border-none border-l border-weather-border',
                     viewMode === 'list'
                       ? 'bg-sidebar-active text-white'
-                      : 'bg-white text-slate-400 hover:text-slate-600'
+                      : 'bg-white text-slate-400 hover:text-slate-600',
                   ]"
                   aria-label="List view"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="7" x="3" y="3" rx="1"/><rect width="18" height="7" x="3" y="14" rx="1"/></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect width="18" height="7" x="3" y="3" rx="1" />
+                    <rect width="18" height="7" x="3" y="14" rx="1" />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -72,7 +132,10 @@
       </section>
 
       <!-- Province Filter Pills -->
-      <section v-if="showFilters" class="mt-4 p-5 bg-white rounded-2xl border border-weather-border shadow-sm animate-fade-in-up">
+      <section
+        v-if="showFilters"
+        class="mt-4 p-5 bg-white rounded-2xl border border-weather-border shadow-sm animate-fade-in-up"
+      >
         <!-- Trending Toggle -->
         <div class="mb-5">
           <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-3">Badge</p>
@@ -83,7 +146,7 @@
                 'px-4 py-1.5 rounded-full text-[13px] font-medium border cursor-pointer transition-all duration-200 flex items-center gap-2',
                 exploreStore.showTrendingOnly
                   ? 'bg-sidebar-active text-white border-sidebar-active shadow-[0_2px_8px_rgba(42,90,66,0.2)]'
-                  : 'bg-white text-slate-500 border-weather-border hover:border-slate-300 hover:text-slate-700'
+                  : 'bg-white text-slate-500 border-weather-border hover:border-slate-300 hover:text-slate-700',
               ]"
             >
               <span class="text-base"></span>
@@ -104,7 +167,7 @@
                 'px-4 py-1.5 rounded-full text-[13px] font-medium border cursor-pointer transition-all duration-200',
                 selectedProvince === province
                   ? 'bg-sidebar-active text-white border-sidebar-active shadow-[0_2px_8px_rgba(42,90,66,0.2)]'
-                  : 'bg-white text-slate-500 border-weather-border hover:border-slate-300 hover:text-slate-700'
+                  : 'bg-white text-slate-500 border-weather-border hover:border-slate-300 hover:text-slate-700',
               ]"
             >
               {{ province === 'All' ? 'All Provinces' : province }}
@@ -118,8 +181,24 @@
         v-if="error && !isLoading"
         class="mt-6 p-5 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-4 animate-fade-in"
       >
-        <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center text-red-500 shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+        <div
+          class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center text-red-500 shrink-0"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" x2="12" y1="8" y2="12" />
+            <line x1="12" x2="12.01" y1="16" y2="16" />
+          </svg>
         </div>
         <div class="flex-1 min-w-0">
           <p class="text-[14px] font-semibold text-red-700 m-0 mb-1">Could not load destinations</p>
@@ -135,7 +214,6 @@
 
       <!-- Destination Cards Grid -->
       <section class="mt-6 sm:mt-8 mb-8 sm:mb-10">
-
         <!-- Loading Skeleton -->
         <div v-if="isLoading" class="grid gap-5 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           <div
@@ -161,9 +239,7 @@
           v-else
           :class="[
             'grid gap-5 sm:gap-6',
-            viewMode === 'grid'
-              ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-              : 'grid-cols-1'
+            viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1',
           ]"
         >
           <TransitionGroup name="card-filter">
@@ -178,10 +254,19 @@
         </div>
 
         <!-- Empty State -->
-        <div v-if="!isLoading && filteredDestinations.length === 0 && !error" class="flex flex-col items-center justify-center py-16 text-center animate-fade-in">
-          <div class="w-20 h-20 rounded-2xl bg-cream-dark flex items-center justify-center text-4xl mb-5 shadow-inner">🔍</div>
+        <div
+          v-if="!isLoading && filteredDestinations.length === 0 && !error"
+          class="flex flex-col items-center justify-center py-16 text-center animate-fade-in"
+        >
+          <div
+            class="w-20 h-20 rounded-2xl bg-cream-dark flex items-center justify-center text-4xl mb-5 shadow-inner"
+          >
+            🔍
+          </div>
           <p class="text-[16px] font-semibold text-slate-600 m-0 mb-2">No destinations found</p>
-          <p class="text-[13px] text-slate-400 m-0 mb-5 max-w-[300px]">Try adjusting your search query or changing the category filter</p>
+          <p class="text-[13px] text-slate-400 m-0 mb-5 max-w-[300px]">
+            Try adjusting your search query or changing the category filter
+          </p>
           <button
             @click="clearFilters"
             class="px-5 py-2 rounded-xl bg-sidebar-active text-white text-[13px] font-medium border-none cursor-pointer transition-all duration-200 hover:shadow-[0_4px_12px_rgba(42,90,66,0.25)] hover:-translate-y-0.5"
@@ -189,16 +274,11 @@
             Clear all filters
           </button>
         </div>
-
       </section>
-
     </div>
 
     <!-- Add Destination Modal -->
-    <AddDestinationModal
-      v-model="showAddModal"
-      @created="exploreStore.loadDestinations()"
-    />
+    <AddDestinationModal v-model="showAddModal" @created="exploreStore.loadDestinations()" />
   </main>
 </template>
 
@@ -228,7 +308,9 @@ const {
 
 const provinceOptions = computed<string[]>(() => {
   const values = provinces.value
-  return Array.isArray(values) ? values.filter((province): province is string => typeof province === 'string') : []
+  return Array.isArray(values)
+    ? values.filter((province): province is string => typeof province === 'string')
+    : []
 })
 
 const showFilters = ref(false)

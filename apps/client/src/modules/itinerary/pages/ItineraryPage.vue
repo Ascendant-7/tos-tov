@@ -17,7 +17,6 @@ const isAddingDestination = ref(false)
 const tripId = route.params.tripId as string
 
 onMounted(async () => {
-
   try {
     itinerary.value = await getItinerary(tripId)
     await addDestinationFromQuery()
@@ -42,7 +41,7 @@ const addDestinationFromQuery = async () => {
       throw new Error('Destination was not found.')
     }
 
-    const day = itinerary.value.days[0] || await createDay(tripId, 'Day 1')
+    const day = itinerary.value.days[0] || (await createDay(tripId, 'Day 1'))
     if (itinerary.value.days.length === 0) {
       itinerary.value.days.push(day)
     }
@@ -101,20 +100,22 @@ const handleAddDay = async () => {
       </button>
     </div>
 
-    <p v-if="isAddingDestination" class="mb-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+    <p
+      v-if="isAddingDestination"
+      class="mb-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700"
+    >
       Adding destination to this trip...
     </p>
 
-    <p v-if="errorMessage" class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+    <p
+      v-if="errorMessage"
+      class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+    >
       {{ errorMessage }}
     </p>
 
     <div v-if="itinerary">
-      <DayColumn
-        v-for="day in itinerary.days"
-        :key="day.id"
-        :day="day"
-      />
+      <DayColumn v-for="day in itinerary.days" :key="day.id" :day="day" />
     </div>
   </div>
 </template>

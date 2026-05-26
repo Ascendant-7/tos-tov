@@ -1,15 +1,15 @@
-import { IsIn, IsOptional, IsString } from 'class-validator';
+import { IsIn, IsOptional, IsString } from 'class-validator'
 
 export class UpdateTripDto {
   @IsString()
   @IsOptional()
-  title?: string;
+  title?: string
 
   @IsString()
   @IsOptional()
-  description?: string;
+  description?: string
 
   @IsIn(['private', 'public'])
   @IsOptional()
-  visibility?: 'private' | 'public';
+  visibility?: 'private' | 'public'
 }

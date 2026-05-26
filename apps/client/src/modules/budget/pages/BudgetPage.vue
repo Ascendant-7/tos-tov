@@ -3,42 +3,22 @@
     <h1>Budget Planner</h1>
 
     <form @submit.prevent="createBudget">
-      <input
-        v-model.number="hotel"
-        type="number"
-        placeholder="Hotel Cost"
-      />
+      <input v-model.number="hotel" type="number" placeholder="Hotel Cost" />
 
-      <input
-        v-model.number="transport"
-        type="number"
-        placeholder="Transport Cost"
-      />
+      <input v-model.number="transport" type="number" placeholder="Transport Cost" />
 
-      <input
-        v-model.number="food"
-        type="number"
-        placeholder="Food Cost"
-      />
+      <input v-model.number="food" type="number" placeholder="Food Cost" />
 
-      <button type="submit">
-        Add Budget
-      </button>
+      <button type="submit">Add Budget</button>
     </form>
 
-    <div
-      v-for="budget in budgets"
-      :key="budget.id"
-      class="budget-card"
-    >
+    <div v-for="budget in budgets" :key="budget.id" class="budget-card">
       <p>Hotel: {{ budget.hotel }}</p>
       <p>Transport: {{ budget.transport }}</p>
       <p>Food: {{ budget.food }}</p>
       <p>Total: {{ budget.totalBudget }}</p>
 
-      <button @click="deleteBudget(budget.id)">
-        Delete
-      </button>
+      <button @click="deleteBudget(budget.id)">Delete</button>
     </div>
   </div>
 </template>

@@ -61,8 +61,8 @@ const parseDuration = (durationStr: string) => {
   const minuteMatch = durationStr.match(/(\d+)\s*(m|min|minute)/i)
 
   if (hourMatch || minuteMatch) {
-    const parsedHours = hourMatch ? hourMatch[1] ?? '0' : '0'
-    const parsedMinutesRaw = minuteMatch ? minuteMatch[1] ?? '0' : '0'
+    const parsedHours = hourMatch ? (hourMatch[1] ?? '0') : '0'
+    const parsedMinutesRaw = minuteMatch ? (minuteMatch[1] ?? '0') : '0'
     const parsedMinutes = ['00', '15', '30', '45'].includes(parsedMinutesRaw)
       ? parsedMinutesRaw
       : '00'
@@ -82,31 +82,35 @@ const formattedDuration = computed(() => {
   return `${h} ${h === 1 ? 'hour' : 'hours'} ${m} min`
 })
 
-watch(() => props.item, (val) => {
-  if (val) {
-    selectedDestinationId.value = val.destination_id || val.destination?.id || ''
-    name.value = val.title || ''
-    const parsed = parseTime(val.time ?? '')
-    hours.value = parsed.hours
-    minutes.value = parsed.minutes
-    ampm.value = parsed.ampm
-    category.value = val.category
-    const parsedDuration = parseDuration(val.duration ?? '')
-    durationHours.value = parsedDuration.hours
-    durationMinutes.value = parsedDuration.minutes
-    cost.value = val.cost || ''
-  } else {
-    selectedDestinationId.value = ''
-    name.value = ''
-    hours.value = ''
-    minutes.value = '00'
-    ampm.value = 'AM'
-    category.value = 'activity'
-    durationHours.value = '0'
-    durationMinutes.value = '00'
-    cost.value = ''
-  }
-}, { immediate: true })
+watch(
+  () => props.item,
+  (val) => {
+    if (val) {
+      selectedDestinationId.value = val.destination_id || val.destination?.id || ''
+      name.value = val.title || ''
+      const parsed = parseTime(val.time ?? '')
+      hours.value = parsed.hours
+      minutes.value = parsed.minutes
+      ampm.value = parsed.ampm
+      category.value = val.category
+      const parsedDuration = parseDuration(val.duration ?? '')
+      durationHours.value = parsedDuration.hours
+      durationMinutes.value = parsedDuration.minutes
+      cost.value = val.cost || ''
+    } else {
+      selectedDestinationId.value = ''
+      name.value = ''
+      hours.value = ''
+      minutes.value = '00'
+      ampm.value = 'AM'
+      category.value = 'activity'
+      durationHours.value = '0'
+      durationMinutes.value = '00'
+      cost.value = ''
+    }
+  },
+  { immediate: true },
+)
 
 const handleSubmit = () => {
   if (!name.value || !hours.value || !minutes.value) return
@@ -130,9 +134,7 @@ onMounted(async () => {
     destinations.value = await getDestinations()
 
     if (selectedDestinationId.value) {
-      const destination = destinations.value.find(
-        (d) => d.id === selectedDestinationId.value,
-      )
+      const destination = destinations.value.find((d) => d.id === selectedDestinationId.value)
 
       if (destination) {
         name.value = destination.name
@@ -151,15 +153,12 @@ watch(selectedDestinationId, (value) => {
     return
   }
 
-  const destination = destinations.value.find(
-    (d) => d.id === value,
-  )
+  const destination = destinations.value.find((d) => d.id === value)
 
   if (!destination) return
 
   name.value = destination.name
-  category.value =
-    destination.category || 'activity'
+  category.value = destination.category || 'activity'
 })
 </script>
 
@@ -186,7 +185,11 @@ watch(selectedDestinationId, (value) => {
             class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-50 disabled:opacity-60"
           >
             <option value="">Custom activity</option>
-            <option v-for="destination in destinations" :key="destination.id" :value="destination.id">
+            <option
+              v-for="destination in destinations"
+              :key="destination.id"
+              :value="destination.id"
+            >
               {{ destination.name }}
             </option>
           </select>
@@ -227,7 +230,9 @@ watch(selectedDestinationId, (value) => {
                   :disabled="loading"
                   class="w-full rounded-lg border border-gray-200 bg-white px-2 py-2.5 text-sm text-center text-gray-900 outline-none transition duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-50 disabled:opacity-60"
                 >
-                  <option v-for="minute in minuteOptions" :key="minute" :value="minute">{{ minute }}</option>
+                  <option v-for="minute in minuteOptions" :key="minute" :value="minute">
+                    {{ minute }}
+                  </option>
                 </select>
                 <p class="text-xs text-gray-500 mt-1 text-center">Minutes</p>
               </div>
@@ -274,7 +279,9 @@ watch(selectedDestinationId, (value) => {
                   :disabled="loading"
                   class="w-full rounded-lg border border-gray-200 bg-white px-2 py-2.5 text-sm text-center text-gray-900 outline-none transition duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-50 disabled:opacity-60"
                 >
-                  <option v-for="hour in durationHourOptions" :key="hour" :value="hour">{{ hour }}</option>
+                  <option v-for="hour in durationHourOptions" :key="hour" :value="hour">
+                    {{ hour }}
+                  </option>
                 </select>
                 <p class="text-xs text-gray-500 mt-1 text-center">Hours</p>
               </div>
@@ -284,7 +291,9 @@ watch(selectedDestinationId, (value) => {
                   :disabled="loading"
                   class="w-full rounded-lg border border-gray-200 bg-white px-2 py-2.5 text-sm text-center text-gray-900 outline-none transition duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-50 disabled:opacity-60"
                 >
-                  <option v-for="minute in durationMinuteOptions" :key="minute" :value="minute">{{ minute }}</option>
+                  <option v-for="minute in durationMinuteOptions" :key="minute" :value="minute">
+                    {{ minute }}
+                  </option>
                 </select>
                 <p class="text-xs text-gray-500 mt-1 text-center">Minutes</p>
               </div>
