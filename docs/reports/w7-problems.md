@@ -3,6 +3,7 @@
 ## 🏗️ Monorepo Overview
 
 The project is a **pnpm-based monorepo** consisting of:
+
 - **`apps/client`**: Vue 3 + Vite frontend using Pinia and Vue Router.
 - **`apps/api`**: NestJS backend providing RESTful endpoints.
 - **`packages/supabase`**: Shared package for Supabase client and schema types.
@@ -13,6 +14,7 @@ The project is a **pnpm-based monorepo** consisting of:
 ## 🛑 Critical Issues (Valid/Unresolved)
 
 ### 🖥️ Backend (NestJS API)
+
 - [ ] **In-Memory Storage**: `BudgetService` still uses a local array. Data is lost on restart.
 - [ ] **Auth Gaps**: Missing `logout` and `token refresh` endpoints.
 - [ ] **Type Safety**: Controllers still use `Promise<any>` instead of DTOs (e.g., `AuthController`).
@@ -20,12 +22,14 @@ The project is a **pnpm-based monorepo** consisting of:
 - [ ] **Minimal Profiles**: `ProfilesController` only supports `getById`.
 
 ### 🌐 Frontend (Vue 3)
+
 - [ ] **Auth State**: Missing Pinia store for global authentication state.
 - [ ] **Security**: No navigation guards (`beforeEach`) to protect private routes.
 - [ ] **Data Flow**: `HomePage` and `Community` modules still rely on hardcoded mock data.
 
 ### ⚙️ Infrastructure & DX
-- [ ] **Version Mismatch**: 
+
+- [ ] **Version Mismatch**:
   - **TS**: API (5.7.3) vs Client (5.9.3) vs Supabase (6.0.3).
   - **Node**: API (>=21) vs Client (^20.19.0 || >=22.12.0).
 - [ ] **Artifacts**: `out.json` and `deleteme` folders should be removed/ignored.
@@ -35,6 +39,7 @@ The project is a **pnpm-based monorepo** consisting of:
 ---
 
 ## ✅ Resolved / Improved
+
 - [x] **Friends Module**: Core interfaces and logic are now present (though using mocks).
 - [x] **Itinerary Filtering**: `getItinerary` now correctly filters by `trip_id`.
 - [x] **UI Progress**: `ProfilePage`, `ExplorePage`, and `TripPlannerPage` have moved beyond empty placeholders.
@@ -43,6 +48,7 @@ The project is a **pnpm-based monorepo** consisting of:
 ---
 
 ## 📋 Recommended Action Plan (Week 7)
+
 1. **Unify Environment**: Align Node and TypeScript versions across the workspace.
 2. **Persistent Budgets**: Migrate `BudgetService` from in-memory to Supabase database.
 3. **Frontend Auth**: Implement `useAuthStore` and add router guards.
