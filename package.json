@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "pnpm -F @repo/supabase gen-types && pnpm -r --parallel --filter \"./apps/*\" run \"/^dev|start:dev$/\"",
+    "dev:light": "pnpm -r --parallel --filter \"./apps/*\" run \"/^dev|start:dev$/\"",
+    "dev": "pnpm -F @repo/supabase gen-types && pnpm -w dev:light",
+    "dev:strict": "pnpm -w format && pnpm -w lint && pnpm -w dev",
     "db:new": "pnpm -F @repo/supabase exec supabase migration new",
     "lint": "pnpm -r --parallel lint",
     "format": "pnpm -r --parallel format"
@@ -14,7 +16,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.33.3+sha512.a19744364a7e248b92657a4ca5973f9354d21caf982579674b1c539f32c7420c47138ad8b1254df07aba9bc782d9b3029e3db34d5dbff974326eb74dac8ff489",
   "engines": {
-    "node": ">=21",
+    "node": ">=25",
     "pnpm": ">=10.33.0"
   },
   "dependencies": {

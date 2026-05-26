@@ -1,11 +1,11 @@
 export class ProfileResponseDto {
-  id!: string;
+  id!: string
 
-  email!: string | null;
+  email!: string | null
 
-  first_name!: string | null;
+  first_name!: string | null
 
-  last_name!: string | null;
+  last_name!: string | null
 
-  created_at!: string | null;
+  created_at!: string | null
 }

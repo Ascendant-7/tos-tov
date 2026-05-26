@@ -4,7 +4,21 @@
     <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
       <!-- Search Input -->
       <div class="relative flex-1">
-        <svg class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <svg
+          class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
         <input
           :value="search"
           @input="handleInput"
@@ -28,7 +42,7 @@
           'px-4 py-1.5 rounded-full text-[13px] font-medium border cursor-pointer transition-all duration-200',
           activeTab === tab
             ? 'bg-sidebar-active text-white border-sidebar-active shadow-[0_2px_8px_rgba(42,90,66,0.2)]'
-            : 'bg-white text-slate-500 border-weather-border hover:border-slate-300 hover:text-slate-700'
+            : 'bg-white text-slate-500 border-weather-border hover:border-slate-300 hover:text-slate-700',
         ]"
       >
         {{ tab }}
@@ -53,16 +67,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-const props = withDefaults(defineProps<{
-  search: string
-  activeTab: string
-  tabs: string[]
-  searchPlaceholder?: string
-  resultCount?: number
-  totalCount?: number
-}>(), {
-  searchPlaceholder: 'Search destinations...',
-})
+const props = withDefaults(
+  defineProps<{
+    search: string
+    activeTab: string
+    tabs: string[]
+    searchPlaceholder?: string
+    resultCount?: number
+    totalCount?: number
+  }>(),
+  {
+    searchPlaceholder: 'Search destinations...',
+  },
+)
 
 const emit = defineEmits<{
   'update:search': [value: string]

@@ -1,13 +1,13 @@
 export class ProfileEntity {
-  id!: string;
+  id!: string
 
-  email!: string;
+  email!: string
 
-  first_name!: string;
+  first_name!: string
 
-  last_name!: string;
+  last_name!: string
 
-  avatar_url?: string;
+  avatar_url?: string
 
-  created_at!: string;
+  created_at!: string
 }

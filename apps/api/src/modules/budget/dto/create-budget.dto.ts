@@ -1,7 +1,7 @@
 export class CreateBudgetDto {
-  hotel?: number;
+  hotel?: number
 
-  transport?: number;
+  transport?: number
 
-  food?: number;
+  food?: number
 }

@@ -1,20 +1,20 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 
   /* KhmerWander Theme Colors */
-  --color-sidebar-dark: #091E14;
+  --color-sidebar-dark: #091e14;
   --color-sidebar-darker: #061510;
-  --color-sidebar-active: #12301F;
-  --color-sidebar-hover: #0E2519;
-  --color-accent-gold: #C8A951;
-  --color-accent-gold-light: #D4BC6A;
-  --color-cream: #FAF8F5;
-  --color-cream-dark: #F0EDE8;
-  --color-ai-teal: #0F4F3F;
-  --color-ai-teal-dark: #0A3D31;
-  --color-weather-border: #E8E4DE;
+  --color-sidebar-active: #12301f;
+  --color-sidebar-hover: #0e2519;
+  --color-accent-gold: #c8a951;
+  --color-accent-gold-light: #d4bc6a;
+  --color-cream: #faf8f5;
+  --color-cream-dark: #f0ede8;
+  --color-ai-teal: #0f4f3f;
+  --color-ai-teal-dark: #0a3d31;
+  --color-weather-border: #e8e4de;
 }
 
 /* Smooth scroll */
@@ -68,19 +68,21 @@ html {
 }
 
 @keyframes shimmerGlow {
-
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(27, 107, 90, 0.15), 0 4px 16px rgba(27, 107, 90, 0.1);
+    box-shadow:
+      0 0 20px rgba(27, 107, 90, 0.15),
+      0 4px 16px rgba(27, 107, 90, 0.1);
   }
 
   50% {
-    box-shadow: 0 0 32px rgba(27, 107, 90, 0.25), 0 8px 24px rgba(27, 107, 90, 0.18);
+    box-shadow:
+      0 0 32px rgba(27, 107, 90, 0.25),
+      0 8px 24px rgba(27, 107, 90, 0.18);
   }
 }
 
 @keyframes pulseGold {
-
   0%,
   100% {
     box-shadow: 0 0 0 0 rgba(200, 169, 81, 0.3);

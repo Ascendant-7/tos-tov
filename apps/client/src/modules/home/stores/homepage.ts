@@ -41,7 +41,7 @@ export const useHomepageStore = defineStore('homepage', () => {
         }
         if (a.created_at) return -1
         if (b.created_at) return 1
-        
+
         // Fallback to sorting by rating descending
         return (Number(b.rating) || 0) - (Number(a.rating) || 0)
       })

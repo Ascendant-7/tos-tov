@@ -125,7 +125,7 @@ export const useCommunityStore = defineStore('community', () => {
   // --- Filter State ---
   const activeFilter = ref('All')
   const selectedTag = ref<string | null>(null)
-  const isLoading = ref(false)
+  // const isLoading = ref(false)
 
   const filterTabs = ['All', 'Following', 'Popular', 'Saved']
 

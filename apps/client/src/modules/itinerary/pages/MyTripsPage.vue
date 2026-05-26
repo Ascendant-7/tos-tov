@@ -49,7 +49,8 @@ const toggleVisibility = async (trip: Trip) => {
       trips.value[index] = updated
     }
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : 'Failed to update trip visibility.'
+    errorMessage.value =
+      error instanceof Error ? error.message : 'Failed to update trip visibility.'
   } finally {
     updatingTripId.value = null
   }
@@ -64,7 +65,9 @@ onMounted(loadTrips)
       <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="m-0 text-[28px] font-bold text-slate-800">My Trips</h1>
-          <p class="mt-2 text-[14px] text-slate-500">Open a saved itinerary and continue planning.</p>
+          <p class="mt-2 text-[14px] text-slate-500">
+            Open a saved itinerary and continue planning.
+          </p>
         </div>
 
         <RouterLink
@@ -75,11 +78,17 @@ onMounted(loadTrips)
         </RouterLink>
       </div>
 
-      <p v-if="errorMessage" class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      <p
+        v-if="errorMessage"
+        class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+      >
         {{ errorMessage }}
       </p>
 
-      <div v-if="isLoading" class="rounded-2xl border border-weather-border bg-white p-6 text-sm text-slate-500 shadow-sm">
+      <div
+        v-if="isLoading"
+        class="rounded-2xl border border-weather-border bg-white p-6 text-sm text-slate-500 shadow-sm"
+      >
         Loading trips...
       </div>
 
@@ -98,7 +107,7 @@ onMounted(loadTrips)
                 'mb-3 inline-flex rounded-full px-2.5 py-1 text-[12px] font-semibold',
                 isPublicTrip(trip)
                   ? 'bg-emerald-50 text-emerald-700'
-                  : 'bg-slate-100 text-slate-600'
+                  : 'bg-slate-100 text-slate-600',
               ]"
             >
               {{ isPublicTrip(trip) ? 'Public' : 'Private' }}
@@ -137,10 +146,14 @@ onMounted(loadTrips)
         </article>
       </div>
 
-      <section v-else class="rounded-2xl border border-weather-border bg-white p-8 text-center shadow-sm">
+      <section
+        v-else
+        class="rounded-2xl border border-weather-border bg-white p-8 text-center shadow-sm"
+      >
         <h2 class="m-0 text-[20px] font-bold text-slate-800">No trips yet</h2>
         <p class="mx-auto mt-2 max-w-md text-[14px] leading-6 text-slate-500">
-          Create a trip from the planner or add a destination from Explore to start building your first itinerary.
+          Create a trip from the planner or add a destination from Explore to start building your
+          first itinerary.
         </p>
         <RouterLink
           to="/trip-planner"

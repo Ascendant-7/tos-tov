@@ -68,11 +68,11 @@ const handleEdit = (item: any) => {
         </div>
 
         <div class="min-w-0">
-          <h2 class="text-lg font-bold leading-none text-gray-900">
-            Day {{ day.day_number }}
-          </h2>
+          <h2 class="text-lg font-bold leading-none text-gray-900">Day {{ day.day_number }}</h2>
           <p class="mt-1 truncate text-sm leading-5 text-gray-400">
-            {{ day.title || (day.items[0]?.title ? `Arrival in ${day.items[0].title}` : 'Trip day') }}
+            {{
+              day.title || (day.items[0]?.title ? `Arrival in ${day.items[0].title}` : 'Trip day')
+            }}
           </p>
         </div>
       </div>
@@ -92,7 +92,10 @@ const handleEdit = (item: any) => {
       </div>
     </div>
 
-    <div v-if="errorMessage" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+    <div
+      v-if="errorMessage"
+      class="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+    >
       {{ errorMessage }}
     </div>
 
@@ -113,7 +116,10 @@ const handleEdit = (item: any) => {
       v-if="showModal"
       :item="editingItem"
       :loading="isLoading"
-      @close="showModal = false; editingItem = null"
+      @close="
+        showModal = false
+        editingItem = null
+      "
       @add="handleAdd"
     />
   </div>
