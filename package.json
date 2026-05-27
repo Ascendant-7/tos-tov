@@ -8,8 +8,8 @@
     "dev": "pnpm -F @repo/supabase gen-types && pnpm -w dev:light",
     "dev:strict": "pnpm -w format && pnpm -w lint && pnpm -w dev",
     "db:new": "pnpm -F @repo/supabase exec supabase migration new",
-    "lint": "pnpm -r --parallel lint",
-    "format": "pnpm -r --parallel format"
+    "lint": "pnpm -r --no-bail lint",
+    "format": "pnpm -r format"
   },
   "keywords": [],
   "author": "",
