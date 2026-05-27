@@ -36,13 +36,29 @@ interface TripApiResponse {
   id: string
   title: string
   description?: string | null
+  user_id?: string | null
+  visibility?: 'private' | 'public' | string | null
   created_at?: string
 }
 
-export const createTrip = async (trip: { title: string; description?: string }): Promise<TripApiResponse> => {
+export type Trip = TripApiResponse
+
+const authHeaders = () => {
+  const token = localStorage.getItem('access_token')
+
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  }
+}
+
+export const createTrip = async (trip: {
+  title: string
+  description?: string
+}): Promise<TripApiResponse> => {
   const response = await fetch(`${API_BASE_URL}/itinerary/trips`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({
       title: trip.title,
       description: trip.description || null,
@@ -56,9 +72,51 @@ export const createTrip = async (trip: { title: string; description?: string }):
   return await response.json()
 }
 
-export const getItinerary = async (tripId: string): Promise<ItineraryResponse> => {
+export const getTrips = async (): Promise<Trip[]> => {
+  const response = await fetch(`${API_BASE_URL}/itinerary/trips`, {
+    headers: authHeaders(),
+  })
 
-  const response = await fetch(`${API_BASE_URL}/itinerary/${encodeURIComponent(tripId)}`)
+  if (!response.ok) {
+    throw new Error(`Failed to load trips (${response.status})`)
+  }
+
+  return await response.json()
+}
+
+export const getSharedTrips = async (): Promise<Trip[]> => {
+  const response = await fetch(`${API_BASE_URL}/itinerary/shared-trips`, {
+    headers: authHeaders(),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to load shared trips (${response.status})`)
+  }
+
+  return await response.json()
+}
+
+export const updateTrip = async (
+  tripId: string,
+  trip: Partial<Pick<Trip, 'title' | 'description' | 'visibility'>>,
+): Promise<TripApiResponse> => {
+  const response = await fetch(`${API_BASE_URL}/itinerary/trips/${encodeURIComponent(tripId)}`, {
+    method: 'PATCH',
+    headers: authHeaders(),
+    body: JSON.stringify(trip),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to update trip (${response.status})`)
+  }
+
+  return await response.json()
+}
+
+export const getItinerary = async (tripId: string): Promise<ItineraryResponse> => {
+  const response = await fetch(`${API_BASE_URL}/itinerary/${encodeURIComponent(tripId)}`, {
+    headers: authHeaders(),
+  })
 
   if (!response.ok) {
     throw new Error(`Failed to load itinerary (${response.status})`)
@@ -73,15 +131,9 @@ export const getItinerary = async (tripId: string): Promise<ItineraryResponse> =
       title: day.title || `Day ${day.day_number}`,
       items: (day.items || []).map((item) => ({
         id: item.id,
-        title:
-          item.destination?.name ||
-          item.title ||
-          'Untitled',
+        title: item.destination?.name || item.title || 'Untitled',
         time: item.time,
-        category:
-          item.destination?.category ||
-          item.category ||
-          'activity',
+        category: item.destination?.category || item.category || 'activity',
         duration: item.duration || undefined,
         cost: item.cost || undefined,
         notes: item.notes || undefined,
@@ -94,7 +146,7 @@ export const getItinerary = async (tripId: string): Promise<ItineraryResponse> =
               province: item.destination.province || undefined,
               category: item.destination.category || undefined,
             }
-          : undefined
+          : undefined,
       })),
     })),
   }
@@ -103,7 +155,7 @@ export const getItinerary = async (tripId: string): Promise<ItineraryResponse> =
 export const createDay = async (tripId: string, title?: string) => {
   const response = await fetch(`${API_BASE_URL}/itinerary/${encodeURIComponent(tripId)}/days`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({ title }),
   })
 
@@ -115,20 +167,23 @@ export const createDay = async (tripId: string, title?: string) => {
 }
 
 export const createItem = async (dayId: string, item: any) => {
-  const response = await fetch(`${API_BASE_URL}/itinerary/days/${encodeURIComponent(dayId)}/items`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      title: item.title,
-      destination_id: item.destination_id || null,
-      time: item.time,
-      category: item.category,
-      duration: item.duration || null,
-      cost: item.cost || null,
-      notes: item.notes || null,
-      position: item.position || 0,
-    }),
-  })
+  const response = await fetch(
+    `${API_BASE_URL}/itinerary/days/${encodeURIComponent(dayId)}/items`,
+    {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        title: item.title,
+        destination_id: item.destination_id || null,
+        time: item.time,
+        category: item.category,
+        duration: item.duration || null,
+        cost: item.cost || null,
+        notes: item.notes || null,
+        position: item.position || 0,
+      }),
+    },
+  )
 
   if (!response.ok) {
     throw new Error(`Failed to create item (${response.status})`)
@@ -140,7 +195,7 @@ export const createItem = async (dayId: string, item: any) => {
 export const updateItem = async (itemId: string, item: any) => {
   const response = await fetch(`${API_BASE_URL}/itinerary/items/${encodeURIComponent(itemId)}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({
       title: item.title,
       destination_id: item.destination_id || null,
@@ -163,6 +218,7 @@ export const updateItem = async (itemId: string, item: any) => {
 export const deleteItem = async (itemId: string) => {
   const response = await fetch(`${API_BASE_URL}/itinerary/items/${encodeURIComponent(itemId)}`, {
     method: 'DELETE',
+    headers: authHeaders(),
   })
 
   if (!response.ok) {

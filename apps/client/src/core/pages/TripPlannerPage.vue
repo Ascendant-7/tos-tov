@@ -21,7 +21,10 @@
     <!-- Content -->
     <div class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
       <!-- Pending Destinations Section -->
-      <section v-if="itineraryStore.hasPendingDestinations" class="mb-12 p-6 bg-white rounded-2xl border border-weather-border shadow-sm">
+      <section
+        v-if="itineraryStore.hasPendingDestinations"
+        class="mb-12 p-6 bg-white rounded-2xl border border-weather-border shadow-sm"
+      >
         <h2 class="text-[20px] font-bold text-slate-800 mb-4">Destinations to Add</h2>
         <div class="space-y-3">
           <div
@@ -31,7 +34,9 @@
           >
             <div class="min-w-0">
               <h3 class="font-bold text-slate-800 text-[15px]">{{ dest.name }}</h3>
-              <p class="text-slate-600 text-[13px] mt-1">{{ dest.location_name || dest.province }}</p>
+              <p class="text-slate-600 text-[13px] mt-1">
+                {{ dest.location_name || dest.province }}
+              </p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
               <button
@@ -52,7 +57,10 @@
       </section>
 
       <!-- Trip Creation/Selection -->
-      <section v-if="!hasSelectedTrip" class="mb-12 p-6 bg-white rounded-2xl border border-weather-border shadow-sm">
+      <section
+        v-if="!hasSelectedTrip"
+        class="mb-12 p-6 bg-white rounded-2xl border border-weather-border shadow-sm"
+      >
         <h2 class="text-[20px] font-bold text-slate-800 mb-4">Create New Trip</h2>
         <div class="space-y-3">
           <input
@@ -78,7 +86,10 @@
       </section>
 
       <!-- Existing Trip Selection -->
-      <section v-if="hasSelectedTrip" class="p-6 bg-white rounded-2xl border border-weather-border shadow-sm">
+      <section
+        v-if="hasSelectedTrip"
+        class="p-6 bg-white rounded-2xl border border-weather-border shadow-sm"
+      >
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-[20px] font-bold text-slate-800">Current Trip</h2>
           <button
@@ -134,7 +145,9 @@ function handleAddDestinationToDay(destination: ExploreDestination) {
   if (!destination.id) return
 
   if (itineraryStore.currentTripId) {
-    router.push(`/trips/${encodeURIComponent(itineraryStore.currentTripId)}?addDestination=${destination.id}`)
+    router.push(
+      `/trips/${encodeURIComponent(itineraryStore.currentTripId)}?addDestination=${destination.id}`,
+    )
   } else {
     tripName.value = `Trip - ${destination.name}`
     createAndNavigateToTrip()

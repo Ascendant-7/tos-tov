@@ -1,13 +1,9 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
 
-import { SupabaseService } from '../../supabase/supabase.service';
+import { SupabaseService } from '../../supabase/supabase.service'
 
-import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateReviewDto } from './dto/update-review.dto';
+import { CreateReviewDto } from './dto/create-review.dto'
+import { UpdateReviewDto } from './dto/update-review.dto'
 
 @Injectable()
 export class ReviewsService {
@@ -17,25 +13,23 @@ export class ReviewsService {
     const { data, error } = await this.supabaseService.anonClient
       .from('reviews')
       .insert(createReviewDto)
-      .select();
+      .select()
 
     if (error) {
-      throw new InternalServerErrorException(error.message);
+      throw new InternalServerErrorException(error.message)
     }
 
-    return data;
+    return data
   }
 
   async findAll() {
-    const { data, error } = await this.supabaseService.anonClient
-      .from('reviews')
-      .select('*');
+    const { data, error } = await this.supabaseService.anonClient.from('reviews').select('*')
 
     if (error) {
-      throw new InternalServerErrorException(error.message);
+      throw new InternalServerErrorException(error.message)
     }
 
-    return data;
+    return data
   }
 
   async findOne(id: string) {
@@ -43,13 +37,13 @@ export class ReviewsService {
       .from('reviews')
       .select('*')
       .eq('id', id)
-      .single();
+      .single()
 
     if (error) {
-      throw new NotFoundException(`Review with id ${id} not found`);
+      throw new NotFoundException(`Review with id ${id} not found`)
     }
 
-    return data;
+    return data
   }
 
   async update(id: string, updateReviewDto: UpdateReviewDto) {
@@ -57,17 +51,17 @@ export class ReviewsService {
       .from('reviews')
       .update(updateReviewDto)
       .eq('id', id)
-      .select();
+      .select()
 
     if (error) {
-      throw new InternalServerErrorException(error.message);
+      throw new InternalServerErrorException(error.message)
     }
 
     if (!data || data.length === 0) {
-      throw new NotFoundException(`Review with id ${id} not found`);
+      throw new NotFoundException(`Review with id ${id} not found`)
     }
 
-    return data;
+    return data
   }
 
   async remove(id: string) {
@@ -75,18 +69,18 @@ export class ReviewsService {
       .from('reviews')
       .delete()
       .eq('id', id)
-      .select();
+      .select()
 
     if (error) {
-      throw new InternalServerErrorException(error.message);
+      throw new InternalServerErrorException(error.message)
     }
 
     if (!data || data.length === 0) {
-      throw new NotFoundException(`Review with id ${id} not found`);
+      throw new NotFoundException(`Review with id ${id} not found`)
     }
 
     return {
       message: 'Review deleted successfully',
-    };
+    }
   }
 }

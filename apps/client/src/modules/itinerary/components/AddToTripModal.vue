@@ -39,7 +39,7 @@ async function addDestinationToTrip(tripId: string) {
   }
 
   const itinerary = await getItinerary(tripId)
-  const day = itinerary.days[0] || await createDay(tripId, 'Day 1')
+  const day = itinerary.days[0] || (await createDay(tripId, 'Day 1'))
 
   await createItem(day.id, {
     title: props.destination.name,
@@ -66,7 +66,8 @@ async function handleCreateTrip() {
     emit('close')
     await router.push(`/trips/${encodeURIComponent(trip.id)}`)
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : 'Failed to add destination to trip.'
+    errorMessage.value =
+      error instanceof Error ? error.message : 'Failed to add destination to trip.'
   } finally {
     isSaving.value = false
   }
@@ -83,7 +84,8 @@ async function handleAddToCurrentTrip() {
     emit('close')
     await router.push(`/trips/${encodeURIComponent(itineraryStore.currentTripId)}`)
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : 'Failed to add destination to trip.'
+    errorMessage.value =
+      error instanceof Error ? error.message : 'Failed to add destination to trip.'
   } finally {
     isSaving.value = false
   }
@@ -112,7 +114,10 @@ async function handleAddToCurrentTrip() {
         {{ destination ? destination.name : 'This destination' }} will be added to Day 1.
       </p>
 
-      <p v-if="errorMessage" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+      <p
+        v-if="errorMessage"
+        class="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+      >
         {{ errorMessage }}
       </p>
 

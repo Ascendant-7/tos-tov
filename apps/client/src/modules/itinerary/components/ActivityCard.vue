@@ -17,6 +17,7 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 const props = defineProps<{
   item: any
   disabled?: boolean
+  isEditing?: boolean
 }>()
 
 const emit = defineEmits(['delete', 'edit'])
@@ -35,7 +36,7 @@ const categoryIcon = computed(() => {
 const displayTime = computed(() => {
   const time = props.item.time
   if (!time) return '—'
-  
+
   // Parse either HH:MM AM/PM or HH:MM.
   const match = time.match(/(\d{1,2}):(\d{2})(?:\s*(AM|PM))?/i)
   if (!match) return time
@@ -45,14 +46,14 @@ const displayTime = computed(() => {
     const normalizedHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour
     return `${normalizedHour}:${match[2]} ${match[3].toUpperCase()}`
   }
-  
+
   let hours = parseInt(match[1] ?? '0', 10)
   const minutes = match[2]
   const ampm = hours >= 12 ? 'PM' : 'AM'
-  
+
   if (hours > 12) hours -= 12
   if (hours === 0) hours = 12
-  
+
   return `${hours}:${minutes} ${ampm}`
 })
 </script>
@@ -66,7 +67,12 @@ const displayTime = computed(() => {
         'border-green-300 bg-green-100 text-green-600': item.category === 'attraction',
         'border-blue-300 bg-blue-100 text-blue-600': item.category === 'rest',
         'border-purple-300 bg-purple-100 text-purple-600': item.category === 'hotel',
-        'border-gray-300 bg-gray-100 text-gray-500': !['food', 'attraction', 'rest', 'hotel'].includes(item.category)
+        'border-gray-300 bg-gray-100 text-gray-500': ![
+          'food',
+          'attraction',
+          'rest',
+          'hotel',
+        ].includes(item.category),
       }"
     >
       <FontAwesomeIcon :icon="categoryIcon" class="h-5 w-5 leading-none" />
@@ -88,7 +94,7 @@ const displayTime = computed(() => {
                 'bg-orange-100 text-orange-700': item.category === 'food',
                 'bg-green-100 text-green-700': item.category === 'attraction',
                 'bg-blue-100 text-blue-700': item.category === 'rest',
-                'bg-purple-100 text-purple-700': item.category === 'hotel'
+                'bg-purple-100 text-purple-700': item.category === 'hotel',
               }"
             >
               {{ item.category || 'activity' }}
@@ -99,19 +105,31 @@ const displayTime = computed(() => {
             {{ item.title }}
           </h3>
 
-          <div v-if="item.duration || item.cost" class="flex items-center gap-3 text-xs text-gray-600">
-            <span v-if="item.duration" class="inline-flex items-center gap-1 px-2 py-1 bg-gray-50 rounded">
+          <div
+            v-if="item.duration || item.cost"
+            class="flex items-center gap-3 text-xs text-gray-600"
+          >
+            <span
+              v-if="item.duration"
+              class="inline-flex items-center gap-1 px-2 py-1 bg-gray-50 rounded"
+            >
               <FontAwesomeIcon :icon="faClock" class="h-3 w-3" />
               <span>{{ item.duration }}</span>
             </span>
-            <span v-if="item.cost" class="inline-flex items-center gap-1 px-2 py-1 bg-gray-50 rounded">
+            <span
+              v-if="item.cost"
+              class="inline-flex items-center gap-1 px-2 py-1 bg-gray-50 rounded"
+            >
               <FontAwesomeIcon :icon="faDollarSign" class="h-3 w-3" />
               <span>{{ item.cost }}</span>
             </span>
           </div>
         </div>
 
-        <div class="flex items-center gap-1 px-3 bg-gray-50 border-l border-gray-200">
+        <div
+          v-if="isEditing"
+          class="flex items-center gap-1 px-3 bg-gray-50 border-l border-gray-200"
+        >
           <button
             class="p-1.5 rounded-lg text-gray-400 transition-all duration-200 hover:bg-blue-100 hover:text-blue-600 active:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
             :title="disabled ? 'Working...' : 'Edit'"

@@ -1,7 +1,7 @@
-import { IsNotEmpty, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsUUID } from 'class-validator'
 
 export class SendFriendRequestDto {
   @IsUUID()
   @IsNotEmpty()
-  friendId: string;
+  friendId: string
 }

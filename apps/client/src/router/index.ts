@@ -40,8 +40,18 @@ const router = createRouter({
     {
       path: '/trip-planner',
       name: 'trip-planner',
-      component: () => import('../core/pages/TripPlannerPage.vue'),
+      redirect: { path: '/trips', query: { tab: 'planner' } },
+    },
+    {
+      path: '/trips',
+      name: 'my-trips',
+      component: () => import('../modules/itinerary/pages/MyTripsPage.vue'),
       meta: { showLayout: true },
+    },
+    {
+      path: '/shared-trips',
+      name: 'shared-trips',
+      redirect: { path: '/trips', query: { tab: 'shared' } },
     },
     {
       path: '/route-intel',
