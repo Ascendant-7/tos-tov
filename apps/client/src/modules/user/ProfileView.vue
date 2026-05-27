@@ -138,15 +138,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { createSupabaseClient } from "@repo/supabase";
 
 type StoredProfile = {
+  id?: string | null;
   first_name?: string | null;
   last_name?: string | null;
   email?: string | null;
 };
 
 type StoredUser = {
+  id?: string | null;
   email?: string | null;
 };
 
@@ -161,9 +164,63 @@ const loadStoredProfile = () => {
   user.value = rawUser ? JSON.parse(rawUser) : null;
 };
 
-loadStoredProfile();
+const fetchProfile = async () => {
+  console.log
+  loadStoredProfile();
+
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as
+    | string
+    | undefined;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return;
+  }
+
+  const accessToken = localStorage.getItem("access_token") ?? "";
+  const supabase = createSupabaseClient(
+    supabaseUrl,
+    supabaseAnonKey,
+    accessToken
+      ? { headers: { Authorization: `Bearer ${accessToken}` } }
+      : undefined
+  );
+
+  let userId = user.value?.id ?? null;
+
+  if (!userId && accessToken) {
+    const { data, error } = await supabase.auth.getUser(accessToken);
+
+    if (!error && data?.user) {
+      user.value = {
+        id: data.user.id,
+        email: data.user.email ?? null,
+      };
+      userId = data.user.id;
+    }
+  }
+
+  if (!userId) {
+    return;
+  }
+
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, first_name, last_name, email")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (data) {
+    profile.value = data;
+  }
+};
+
+onMounted(() => {
+  void fetchProfile();
+});
 
 const displayName = computed(() => {
+
   const firstName = profile.value?.first_name?.trim();
   const lastName = profile.value?.last_name?.trim();
 

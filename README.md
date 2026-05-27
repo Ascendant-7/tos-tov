@@ -22,11 +22,13 @@ then install the pnpm dependencies.
 
 ### SUPABASE
 
-the supabase package needs to generate the types and be used through the dist/ folder, but since dist/ is ignored, you must run this script to reproduce it yourself:
+the supabase package needs you to log in to let you access the database. Before running commands, go to supabase.com and login, then get invited into the team's database. After all that, run:
 
 ```sh
-pnpm -F @repo/supabase build
+pnpm -F @repo/supabase login
 ```
+
+...and follow their guide. You should be directed to the supabase website. Then they will give you a code to verify. You can copy this code and enter it into the CLI that runs the login earlier.
 
 ## API
 

@@ -1,7 +1,10 @@
 import { IsOptional, IsString } from 'class-validator';
 
-export class CreateItineraryDayDto {
+export class CreateTripDto {
+  @IsString()
+  title: string;
+
   @IsString()
   @IsOptional()
-  title?: string;
+  description?: string;
 }

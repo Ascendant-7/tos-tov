@@ -44,6 +44,18 @@ const router = createRouter({
       meta: { showLayout: true },
     },
     {
+      path: '/trips',
+      name: 'my-trips',
+      component: () => import('../modules/itinerary/pages/MyTripsPage.vue'),
+      meta: { showLayout: true },
+    },
+    {
+      path: '/shared-trips',
+      name: 'shared-trips',
+      component: () => import('../modules/itinerary/pages/SharedTripsPage.vue'),
+      meta: { showLayout: true },
+    },
+    {
       path: '/route-intel',
       name: 'route-intel',
       component: () => import('../core/pages/RoutesPage.vue'),
@@ -68,11 +80,17 @@ const router = createRouter({
       meta: { showLayout: true },
     },
     {
-      path: '/itinerary',
-      name: 'itinerary',
+      path: '/trips/:tripId',
+      name: 'trip-itinerary',
       component: () => import('../modules/itinerary/pages/ItineraryPage.vue'),
       meta: { showLayout: true },
-    }
+    },
+    {
+      path: '/budget',
+      name: 'budget',
+      component: () => import('../modules/budget/pages/BudgetPage.vue'),
+      meta: { showLayout: true },
+    },
   ],
 })
 

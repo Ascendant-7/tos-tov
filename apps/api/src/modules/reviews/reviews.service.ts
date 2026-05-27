@@ -14,7 +14,7 @@ export class ReviewsService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
   async create(createReviewDto: CreateReviewDto) {
-    const { data, error } = await this.supabaseService.client
+    const { data, error } = await this.supabaseService.anonClient
       .from('reviews')
       .insert(createReviewDto)
       .select();
@@ -27,7 +27,7 @@ export class ReviewsService {
   }
 
   async findAll() {
-    const { data, error } = await this.supabaseService.client
+    const { data, error } = await this.supabaseService.anonClient
       .from('reviews')
       .select('*');
 
@@ -39,7 +39,7 @@ export class ReviewsService {
   }
 
   async findOne(id: string) {
-    const { data, error } = await this.supabaseService.client
+    const { data, error } = await this.supabaseService.anonClient
       .from('reviews')
       .select('*')
       .eq('id', id)
@@ -53,7 +53,7 @@ export class ReviewsService {
   }
 
   async update(id: string, updateReviewDto: UpdateReviewDto) {
-    const { data, error } = await this.supabaseService.client
+    const { data, error } = await this.supabaseService.anonClient
       .from('reviews')
       .update(updateReviewDto)
       .eq('id', id)
@@ -71,7 +71,7 @@ export class ReviewsService {
   }
 
   async remove(id: string) {
-    const { data, error } = await this.supabaseService.client
+    const { data, error } = await this.supabaseService.anonClient
       .from('reviews')
       .delete()
       .eq('id', id)
