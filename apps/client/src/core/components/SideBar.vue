@@ -177,12 +177,6 @@ const DashboardIcon: FunctionalComponent = () =>
   )
 
 const ExploreIcon: FunctionalComponent = () =>
-<<<<<<< HEAD
-  h('svg', { xmlns: 'http://www.w3.org/2000/svg', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', class: 'w-[18px] h-[18px]' }, [
-    h('circle', { cx: '12', cy: '12', r: '10' }),
-    h('polygon', { points: '16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76' }),
-  ])
-=======
   h(
     'svg',
     {
@@ -200,7 +194,6 @@ const ExploreIcon: FunctionalComponent = () =>
       h('polygon', { points: '16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76' }),
     ],
   )
->>>>>>> e95c838e12d9aabd77577a9ac81aa3179846171b
 
 const RouteIntelIcon: FunctionalComponent = () =>
   h(
@@ -314,11 +307,7 @@ const CreatePostIcon: FunctionalComponent = () =>
 const navItems = [
   { to: '/home', label: 'Home', icon: DashboardIcon },
   { to: '/explore', label: 'Explore', icon: ExploreIcon },
-<<<<<<< HEAD
-  { to: '/route-intel', label: 'Route Intel', icon: RouteIntelIcon },
-=======
   { to: '/trips', label: 'My Trips', icon: SavedIcon },
->>>>>>> e95c838e12d9aabd77577a9ac81aa3179846171b
   { to: '/social', label: 'Social Travel', icon: SocialIcon },
   { to: '/community', label: 'Community', icon: CommunityIcon },
   { to: '/profile', label: 'Profile', icon: ProfileIcon },
