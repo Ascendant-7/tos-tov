@@ -31,31 +31,32 @@ export class AuthService {
 
     if (!data.user) throw new BadRequestException('User Creation Failed')
 
-    const profilePayload = {
-      id: data.user.id,
-      email,
-      first_name: firstName,
-      last_name: lastName,
-    }
-
     if (data.session?.access_token) {
       const userClient = this.supabaseService.createUserClient(data.session.access_token)
 
-      const { error: profileError } = await userClient.from('profiles').insert(profilePayload)
+      const { error: profileError } = await userClient.from('profiles').insert({
+        id: data.user.id,
+        email,
+        first_name: firstName,
+        last_name: lastName,
+      })
 
       if (profileError) throw new BadRequestException('Profile Creation Failed')
 
       console.log(`User ${data.user.id} registered with session`)
     } else {
-      await this.supabaseService.adminClient.from('profiles').insert(profilePayload)
+      await this.supabaseService.adminClient.from('profiles').insert({
+        id: data.user.id,
+        email,
+        first_name: firstName,
+        last_name: lastName,
+      })
       console.log(`User ${data.user.id} registered but email confirmation required`)
     }
 
     return {
       msg: 'profile created',
       user: { id: data.user.id, email },
-      profile: profilePayload,
-      session: data.session ?? null,
     }
   }
 

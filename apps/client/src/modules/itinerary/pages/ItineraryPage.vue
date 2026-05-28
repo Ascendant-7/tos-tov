@@ -14,10 +14,10 @@ const itinerary = ref<ItineraryResponse | null>(null)
 const errorMessage = ref('')
 const isCreatingDay = ref(false)
 const isAddingDestination = ref(false)
+const isEditingPlan = ref(false)
 const tripId = route.params.tripId as string
 
 onMounted(async () => {
-
   try {
     itinerary.value = await getItinerary(tripId)
     await addDestinationFromQuery()
@@ -42,7 +42,7 @@ const addDestinationFromQuery = async () => {
       throw new Error('Destination was not found.')
     }
 
-    const day = itinerary.value.days[0] || await createDay(tripId, 'Day 1')
+    const day = itinerary.value.days[0] || (await createDay(tripId, 'Day 1'))
     if (itinerary.value.days.length === 0) {
       itinerary.value.days.push(day)
     }
@@ -85,27 +85,60 @@ const handleAddDay = async () => {
     isCreatingDay.value = false
   }
 }
+
+const toggleEditPlan = () => {
+  isEditingPlan.value = !isEditingPlan.value
+}
 </script>
 
 <template>
   <div class="p-6">
     <div class="mb-4 flex items-center justify-between gap-4">
-      <h1 class="text-2xl font-bold">Itinerary</h1>
+      <div>
+        <h1 class="text-2xl font-bold">Itinerary</h1>
+        <p class="mt-1 text-sm text-slate-500">
+          {{
+            isEditingPlan ? 'Edit trip days and activities.' : 'Review the planned trip schedule.'
+          }}
+        </p>
+      </div>
 
-      <button
-        class="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-blue-700 disabled:opacity-50"
-        :disabled="isCreatingDay || isAddingDestination || !itinerary"
-        @click="handleAddDay"
-      >
-        {{ isCreatingDay ? 'Adding Day...' : 'Add Day' }}
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          v-if="isEditingPlan"
+          class="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-blue-700 disabled:opacity-50"
+          :disabled="isCreatingDay || isAddingDestination || !itinerary"
+          @click="handleAddDay"
+        >
+          {{ isCreatingDay ? 'Adding Day...' : 'Add Day' }}
+        </button>
+
+        <button
+          class="rounded-full px-4 py-2 text-sm font-semibold transition duration-200"
+          :class="
+            isEditingPlan
+              ? 'bg-slate-900 text-white hover:bg-slate-800'
+              : 'bg-white text-slate-700 border border-gray-200 hover:bg-gray-50'
+          "
+          :disabled="!itinerary"
+          @click="toggleEditPlan"
+        >
+          {{ isEditingPlan ? 'Done' : 'Edit Plan' }}
+        </button>
+      </div>
     </div>
 
-    <p v-if="isAddingDestination" class="mb-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+    <p
+      v-if="isAddingDestination"
+      class="mb-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700"
+    >
       Adding destination to this trip...
     </p>
 
-    <p v-if="errorMessage" class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+    <p
+      v-if="errorMessage"
+      class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+    >
       {{ errorMessage }}
     </p>
 
@@ -114,6 +147,7 @@ const handleAddDay = async () => {
         v-for="day in itinerary.days"
         :key="day.id"
         :day="day"
+        :is-editing="isEditingPlan"
       />
     </div>
   </div>

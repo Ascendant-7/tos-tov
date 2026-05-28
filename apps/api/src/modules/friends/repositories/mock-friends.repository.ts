@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { FriendsRepository } from './friends.repository.interface';
-import { Friendship } from '../model/friendship.model';
-import { FriendshipStatus } from '../model/friendship-status.enum';
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { FriendsRepository } from './friends.repository.interface'
+import { Friendship } from '../model/friendship.model'
+import { FriendshipStatus } from '../model/friendship-status.enum'
 
 @Injectable()
 export class MockFriendsRepository implements FriendsRepository {
@@ -16,34 +16,28 @@ export class MockFriendsRepository implements FriendsRepository {
       friend_id: '11111111-1111-1111-1111-111111111111',
       status: FriendshipStatus.Pending,
     },
-  ];
+  ]
 
-  async findFriendship(
-    userId: string,
-    friendId: string,
-  ): Promise<Friendship | null> {
+  async findFriendship(userId: string, friendId: string): Promise<Friendship | null> {
     const friendship = this.friendships.find(
       (item) =>
         (item.user_id === userId && item.friend_id === friendId) ||
         (item.user_id === friendId && item.friend_id === userId),
-    );
+    )
 
-    return friendship ?? null;
+    return friendship ?? null
   }
 
-  async createFriendRequest(
-    userId: string,
-    friendId: string,
-  ): Promise<Friendship> {
+  async createFriendRequest(userId: string, friendId: string): Promise<Friendship> {
     const newFriendship: Friendship = {
       user_id: userId,
       friend_id: friendId,
       status: FriendshipStatus.Pending,
-    };
+    }
 
-    this.friendships.push(newFriendship);
+    this.friendships.push(newFriendship)
 
-    return newFriendship;
+    return newFriendship
   }
 
   async updateFriendshipStatus(
@@ -51,15 +45,15 @@ export class MockFriendsRepository implements FriendsRepository {
     friendId: string,
     status: FriendshipStatus,
   ): Promise<Friendship> {
-    const friendship = await this.findFriendship(userId, friendId);
+    const friendship = await this.findFriendship(userId, friendId)
 
     if (!friendship) {
-      throw new NotFoundException('Friendship not found');
+      throw new NotFoundException('Friendship not found')
     }
 
-    friendship.status = status;
+    friendship.status = status
 
-    return friendship;
+    return friendship
   }
 
   async deleteFriendship(userId: string, friendId: string): Promise<void> {
@@ -69,7 +63,7 @@ export class MockFriendsRepository implements FriendsRepository {
           (item.user_id === userId && item.friend_id === friendId) ||
           (item.user_id === friendId && item.friend_id === userId)
         ),
-    );
+    )
   }
 
   async findFriends(userId: string): Promise<Friendship[]> {
@@ -77,20 +71,18 @@ export class MockFriendsRepository implements FriendsRepository {
       (item) =>
         item.status === FriendshipStatus.Accepted &&
         (item.user_id === userId || item.friend_id === userId),
-    );
+    )
   }
 
   async findIncomingRequests(userId: string): Promise<Friendship[]> {
     return this.friendships.filter(
-      (item) =>
-        item.friend_id === userId && item.status === FriendshipStatus.Pending,
-    );
+      (item) => item.friend_id === userId && item.status === FriendshipStatus.Pending,
+    )
   }
 
   async findOutgoingRequests(userId: string): Promise<Friendship[]> {
     return this.friendships.filter(
-      (item) =>
-        item.user_id === userId && item.status === FriendshipStatus.Pending,
-    );
+      (item) => item.user_id === userId && item.status === FriendshipStatus.Pending,
+    )
   }
 }

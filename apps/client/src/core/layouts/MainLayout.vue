@@ -7,10 +7,7 @@
       @click="isMobileSidebarOpen = false"
     ></div>
 
-    <SideBar
-      :mobile-open="isMobileSidebarOpen"
-      @close-mobile="isMobileSidebarOpen = false"
-    />
+    <SideBar :mobile-open="isMobileSidebarOpen" @close-mobile="isMobileSidebarOpen = false" />
     <div class="flex-1 flex flex-col overflow-hidden min-w-0">
       <TopBar @toggle-sidebar="isMobileSidebarOpen = !isMobileSidebarOpen" />
       <router-view />

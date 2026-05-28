@@ -41,7 +41,9 @@ onMounted(loadSharedTrips)
       <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="m-0 text-[28px] font-bold text-slate-800">Shared Trips</h1>
-          <p class="mt-2 text-[14px] text-slate-500">Browse public itineraries shared by travelers.</p>
+          <p class="mt-2 text-[14px] text-slate-500">
+            Browse public itineraries shared by travelers.
+          </p>
         </div>
 
         <RouterLink
@@ -52,11 +54,17 @@ onMounted(loadSharedTrips)
         </RouterLink>
       </div>
 
-      <p v-if="errorMessage" class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      <p
+        v-if="errorMessage"
+        class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+      >
         {{ errorMessage }}
       </p>
 
-      <div v-if="isLoading" class="rounded-2xl border border-weather-border bg-white p-6 text-sm text-slate-500 shadow-sm">
+      <div
+        v-if="isLoading"
+        class="rounded-2xl border border-weather-border bg-white p-6 text-sm text-slate-500 shadow-sm"
+      >
         Loading shared trips...
       </div>
 
@@ -70,7 +78,9 @@ onMounted(loadSharedTrips)
             <p class="mb-2 text-[12px] font-semibold uppercase tracking-wide text-slate-400">
               {{ formatDate(trip.created_at) }}
             </p>
-            <span class="mb-3 inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-[12px] font-semibold text-emerald-700">
+            <span
+              class="mb-3 inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-[12px] font-semibold text-emerald-700"
+            >
               Public
             </span>
             <h2 class="m-0 text-[20px] font-bold text-slate-800">
@@ -90,7 +100,10 @@ onMounted(loadSharedTrips)
         </article>
       </div>
 
-      <section v-else class="rounded-2xl border border-weather-border bg-white p-8 text-center shadow-sm">
+      <section
+        v-else
+        class="rounded-2xl border border-weather-border bg-white p-8 text-center shadow-sm"
+      >
         <h2 class="m-0 text-[20px] font-bold text-slate-800">No shared trips yet</h2>
         <p class="mx-auto mt-2 max-w-md text-[14px] leading-6 text-slate-500">
           Public trips will appear here when travelers choose to share their itinerary.

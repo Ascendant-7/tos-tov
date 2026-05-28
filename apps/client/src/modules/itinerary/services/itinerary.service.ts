@@ -52,7 +52,10 @@ const authHeaders = () => {
   }
 }
 
-export const createTrip = async (trip: { title: string; description?: string }): Promise<TripApiResponse> => {
+export const createTrip = async (trip: {
+  title: string
+  description?: string
+}): Promise<TripApiResponse> => {
   const response = await fetch(`${API_BASE_URL}/itinerary/trips`, {
     method: 'POST',
     headers: authHeaders(),
@@ -111,7 +114,6 @@ export const updateTrip = async (
 }
 
 export const getItinerary = async (tripId: string): Promise<ItineraryResponse> => {
-
   const response = await fetch(`${API_BASE_URL}/itinerary/${encodeURIComponent(tripId)}`, {
     headers: authHeaders(),
   })
@@ -129,15 +131,9 @@ export const getItinerary = async (tripId: string): Promise<ItineraryResponse> =
       title: day.title || `Day ${day.day_number}`,
       items: (day.items || []).map((item) => ({
         id: item.id,
-        title:
-          item.destination?.name ||
-          item.title ||
-          'Untitled',
+        title: item.destination?.name || item.title || 'Untitled',
         time: item.time,
-        category:
-          item.destination?.category ||
-          item.category ||
-          'activity',
+        category: item.destination?.category || item.category || 'activity',
         duration: item.duration || undefined,
         cost: item.cost || undefined,
         notes: item.notes || undefined,
@@ -150,7 +146,7 @@ export const getItinerary = async (tripId: string): Promise<ItineraryResponse> =
               province: item.destination.province || undefined,
               category: item.destination.category || undefined,
             }
-          : undefined
+          : undefined,
       })),
     })),
   }
@@ -171,20 +167,23 @@ export const createDay = async (tripId: string, title?: string) => {
 }
 
 export const createItem = async (dayId: string, item: any) => {
-  const response = await fetch(`${API_BASE_URL}/itinerary/days/${encodeURIComponent(dayId)}/items`, {
-    method: 'POST',
-    headers: authHeaders(),
-    body: JSON.stringify({
-      title: item.title,
-      destination_id: item.destination_id || null,
-      time: item.time,
-      category: item.category,
-      duration: item.duration || null,
-      cost: item.cost || null,
-      notes: item.notes || null,
-      position: item.position || 0,
-    }),
-  })
+  const response = await fetch(
+    `${API_BASE_URL}/itinerary/days/${encodeURIComponent(dayId)}/items`,
+    {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({
+        title: item.title,
+        destination_id: item.destination_id || null,
+        time: item.time,
+        category: item.category,
+        duration: item.duration || null,
+        cost: item.cost || null,
+        notes: item.notes || null,
+        position: item.position || 0,
+      }),
+    },
+  )
 
   if (!response.ok) {
     throw new Error(`Failed to create item (${response.status})`)

@@ -1,40 +1,40 @@
-import { IsString, IsOptional, IsInt } from 'class-validator';
+import { IsString, IsOptional, IsInt } from 'class-validator'
 
 export class CreateDestinationDto {
   @IsString()
-  name: string;
+  name: string
 
   @IsOptional()
   @IsString()
-  description?: string;
+  description?: string
 
   @IsString()
-  province: string;
-
-  @IsOptional()
-  @IsString()
-  location_name?: string;
-
-  @IsString()
-  category: string;
+  province: string
 
   @IsOptional()
   @IsString()
-  cover_image_url?: string;
+  location_name?: string
+
+  @IsString()
+  category: string
+
+  @IsOptional()
+  @IsString()
+  cover_image_url?: string
 
   @IsOptional()
   @IsInt()
-  duration_min?: number;
+  duration_min?: number
 
   @IsOptional()
   @IsInt()
-  duration_max?: number;
+  duration_max?: number
 
   @IsOptional()
   @IsInt()
-  budget_min?: number;
+  budget_min?: number
 
   @IsOptional()
   @IsInt()
-  budget_max?: number;
+  budget_max?: number
 }
