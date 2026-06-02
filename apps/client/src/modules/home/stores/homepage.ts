@@ -1,3 +1,4 @@
+import { fetchWeather } from '../services/weatherApi'
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useExploreStore } from '@/modules/explore/store/explore'
@@ -11,19 +12,66 @@ export const useHomepageStore = defineStore('homepage', () => {
   const tabs = ref(['All', 'Beach', 'Temple', 'Nature', 'City', 'Adventure'])
 
   // --- Weather ---
-  const weatherData = ref([
-    { city: 'Siem Reap', temp: 32, condition: 'Sunny', icon: '☀️', bgClass: 'bg-amber-50' },
-    {
-      city: 'Phnom Penh',
-      temp: 31,
-      condition: 'Partly Cloudy',
-      icon: '⛅',
-      bgClass: 'bg-slate-50',
-    },
-    { city: 'Koh Rong', temp: 29, condition: 'Humid', icon: '🌊', bgClass: 'bg-blue-50' },
-    { city: 'Kampot', temp: 28, condition: 'Breezy', icon: '🍃', bgClass: 'bg-green-50' },
-  ])
+  // const weatherData = ref([
+  //   { city: 'Siem Reap', temp: 32, condition: 'Sunny', icon: '☀️', bgClass: 'bg-amber-50' },
+  //   {
+  //     city: 'Phnom Penh',
+  //     temp: 31,
+  //     condition: 'Partly Cloudy',
+  //     icon: '⛅',
+  //     bgClass: 'bg-slate-50',
+  //   },
+  //   { city: 'Koh Rong', temp: 29, condition: 'Humid', icon: '🌊', bgClass: 'bg-blue-50' },
+  //   { city: 'Kampot', temp: 28, condition: 'Breezy', icon: '🍃', bgClass: 'bg-green-50' },
+  // ])
+  interface WeatherCard {
+  city: string
+  temp: number
+  condition: string
+  icon: string
+  bgClass: string
+}
 
+  const weatherData = ref<WeatherCard[]>([])
+
+  async function loadWeather() {
+    try {
+      const data = await fetchWeather()
+
+      weatherData.value = data.map((item) => ({
+        city: item.city,
+        temp: Math.round(item.temperature),
+        condition: getCondition(item.weatherCode),
+        icon: getIcon(item.weatherCode),
+        bgClass: getBgClass(item.weatherCode),
+      }))
+    } catch (error) {
+      console.error('Failed to load weather:', error)
+    }
+  }
+      function getCondition(code: number) {
+    if (code <= 1) return 'Sunny'
+    if (code <= 3) return 'Partly Cloudy'
+    if (code <= 50) return 'Cloudy'
+    if (code <= 70) return 'Rainy'
+    return 'Stormy'
+  }
+
+  function getIcon(code: number) {
+    if (code <= 1) return '☀️'
+    if (code <= 3) return '⛅'
+    if (code <= 50) return '☁️'
+    if (code <= 70) return '🌧️'
+    return '⛈️'
+  }
+
+  function getBgClass(code: number) {
+    if (code <= 1) return 'bg-amber-50'
+    if (code <= 3) return 'bg-slate-50'
+    if (code <= 50) return 'bg-blue-50'
+    if (code <= 70) return 'bg-cyan-50'
+    return 'bg-red-50'
+  }
   // --- Destinations (Top-rated from the explore store / backend API) ---
   const exploreStore = useExploreStore()
 
@@ -234,5 +282,6 @@ export const useHomepageStore = defineStore('homepage', () => {
     filteredUpcomingEvents,
     travelTips,
     filteredTravelTips,
+    loadWeather,
   }
 })
