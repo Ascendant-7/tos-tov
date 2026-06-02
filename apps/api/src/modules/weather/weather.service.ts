@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import axios from 'axios'
 
 @Injectable()
@@ -15,6 +15,7 @@ export class WeatherService {
       this.cities.map(async (city) => {
         const response = await axios.get(
           `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current=temperature_2m,weather_code`,
+          { timeout: 5000 },
         )
 
         return {
@@ -36,18 +37,18 @@ export class WeatherService {
 
     const geoResponse = await axios.get(
       `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(formattedCity)}&count=1`,
+      { timeout: 5000 },
     )
 
     if (!geoResponse.data.results?.length) {
-      return {
-        message: 'City not found',
-      }
+      throw new NotFoundException('City not found')
     }
 
     const city = geoResponse.data.results[0]
 
     const weatherResponse = await axios.get(
       `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current=temperature_2m,weather_code`,
+      { timeout: 5000 },
     )
 
     return {

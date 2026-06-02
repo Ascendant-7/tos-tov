@@ -25,12 +25,12 @@ export const useHomepageStore = defineStore('homepage', () => {
   //   { city: 'Kampot', temp: 28, condition: 'Breezy', icon: '🍃', bgClass: 'bg-green-50' },
   // ])
   interface WeatherCard {
-  city: string
-  temp: number
-  condition: string
-  icon: string
-  bgClass: string
-}
+    city: string
+    temp: number
+    condition: string
+    icon: string
+    bgClass: string
+  }
 
   const weatherData = ref<WeatherCard[]>([])
 
@@ -49,7 +49,7 @@ export const useHomepageStore = defineStore('homepage', () => {
       console.error('Failed to load weather:', error)
     }
   }
-      function getCondition(code: number) {
+  function getCondition(code: number) {
     if (code <= 1) return 'Sunny'
     if (code <= 3) return 'Partly Cloudy'
     if (code <= 50) return 'Cloudy'
