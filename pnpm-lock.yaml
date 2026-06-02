@@ -45,6 +45,9 @@ importers:
       '@repo/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
+      axios:
+        specifier: ^1.16.1
+        version: 1.16.1
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
