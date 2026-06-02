@@ -1,11 +1,13 @@
 <template>
   <article
-    class="bg-white rounded-2xl border border-weather-border overflow-hidden hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300">
+    class="bg-white rounded-2xl border border-weather-border overflow-hidden hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300"
+  >
     <!-- Post Header -->
     <div class="p-4 sm:p-5 flex items-center justify-between border-b border-weather-border/50">
       <div class="flex items-center gap-3 min-w-0">
         <div
-          class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 text-white flex items-center justify-center font-bold text-sm shrink-0">
+          class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 text-white flex items-center justify-center font-bold text-sm shrink-0"
+        >
           {{ post.userInitials }}
         </div>
         <div class="min-w-0">
@@ -89,7 +91,8 @@
           {{ currentMediaIndex + 1 }} / {{ post.media.length }}
         </div>
         <div
-          class="bg-slate-800/70 backdrop-blur-sm text-white text-[10px] sm:text-[11px] font-semibold px-3 py-1.5 rounded-full">
+          class="bg-slate-800/70 backdrop-blur-sm text-white text-[10px] sm:text-[11px] font-semibold px-3 py-1.5 rounded-full"
+        >
           <FontAwesomeIcon :icon="faCircleCheck" class="mr-1 h-3 w-3" />
           Visited
         </div>
@@ -180,7 +183,8 @@
 
       <!-- Interactions Bar -->
       <div
-        class="flex items-center justify-between text-[12px] sm:text-[13px] text-slate-500 mb-4 pb-4 border-b border-weather-border/50">
+        class="flex items-center justify-between text-[12px] sm:text-[13px] text-slate-500 mb-4 pb-4 border-b border-weather-border/50"
+      >
         <div class="flex items-center gap-4">
           <span class="flex items-center gap-1">
             <FontAwesomeIcon :icon="faHeart" class="h-3.5 w-3.5 text-red-500" />
@@ -195,26 +199,40 @@
 
       <!-- Action Buttons -->
       <div class="flex items-center justify-between gap-2">
-        <button @click="$emit('like')" :class="[
-          'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[12px] sm:text-[13px] font-medium cursor-pointer transition-all duration-200 border-none',
-          post.liked
-            ? 'text-red-500 bg-red-50 hover:bg-red-100'
-            : 'text-slate-600 bg-cream hover:bg-cream-dark'
-        ]">
-          <FontAwesomeIcon :icon="faHeart" class="h-4 w-4" :class="post.liked ? 'text-red-500' : ''" />
+        <button
+          @click="$emit('like')"
+          :class="[
+            'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[12px] sm:text-[13px] font-medium cursor-pointer transition-all duration-200 border-none',
+            post.liked
+              ? 'text-red-500 bg-red-50 hover:bg-red-100'
+              : 'text-slate-600 bg-cream hover:bg-cream-dark',
+          ]"
+        >
+          <FontAwesomeIcon
+            :icon="faHeart"
+            class="h-4 w-4"
+            :class="post.liked ? 'text-red-500' : ''"
+          />
           Like
         </button>
 
-        <button @click="$emit('comment')" :class="[
-          'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[12px] sm:text-[13px] font-medium cursor-pointer transition-all duration-200 border-none',
-          expanded ? 'text-sidebar-active bg-sidebar-active/10 hover:bg-sidebar-active/15' : 'text-slate-600 bg-cream hover:bg-cream-dark'
-        ]">
+        <button
+          @click="$emit('comment')"
+          :class="[
+            'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[12px] sm:text-[13px] font-medium cursor-pointer transition-all duration-200 border-none',
+            expanded
+              ? 'text-sidebar-active bg-sidebar-active/10 hover:bg-sidebar-active/15'
+              : 'text-slate-600 bg-cream hover:bg-cream-dark',
+          ]"
+        >
           <FontAwesomeIcon :icon="faCommentDots" class="h-4 w-4" />
           Comment
         </button>
 
-        <button @click="$emit('share')"
-          class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[12px] sm:text-[13px] font-medium text-slate-600 bg-cream hover:bg-cream-dark cursor-pointer transition-all duration-200 border-none">
+        <button
+          @click="$emit('share')"
+          class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[12px] sm:text-[13px] font-medium text-slate-600 bg-cream hover:bg-cream-dark cursor-pointer transition-all duration-200 border-none"
+        >
           <FontAwesomeIcon :icon="faShareNodes" class="h-4 w-4" />
           Share
         </button>

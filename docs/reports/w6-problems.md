@@ -22,8 +22,8 @@
 ### Configuration & Environment
 
 - `[CAUSE/FIXER-AP][RESOLVED]` **Missing `.env.example` file**: The SETUP.md references `cp .env.example .env` but the file doesn't exist in the workspace
-- `[CAUSE-ST][FIXER-AP]` **Inconsistent Supabase configuration**: supabase.service.ts in API uses hardcoded environment variables, while it should use the ConfigService from the root
-- `[CAUSE/FIXER-!!]` **TypeScript strict mode partial**: `noImplicitAny` is set to `false`, contradicting other strict settings
+- `[CAUSE-ST][FIXER-AP][RESOLVED]` **Inconsistent Supabase configuration**: supabase.service.ts in API uses hardcoded environment variables, while it should use the ConfigService from the root
+- `[CAUSE/FIXER-AP][RESOLVED]` **TypeScript strict mode partial**: `noImplicitAny` is set to `false`, contradicting other strict settings
 
 ### Data Layer Issues
 

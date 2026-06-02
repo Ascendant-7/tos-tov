@@ -7,10 +7,7 @@
       @click="isMobileSidebarOpen = false"
     ></div>
 
-    <SideBar
-      :mobile-open="isMobileSidebarOpen"
-      @close-mobile="isMobileSidebarOpen = false"
-    />
+    <SideBar :mobile-open="isMobileSidebarOpen" @close-mobile="isMobileSidebarOpen = false" />
     <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <TopBar @toggle-sidebar="isMobileSidebarOpen = !isMobileSidebarOpen" />
       <main class="min-h-0 flex-1 overflow-y-auto bg-cream custom-scrollbar">
@@ -26,8 +23,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import SideBar from './core/components/SideBar.vue';
-import TopBar from './core/components/TopBar.vue';
+import SideBar from './core/components/SideBar.vue'
+import TopBar from './core/components/TopBar.vue'
 
 const route = useRoute()
 const isMobileSidebarOpen = ref(false)

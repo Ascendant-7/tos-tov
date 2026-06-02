@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
-import { SupabaseModule } from '../../supabase/supabase.module';
-import { ReviewsService } from './reviews.service';
-import { ReviewsController } from './reviews.controller';
+import { Module } from '@nestjs/common'
+import { SupabaseModule } from '../../supabase/supabase.module'
+import { ReviewsService } from './reviews.service'
+import { ReviewsController } from './reviews.controller'
 
 @Module({
   imports: [SupabaseModule],

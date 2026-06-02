@@ -4,13 +4,22 @@
       @create-post="showCreatePostModal = true" @share-post="sharePost" @toggle-comments="toggleComments"
       @request-delete="requestDeletePost" @update:new-comment="newComment = $event" @submit-comment="addComment" />
 
-    <div v-if="showCreatePostModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div
+      v-if="showCreatePostModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+    >
       <div class="w-full max-w-[500px] max-h-[80vh] overflow-y-auto rounded-2xl bg-white">
-        <div class="sticky top-0 flex items-center justify-between border-b border-weather-border bg-white p-5 sm:p-6">
-          <h3 class="m-0 text-[16px] font-bold text-slate-800 sm:text-[18px]">Share Your Experience</h3>
-          <button aria-label="Close modal"
+        <div
+          class="sticky top-0 flex items-center justify-between border-b border-weather-border bg-white p-5 sm:p-6"
+        >
+          <h3 class="m-0 text-[16px] font-bold text-slate-800 sm:text-[18px]">
+            Share Your Experience
+          </h3>
+          <button
+            aria-label="Close modal"
             class="cursor-pointer rounded-lg border-none bg-transparent p-1 transition-colors hover:bg-cream"
-            @click="closeCreatePostModal">
+            @click="closeCreatePostModal"
+          >
             <FontAwesomeIcon :icon="faXmark" class="h-5 w-5 text-slate-700" />
           </button>
         </div>
@@ -102,7 +111,9 @@
             class="h-24 w-full resize-none rounded-xl border border-weather-border p-4 text-[13px] text-slate-800 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20 sm:text-[14px]" />
           </label>
 
-          <div class="space-y-3 rounded-xl border border-dashed border-weather-border bg-cream/60 p-4">
+          <div
+            class="space-y-3 rounded-xl border border-dashed border-weather-border bg-cream/60 p-4"
+          >
             <div class="flex items-center justify-between gap-3">
               <div class="flex items-center gap-2 text-slate-700">
                 <FontAwesomeIcon :icon="faImage" class="h-4 w-4" />
@@ -179,7 +190,8 @@
           <div class="flex gap-3">
             <button
               class="flex-1 rounded-xl border border-weather-border px-4 py-2.5 text-[13px] font-semibold text-slate-600 transition-all duration-200 hover:bg-cream sm:text-[14px]"
-              @click="closeCreatePostModal">
+              @click="closeCreatePostModal"
+            >
               Cancel
             </button>
             <button

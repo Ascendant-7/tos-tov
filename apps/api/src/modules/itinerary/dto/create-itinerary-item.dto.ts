@@ -1,43 +1,36 @@
-import {
-  IsInt,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Min,
-} from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Min } from 'class-validator'
 
 export class CreateItineraryItemDto {
   @IsString()
   @IsOptional()
-  title?: string;
+  title?: string
 
   @IsUUID()
   @IsOptional()
-  destination_id?: string;
+  destination_id?: string
 
   @IsString()
   @IsNotEmpty()
-  time?: string;
+  time?: string
 
   @IsString()
   @IsOptional()
-  category?: string;
+  category?: string
 
   @IsString()
   @IsOptional()
-  duration?: string;
+  duration?: string
 
   @IsString()
   @IsOptional()
-  cost?: string;
+  cost?: string
 
   @IsString()
   @IsOptional()
-  notes?: string;
+  notes?: string
 
   @IsInt()
   @Min(0)
   @IsOptional()
-  position?: number;
+  position?: number
 }

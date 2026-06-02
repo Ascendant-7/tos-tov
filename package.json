@@ -4,28 +4,28 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "pnpm -F @repo/supabase gen-types && pnpm -r --parallel --filter \"./apps/*\" run \"/^dev|start:dev$/\"",
-    "db:new": "pnpm -F @repo/supabase exec supabase migration new"
+    "dev:light": "pnpm -r --parallel --filter \"./apps/*\" run \"/^dev|start:dev$/\"",
+    "dev": "pnpm -F @repo/supabase gen-types && pnpm -w dev:light",
+    "dev:strict": "pnpm -w format && pnpm -w lint && pnpm -w dev",
+    "db:new": "pnpm -F @repo/supabase exec supabase migration new",
+    "lint": "pnpm -r --parallel lint",
+    "format": "pnpm -r --parallel format"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.33.3+sha512.a19744364a7e248b92657a4ca5973f9354d21caf982579674b1c539f32c7420c47138ad8b1254df07aba9bc782d9b3029e3db34d5dbff974326eb74dac8ff489",
   "engines": {
-    "node": ">=21",
+    "node": ">=25",
     "pnpm": ">=10.33.0"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.2.4",
-    "axios": "^1.16.0",
     "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.59.0",
     "@typescript-eslint/parser": "^8.59.0",
-    "autoprefixer": "^10.5.0",
-    "postcss": "^8.5.10",
-    "tailwindcss": "^4.2.2",
+    "typescript": "5.9.3",
     "typescript-eslint": "^8.57.2"
   }
 }

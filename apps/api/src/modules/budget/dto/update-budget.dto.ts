@@ -1,5 +1,5 @@
 export class UpdateBudgetDto {
-  hotel?: number;
-  transport?: number;
-  food?: number;
+  hotel?: number
+  transport?: number
+  food?: number
 }
