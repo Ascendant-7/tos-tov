@@ -9,11 +9,17 @@
           {{ post.userInitials }}
         </div>
         <div class="min-w-0">
-          <h3 class="text-[13px] sm:text-[14px] font-semibold text-slate-800 m-0">{{ post.userName }}</h3>
+          <h3 class="text-[13px] sm:text-[14px] font-semibold text-slate-800 m-0">
+            <span v-for="(part, index) in highlightParts(post.userName)" :key="`${part.text}-${index}`"
+              :class="part.match ? highlightClass : ''">{{ part.text }}</span>
+          </h3>
           <div class="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] text-slate-500 sm:text-[12px]">
             <span class="flex min-w-0 items-center gap-1.5">
               <FontAwesomeIcon :icon="faLocationDot" class="h-3 w-3 shrink-0" />
-              <span class="truncate">{{ post.location }}</span>
+              <span class="truncate">
+                <span v-for="(part, index) in highlightParts(post.location)" :key="`${part.text}-${index}`"
+                  :class="part.match ? highlightClass : ''">{{ part.text }}</span>
+              </span>
             </span>
             <span class="text-slate-400">{{ post.timeAgo }}</span>
             <span
@@ -103,14 +109,34 @@
 
     <!-- Post Content -->
     <div class="p-4 sm:p-5">
-      <h4 v-if="post.title" class="text-[14px] sm:text-[15px] font-bold text-slate-800 m-0 mb-2">{{ post.title }}</h4>
-      <p class="text-[12px] sm:text-[13px] text-slate-700 m-0 mb-3 leading-relaxed">{{ post.description }}</p>
+      <div v-if="post.sharedPost"
+        class="mb-3 rounded-lg border border-weather-border bg-cream/60 px-3 py-2 text-[12px] text-slate-600">
+        <p class="m-0 font-semibold text-slate-700">
+          Shared from
+          <span v-for="(part, index) in highlightParts(post.sharedPost.userName)" :key="`${part.text}-${index}`"
+            :class="part.match ? highlightClass : ''">{{ part.text }}</span>
+        </p>
+        <p v-if="post.sharedPost.title || post.sharedPost.description" class="m-0 mt-1 line-clamp-2 leading-relaxed">
+          <span v-for="(part, index) in highlightParts(sharedPostPreview)" :key="`${part.text}-${index}`"
+            :class="part.match ? highlightClass : ''">{{ part.text }}</span>
+        </p>
+      </div>
+
+      <h4 v-if="post.title" class="text-[14px] sm:text-[15px] font-bold text-slate-800 m-0 mb-2">
+        <span v-for="(part, index) in highlightParts(post.title)" :key="`${part.text}-${index}`"
+          :class="part.match ? highlightClass : ''">{{ part.text }}</span>
+      </h4>
+      <p class="text-[12px] sm:text-[13px] text-slate-700 m-0 mb-3 leading-relaxed">
+        <span v-for="(part, index) in highlightParts(post.description)" :key="`${part.text}-${index}`"
+          :class="part.match ? highlightClass : ''">{{ part.text }}</span>
+      </p>
 
       <!-- Hashtags -->
       <div class="flex flex-wrap gap-2 mb-4">
         <span v-for="tag in post.hashtags" :key="tag"
           class="text-[11px] sm:text-[12px] text-sidebar-active font-medium">
-          {{ tag }}
+          <span v-for="(part, index) in highlightParts(tag)" :key="`${part.text}-${index}`"
+            :class="part.match ? highlightClass : ''">{{ part.text }}</span>
         </span>
       </div>
 
@@ -124,7 +150,9 @@
             <div class="flex-1 min-w-0">
               <p class="text-[12px] text-slate-700 m-0 leading-relaxed">
                 <span class="font-semibold text-slate-800">{{ comment.userName }}</span>
-                {{ comment.text }}
+                <span> </span>
+                <span v-for="(part, index) in highlightParts(comment.text)" :key="`${part.text}-${index}`"
+                  :class="part.match ? highlightClass : ''">{{ part.text }}</span>
               </p>
             </div>
           </div>
@@ -216,6 +244,7 @@ const props = defineProps<{
   expanded?: boolean
   commentDraft?: string
   canDelete?: boolean
+  searchQuery?: string
 }>()
 
 const currentMediaIndex = ref(0)
@@ -238,6 +267,15 @@ const visibilityOption = computed(() =>
 )
 const visibilityIcon = computed(() => visibilityOption.value.icon)
 const visibilityLabel = computed(() => visibilityOption.value.label)
+const highlightClass =
+  'rounded bg-amber-200/80 px-0.5 font-semibold text-slate-900 ring-1 ring-amber-300/60'
+const sharedPostPreview = computed(() => {
+  if (!props.post.sharedPost) {
+    return ''
+  }
+
+  return props.post.sharedPost.title || props.post.sharedPost.description
+})
 
 const visibleComments = computed(() => {
   return props.expanded ? props.post.comments : props.post.comments.slice(0, 2)
@@ -265,6 +303,42 @@ const handlePrivacyUpdate = (visibility: PostVisibility) => {
   if (visibility !== props.post.visibility) {
     emit('update-privacy', visibility)
   }
+}
+
+type HighlightPart = {
+  text: string
+  match: boolean
+}
+
+const highlightParts = (value: string): HighlightPart[] => {
+  const query = props.searchQuery?.trim()
+
+  if (!query) {
+    return [{ text: value, match: false }]
+  }
+
+  const lowerValue = value.toLowerCase()
+  const lowerQuery = query.toLowerCase()
+  const parts: HighlightPart[] = []
+  let cursor = 0
+  let matchIndex = lowerValue.indexOf(lowerQuery)
+
+  while (matchIndex >= 0) {
+    if (matchIndex > cursor) {
+      parts.push({ text: value.slice(cursor, matchIndex), match: false })
+    }
+
+    const matchEnd = matchIndex + query.length
+    parts.push({ text: value.slice(matchIndex, matchEnd), match: true })
+    cursor = matchEnd
+    matchIndex = lowerValue.indexOf(lowerQuery, cursor)
+  }
+
+  if (cursor < value.length) {
+    parts.push({ text: value.slice(cursor), match: false })
+  }
+
+  return parts.length > 0 ? parts : [{ text: value, match: false }]
 }
 
 const formatNumber = (num: number): string => {

@@ -239,6 +239,7 @@ type SelectedMedia = {
 
 const showCreatePostModal = ref(false)
 const activeCommentPostId = ref<string | null>(null)
+const activeCommentTargetPostId = ref<string | null>(null)
 const newPostTitle = ref('')
 const newPostText = ref('')
 const selectedMedia = ref<SelectedMedia[]>([])
@@ -352,17 +353,17 @@ const hideDestinationDropdown = () => {
 }
 
 const toggleComments = (post: Post) => {
-  activeCommentPostId.value = activeCommentPostId.value === post.id ? null : post.id
+  const isClosing = activeCommentPostId.value === post.id
+  activeCommentPostId.value = isClosing ? null : post.id
+  activeCommentTargetPostId.value = isClosing ? null : post.postId
   newComment.value = ''
 }
 
-const sharePost = (post: Post) => {
-  if (navigator.share) {
-    navigator.share({
-      title: post.title,
-      text: post.description,
-      url: window.location.href,
-    })
+const sharePost = async (post: Post) => {
+  try {
+    await communityStore.sharePost(post.postId)
+  } catch {
+    // The store owns the user-facing error message.
   }
 }
 
@@ -410,9 +411,9 @@ const createPost = async () => {
 }
 
 const addComment = async () => {
-  if (newComment.value.trim() && activeCommentPostId.value) {
+  if (newComment.value.trim() && activeCommentTargetPostId.value) {
     try {
-      await communityStore.addComment(activeCommentPostId.value, newComment.value)
+      await communityStore.addComment(activeCommentTargetPostId.value, newComment.value)
       newComment.value = ''
     } catch {
       // The store owns the user-facing error message.

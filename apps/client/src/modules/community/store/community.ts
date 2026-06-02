@@ -11,6 +11,7 @@ export interface Comment {
 
 export interface Post {
   id: string
+  postId: string
   userId: string
   userName: string
   userInitials: string
@@ -27,9 +28,17 @@ export interface Post {
   liked: boolean
   bookmarked: boolean
   visibility: PostVisibility
+  sharedPost: SharedPost | null
 }
 
 export type PostVisibility = 'public' | 'friends' | 'private'
+
+export interface SharedPost {
+  id: string
+  userName: string
+  title: string
+  description: string
+}
 
 export interface PostMedia {
   url: string
@@ -89,6 +98,11 @@ interface CommunityPostRow {
   liked_by_viewer?: boolean
   saved_by_viewer?: boolean
   visibility?: PostVisibility | null
+  feed_id?: string
+  shared_at?: string | null
+  shared_by_user_id?: string | null
+  shared_by_profile?: ProfileRow | ProfileRow[] | null
+  share_caption?: string | null
 }
 
 interface FriendOverviewRow {
@@ -149,6 +163,27 @@ const requireAuthHeaders = () => {
   return headers
 }
 
+const isAuthFailure = (error: unknown) => {
+  if (error instanceof Error && error.message === 'Please log in to use this feature.') {
+    return true
+  }
+
+  if (!axios.isAxiosError(error)) {
+    return false
+  }
+
+  const responseMessage = String(error.response?.data?.message ?? '').toLowerCase()
+
+  return (
+    error.response?.status === 401 ||
+    error.response?.status === 403 ||
+    responseMessage.includes('forbidden resource')
+  )
+}
+
+const authActionMessage = (action: 'like' | 'comment') =>
+  action === 'like' ? 'Please log in to like posts.' : 'Please log in to comment.'
+
 const getCurrentUserId = () => {
   try {
     const user = JSON.parse(localStorage.getItem('user') || 'null') as { id?: string } | null
@@ -203,7 +238,9 @@ const extractHashtags = (content: string) => content.match(/#[\p{L}\p{N}_]+/gu) 
 const mapPost = (row: CommunityPostRow): Post => {
   const profile = firstRelation(row.profiles)
   const destination = firstRelation(row.destinations)
-  const userName = displayNameFor(profile)
+  const sharedByProfile = firstRelation(row.shared_by_profile)
+  const originalUserName = displayNameFor(profile)
+  const userName = row.shared_by_user_id ? displayNameFor(sharedByProfile) : originalUserName
   const content = row.content ?? ''
   const media =
     row.post_media
@@ -219,15 +256,17 @@ const mapPost = (row: CommunityPostRow): Post => {
     type: 'image',
   }
 
-  const location = [destination?.name, destination?.province].filter(Boolean).join(', ') || 'Cambodia'
+  const location =
+    [destination?.name, destination?.province].filter(Boolean).join(', ') || 'Cambodia'
 
   return {
-    id: row.id,
-    userId: row.user_id ?? '',
+    id: row.feed_id ?? row.id,
+    postId: row.id,
+    userId: row.shared_by_user_id ?? row.user_id ?? '',
     userName,
     userInitials: initialsFor(userName),
     location,
-    timeAgo: timeAgo(row.created_at),
+    timeAgo: timeAgo(row.shared_at ?? row.created_at),
     image: images[0] ?? media[0]?.url ?? destination?.cover_image_url ?? FALLBACK_IMAGE,
     images: images.length > 0 ? images : [destination?.cover_image_url ?? FALLBACK_IMAGE],
     media: media.length > 0 ? media : [fallbackMedia],
@@ -250,6 +289,14 @@ const mapPost = (row: CommunityPostRow): Post => {
     liked: row.liked_by_viewer ?? false,
     bookmarked: row.saved_by_viewer ?? false,
     visibility: row.visibility ?? 'public',
+    sharedPost: row.shared_by_user_id
+      ? {
+          id: row.id,
+          userName: originalUserName,
+          title: row.title?.trim() ?? '',
+          description: content,
+        }
+      : null,
   }
 }
 
@@ -294,6 +341,7 @@ const mapCommunityUser = (friend: FriendOverviewRow): CommunityUser => {
 export const useCommunityStore = defineStore('community', () => {
   const activeFilter = ref('All')
   const selectedTag = ref<string | null>(null)
+  const searchQuery = ref('')
   const currentUserId = ref(getCurrentUserId())
   const isLoading = ref(false)
   const isSubmitting = ref(false)
@@ -333,12 +381,35 @@ export const useCommunityStore = defineStore('community', () => {
   const communityUsers = ref<CommunityUser[]>([])
   const posts = ref<Post[]>([])
   const destinationResults = ref<DestinationOption[]>([])
+  const normalizedSearchQuery = computed(() => searchQuery.value.trim().toLowerCase())
+
+  const postMatchesSearch = (post: Post, query: string) => {
+    const searchableText = [
+      post.userName,
+      post.location,
+      post.title,
+      post.description,
+      post.sharedPost?.userName,
+      post.sharedPost?.title,
+      post.sharedPost?.description,
+      ...post.hashtags,
+      ...post.comments.map((comment) => `${comment.userName} ${comment.text}`),
+    ]
+      .join(' ')
+      .toLowerCase()
+
+    return searchableText.includes(query)
+  }
 
   const filteredPosts = computed(() => {
     let result = posts.value
 
     if (selectedTag.value) {
       result = result.filter((post) => post.hashtags.includes(selectedTag.value as string))
+    }
+
+    if (normalizedSearchQuery.value) {
+      result = result.filter((post) => postMatchesSearch(post, normalizedSearchQuery.value))
     }
 
     return result
@@ -414,6 +485,10 @@ export const useCommunityStore = defineStore('community', () => {
     selectedTag.value = selectedTag.value === tag ? null : tag
   }
 
+  const setSearchQuery = (query: string) => {
+    searchQuery.value = query
+  }
+
   const searchDestinations = async (query: string) => {
     const trimmedQuery = query.trim()
 
@@ -448,6 +523,11 @@ export const useCommunityStore = defineStore('community', () => {
 
     if (!post) return
 
+    if (!authHeaders()) {
+      showError(authActionMessage('like'))
+      return
+    }
+
     const wasLiked = post.liked
     post.liked = !wasLiked
     post.likes += wasLiked ? -1 : 1
@@ -457,15 +537,19 @@ export const useCommunityStore = defineStore('community', () => {
       if (wasLiked) {
         await api.delete(`/community/posts/${postId}/like`, { headers: requireAuthHeaders() })
       } else {
-        await api.post(`/community/posts/${postId}/like`, undefined, { headers: requireAuthHeaders() })
+        await api.post(`/community/posts/${postId}/like`, undefined, {
+          headers: requireAuthHeaders(),
+        })
       }
     } catch (error) {
       post.liked = wasLiked
       post.likes += wasLiked ? 1 : -1
       showError(
-        axios.isAxiosError(error)
-          ? error.response?.data?.message || 'Please log in to like posts.'
-          : 'Please log in to like posts.',
+        isAuthFailure(error)
+          ? authActionMessage('like')
+          : error instanceof Error
+            ? error.message
+            : 'Failed to update like.',
       )
     }
   }
@@ -484,7 +568,9 @@ export const useCommunityStore = defineStore('community', () => {
         await api.delete(`/community/posts/${postId}/save`, { headers: requireAuthHeaders() })
         showFeedback('Removed from saved.', 'info')
       } else {
-        await api.post(`/community/posts/${postId}/save`, undefined, { headers: requireAuthHeaders() })
+        await api.post(`/community/posts/${postId}/save`, undefined, {
+          headers: requireAuthHeaders(),
+        })
         showFeedback('Post saved.', 'success')
       }
     } catch (error) {
@@ -545,7 +631,8 @@ export const useCommunityStore = defineStore('community', () => {
     } catch (error) {
       showError(
         axios.isAxiosError(error)
-          ? error.response?.data?.message || 'Post was created only if the request reached the server. Please try again.'
+          ? error.response?.data?.message ||
+              'Post was created only if the request reached the server. Please try again.'
           : 'Please log in to create posts.',
       )
 
@@ -555,8 +642,43 @@ export const useCommunityStore = defineStore('community', () => {
     }
   }
 
+  const sharePost = async (postId: string) => {
+    if (!authHeaders()) {
+      showError('Please log in to share posts.')
+      return
+    }
+
+    try {
+      clearMessages()
+
+      const response = await api.post<CommunityPostRow>(
+        `/community/posts/${postId}/share`,
+        undefined,
+        { headers: requireAuthHeaders() },
+      )
+
+      await loadPosts()
+      showFeedback('Post shared to the community feed.', 'success')
+
+      return posts.value.find((post) => post.id === response.data.id) ?? mapPost(response.data)
+    } catch (error) {
+      showError(
+        axios.isAxiosError(error)
+          ? error.response?.data?.message || 'Failed to share post.'
+          : 'Failed to share post.',
+      )
+
+      throw error
+    }
+  }
+
   const addComment = async (postId: string, text: string) => {
     try {
+      if (!authHeaders()) {
+        showError(authActionMessage('comment'))
+        return
+      }
+
       clearMessages()
 
       const response = await api.post<CommentRow>(
@@ -570,12 +692,13 @@ export const useCommunityStore = defineStore('community', () => {
       if (post) {
         post.comments.push(mapComment(response.data))
       }
-
     } catch (error) {
       showError(
-        axios.isAxiosError(error)
-          ? error.response?.data?.message || 'Please log in to comment.'
-          : 'Please log in to comment.',
+        isAuthFailure(error)
+          ? authActionMessage('comment')
+          : error instanceof Error
+            ? error.message
+            : 'Failed to add comment.',
       )
 
       throw error
@@ -641,6 +764,8 @@ export const useCommunityStore = defineStore('community', () => {
   return {
     activeFilter,
     selectedTag,
+    searchQuery,
+    normalizedSearchQuery,
     currentUserId,
     filterTabs,
     trendingTags,
@@ -659,10 +784,13 @@ export const useCommunityStore = defineStore('community', () => {
     toggleLike,
     toggleBookmark,
     addPost,
+    sharePost,
     addComment,
     deletePost,
     updatePostVisibility,
     setActiveFilter,
     setSelectedTag,
+    setSearchQuery,
+    showFeedback,
   }
 })

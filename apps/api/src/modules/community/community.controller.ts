@@ -136,6 +136,12 @@ export class CommunityController {
     return this.communityService.savePost(requireUserId(req), postId);
   }
 
+  @Post('posts/:postId/share')
+  @UseGuards(AuthGuard)
+  sharePost(@Req() req: AuthenticatedRequest, @Param('postId') postId: string) {
+    return this.communityService.sharePost(requireUserId(req), postId);
+  }
+
   @Delete('posts/:postId/save')
   @UseGuards(AuthGuard)
   unsavePost(

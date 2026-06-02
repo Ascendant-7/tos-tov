@@ -16,13 +16,31 @@ type UserRelationRow = {
   user_id?: string | null;
 };
 
+type PostMediaRow = {
+  bucket_name?: string | null;
+  file_path?: string | null;
+  public_url?: string | null;
+  media_type?: MediaType | string | null;
+  position?: number | null;
+};
+
 type CommunityPostRow = {
   id: string;
   user_id: string;
+  destination_id?: string | null;
+  title?: string | null;
+  content?: string | null;
+  visit_status?: string | null;
+  created_at?: string | null;
   visibility: PostVisibility;
+  post_media?: PostMediaRow[] | null;
   post_likes?: UserRelationRow[] | null;
   post_comments?: unknown[] | null;
   saved_posts?: UserRelationRow[] | null;
+  feed_id?: string;
+  shared_at?: string | null;
+  shared_by_user_id?: string | null;
+  shared_by_profile?: unknown;
   [key: string]: unknown;
 };
 
@@ -34,6 +52,15 @@ type DecoratedCommunityPostRow = CommunityPostRow & {
 type FriendshipPairRow = {
   requester_id: string;
   receiver_id: string;
+};
+
+type SharedPostRow = {
+  id: string;
+  user_id: string;
+  caption?: string | null;
+  created_at?: string | null;
+  profiles?: unknown;
+  community_posts?: CommunityPostRow | CommunityPostRow[] | null;
 };
 
 @Injectable()
@@ -205,7 +232,7 @@ export class CommunityService {
     const normalizedFilter = filter.toLowerCase();
     const friendIds = userId ? await this.getFriendIds(userId) : [];
 
-    const { data, error } = await supabase
+    const { data: postData, error } = await supabase
       .from('community_posts')
       .select(this.postSelectQuery())
       .eq('status', 'published')
@@ -215,20 +242,62 @@ export class CommunityService {
       throw new BadRequestException(error.message);
     }
 
-    let posts = ((data || []) as unknown as CommunityPostRow[]).filter((post) =>
-      this.canViewPost(post, userId, friendIds),
-    );
+    const { data: shareData, error: shareError } = await (supabase as any)
+      .from('shared_posts')
+      .select(
+        `
+        id,
+        user_id,
+        caption,
+        created_at,
+        profiles:user_id (
+          id,
+          first_name,
+          last_name,
+          email
+        ),
+        community_posts:post_id (
+          ${this.postSelectQuery()}
+        )
+      `,
+      )
+      .order('created_at', { ascending: false });
+
+    if (shareError) {
+      throw new BadRequestException(shareError.message);
+    }
+
+    const posts = ((postData || []) as unknown as CommunityPostRow[])
+      .filter((post) => this.canViewPost(post, userId, friendIds))
+      .map((post) => ({
+        ...post,
+        feed_id: post.id,
+      }));
+
+    const sharedPosts = ((shareData || []) as SharedPostRow[])
+      .map((share) => this.mapSharedPostFeedRow(share))
+      .filter((post): post is CommunityPostRow => Boolean(post))
+      .filter((post) => this.canViewPost(post, userId, friendIds));
+
+    let feedItems = [...posts, ...sharedPosts].sort((a, b) => {
+      const dateA = new Date(a.shared_at || a.created_at || 0).getTime();
+      const dateB = new Date(b.shared_at || b.created_at || 0).getTime();
+
+      return dateB - dateA;
+    });
 
     if (normalizedFilter === 'following') {
       if (!userId) return [];
 
-      posts = posts.filter((post) => friendIds.includes(post.user_id));
+      feedItems = feedItems.filter((post) =>
+        friendIds.includes(this.feedOwnerId(post)),
+      );
     }
 
     if (normalizedFilter === 'saved') {
       if (!userId) return [];
 
-      posts = posts.filter((post) => {
+      feedItems = feedItems.filter((post) => {
         return (post.saved_posts || []).some(
           (saved) => saved.user_id === userId,
         );
@@ -236,7 +305,7 @@ export class CommunityService {
     }
 
     if (normalizedFilter === 'popular') {
-      posts = posts.sort((a, b) => {
+      feedItems = feedItems.sort((a, b) => {
         const scoreA =
           (a.post_likes?.length || 0) * 2 + (a.post_comments?.length || 0);
 
@@ -247,7 +316,7 @@ export class CommunityService {
       });
     }
 
-    return posts.map((post) => this.decoratePostForViewer(post, userId));
+    return feedItems.map((post) => this.decoratePostForViewer(post, userId));
   }
 
   async getPostById(
@@ -397,6 +466,55 @@ export class CommunityService {
       data,
       message: 'Post saved successfully',
     };
+  }
+
+  async sharePost(
+    userId: string,
+    postId: string,
+  ): Promise<DecoratedCommunityPostRow> {
+    const supabase = this.db();
+    const originalPost = await this.ensurePostViewable(userId, postId);
+
+    const { data: createdShare, error } = await (supabase as any)
+      .from('shared_posts')
+      .insert({
+        user_id: userId,
+        post_id: originalPost.id,
+      })
+      .select(
+        `
+        id,
+        user_id,
+        caption,
+        created_at,
+        profiles:user_id (
+          id,
+          first_name,
+          last_name,
+          email
+        ),
+        community_posts:post_id (
+          ${this.postSelectQuery()}
+        )
+      `,
+      )
+      .single();
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    if (!createdShare) {
+      throw new BadRequestException('Failed to share post');
+    }
+
+    const feedRow = this.mapSharedPostFeedRow(createdShare as SharedPostRow);
+
+    if (!feedRow) {
+      throw new BadRequestException('Failed to load shared post');
+    }
+
+    return this.decoratePostForViewer(feedRow, userId);
   }
 
   async unsavePost(userId: string, postId: string) {
@@ -740,7 +858,24 @@ export class CommunityService {
 
     const { data, error } = await supabase
       .from('community_posts')
-      .select('id, user_id, visibility')
+      .select(
+        `
+        id,
+        user_id,
+        destination_id,
+        title,
+        content,
+        visit_status,
+        visibility,
+        post_media (
+          bucket_name,
+          file_path,
+          public_url,
+          media_type,
+          position
+        )
+      `,
+      )
       .eq('id', postId)
       .eq('status', 'published')
       .single();
@@ -822,6 +957,35 @@ export class CommunityService {
     }
 
     return post.visibility === 'friends' && friendIds.includes(post.user_id);
+  }
+
+  private feedOwnerId(post: CommunityPostRow) {
+    return post.shared_by_user_id || post.user_id;
+  }
+
+  private firstRelation<T>(relation?: T | T[] | null): T | undefined {
+    if (Array.isArray(relation)) {
+      return relation[0];
+    }
+
+    return relation ?? undefined;
+  }
+
+  private mapSharedPostFeedRow(share: SharedPostRow): CommunityPostRow | null {
+    const originalPost = this.firstRelation(share.community_posts);
+
+    if (!originalPost) {
+      return null;
+    }
+
+    return {
+      ...originalPost,
+      feed_id: `share:${share.id}`,
+      shared_at: share.created_at ?? null,
+      shared_by_user_id: share.user_id,
+      shared_by_profile: share.profiles,
+      share_caption: share.caption ?? null,
+    };
   }
 
   private postSelectQuery() {

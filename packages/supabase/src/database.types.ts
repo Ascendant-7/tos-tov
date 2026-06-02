@@ -382,6 +382,7 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          password: string
         }
         Insert: {
           created_at?: string | null
@@ -389,6 +390,7 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
+          password?: string
         }
         Update: {
           created_at?: string | null
@@ -396,6 +398,7 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          password?: string
         }
         Relationships: []
       }
