@@ -236,7 +236,9 @@ export class ProfilesService {
       tripsCount: trips.length,
       placesCount: uniqueDestinations.size,
       countriesCount: 0, // Need country data in destinations table
-      distanceKm: 0, // Need coordinates data
+      distanceKm: 0,
+    }
+  } // Need coordinates data
   async search(query: string) {
     if (!query || !query.trim()) {
       return []
@@ -247,9 +249,7 @@ export class ProfilesService {
       const { data, error } = await this.supabaseService.anonClient
         .from('profiles')
         .select('id, first_name, last_name, email')
-        .or(
-          `first_name.ilike.${pattern},last_name.ilike.${pattern},email.ilike.${pattern}`,
-        )
+        .or(`first_name.ilike.${pattern},last_name.ilike.${pattern},email.ilike.${pattern}`)
         .limit(10)
 
       if (error) {
