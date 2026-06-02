@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-screen h-screen overflow-hidden bg-cream">
+  <div v-if="showLayout" class="flex h-screen w-screen overflow-hidden bg-cream">
     <!-- Mobile overlay backdrop -->
     <div
       v-if="isMobileSidebarOpen"
@@ -7,21 +7,29 @@
       @click="isMobileSidebarOpen = false"
     ></div>
 
-    <SideBar
-      :mobile-open="isMobileSidebarOpen"
-      @close-mobile="isMobileSidebarOpen = false"
-    />
-    <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <SideBar :mobile-open="isMobileSidebarOpen" @close-mobile="isMobileSidebarOpen = false" />
+    <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <TopBar @toggle-sidebar="isMobileSidebarOpen = !isMobileSidebarOpen" />
-      <router-view />
+      <main class="min-h-0 flex-1 overflow-y-auto bg-cream custom-scrollbar">
+        <router-view />
+      </main>
     </div>
+  </div>
+  <div v-else class="min-h-screen w-screen overflow-y-auto bg-cream custom-scrollbar">
+    <router-view />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import SideBar from './components/SideBar.vue';
-import TopBar from './components/TopBar.vue';
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import SideBar from './core/components/SideBar.vue'
+import TopBar from './core/components/TopBar.vue'
 
+const route = useRoute()
 const isMobileSidebarOpen = ref(false)
+
+const showLayout = computed(() => {
+  return route.meta.showLayout !== false
+})
 </script>

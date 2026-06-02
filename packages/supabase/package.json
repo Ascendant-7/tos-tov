@@ -14,7 +14,7 @@
     }
   },
   "scripts": {
-    "gen-types": "supabase gen types typescript --project-id uhfjmbvbnuhotlnxdvgj > src/database.types.ts",
+    "gen-types": "supabase gen types typescript --project-id uhfjmbvbnuhotlnxdvgj > src/database.types.ts && pnpm build",
     "build": "tsup",
     "dev": "tsup --watch"
   },
@@ -23,11 +23,10 @@
   "license": "ISC",
   "packageManager": "pnpm@10.33.0",
   "dependencies": {
-    "@supabase/supabase-js": "^2.104.1"
+    "@supabase/supabase-js": "^2.105.3"
   },
   "devDependencies": {
-    "supabase": "^2.95.3",
-    "tsup": "^8.5.1",
-    "typescript": "^6.0.3"
+    "supabase": "^2.98.2",
+    "tsup": "^8.5.1"
   }
 }
