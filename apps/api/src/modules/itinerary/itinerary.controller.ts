@@ -8,22 +8,37 @@ import { UpdateTripDto } from './dto/update-trip.dto'
 import { UpdateItineraryItemDto } from './dto/update-itinerary-item.dto'
 import { ItineraryService } from './itinerary.service'
 import { AuthGuard } from '../../common/guards/auth.guard'
+import { SupabaseService } from '../../supabase/supabase.service'
 
 interface AuthenticatedRequest extends Request {
   user: User
 }
 
 @Controller('itinerary')
-@UseGuards(AuthGuard)
 export class ItineraryController {
-  constructor(private readonly itineraryService: ItineraryService) {}
+  constructor(
+    private readonly itineraryService: ItineraryService,
+    private readonly supabaseService: SupabaseService,
+  ) {}
+
+  private async getOptionalUserId(request: Request) {
+    const token = request.headers.authorization?.replace('Bearer ', '')
+    if (!token) return undefined
+
+    const { data, error } = await this.supabaseService.anonClient.auth.getUser(token)
+    if (error) return undefined
+
+    return data.user?.id
+  }
 
   @Post('trips')
+  @UseGuards(AuthGuard)
   createTrip(@Body() dto: CreateTripDto, @Req() request: AuthenticatedRequest) {
     return this.itineraryService.createTrip(dto, request.user.id)
   }
 
   @Get('trips')
+  @UseGuards(AuthGuard)
   getTrips(@Req() request: AuthenticatedRequest) {
     return this.itineraryService.getTrips(request.user.id)
   }
@@ -34,6 +49,7 @@ export class ItineraryController {
   }
 
   @Patch('trips/:tripId')
+  @UseGuards(AuthGuard)
   updateTrip(
     @Param('tripId') tripId: string,
     @Body() dto: UpdateTripDto,
@@ -43,11 +59,13 @@ export class ItineraryController {
   }
 
   @Get(':tripId')
-  getItinerary(@Param('tripId') tripId: string, @Req() request: AuthenticatedRequest) {
-    return this.itineraryService.getItinerary(tripId, request.user.id)
+  async getItinerary(@Param('tripId') tripId: string, @Req() request: Request) {
+    const userId = await this.getOptionalUserId(request)
+    return this.itineraryService.getItinerary(tripId, userId)
   }
 
   @Post(':tripId/days')
+  @UseGuards(AuthGuard)
   createDay(
     @Param('tripId') tripId: string,
     @Body() dto: CreateItineraryDayDto,
@@ -57,6 +75,7 @@ export class ItineraryController {
   }
 
   @Post('days/:dayId/items')
+  @UseGuards(AuthGuard)
   createItem(
     @Param('dayId') dayId: string,
     @Body() dto: CreateItineraryItemDto,
@@ -66,6 +85,7 @@ export class ItineraryController {
   }
 
   @Patch('items/:itemId')
+  @UseGuards(AuthGuard)
   updateItem(
     @Param('itemId') itemId: string,
     @Body() dto: UpdateItineraryItemDto,
@@ -75,6 +95,7 @@ export class ItineraryController {
   }
 
   @Delete('items/:itemId')
+  @UseGuards(AuthGuard)
   deleteItem(@Param('itemId') itemId: string, @Req() request: AuthenticatedRequest) {
     return this.itineraryService.deleteItem(itemId, request.user.id)
   }

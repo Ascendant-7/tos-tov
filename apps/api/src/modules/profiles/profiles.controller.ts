@@ -7,6 +7,7 @@ import {
   Patch,
   Req,
   UseGuards,
+  Query
 } from '@nestjs/common'
 import { ProfilesService } from './profiles.service'
 import { AuthGuard } from '../../common/guards/auth.guard'
@@ -26,6 +27,9 @@ export class ProfilesController {
   @Get('stats/:id')
   getStats(@Param('id') id: string) {
     return this.profilesService.getStats(id)
+  @Get()
+  search(@Query('q') q?: string) {
+    return this.profilesService.search(q ?? '')
   }
 
   @Get(':id')

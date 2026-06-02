@@ -237,6 +237,30 @@ export class ProfilesService {
       placesCount: uniqueDestinations.size,
       countriesCount: 0, // Need country data in destinations table
       distanceKm: 0, // Need coordinates data
+  async search(query: string) {
+    if (!query || !query.trim()) {
+      return []
+    }
+
+    try {
+      const pattern = `%${query.trim()}%`
+      const { data, error } = await this.supabaseService.anonClient
+        .from('profiles')
+        .select('id, first_name, last_name, email')
+        .or(
+          `first_name.ilike.${pattern},last_name.ilike.${pattern},email.ilike.${pattern}`,
+        )
+        .limit(10)
+
+      if (error) {
+        console.error('[ProfilesService] search error:', error)
+        return []
+      }
+
+      return data ?? []
+    } catch (err) {
+      console.error('[ProfilesService] unexpected search error:', err)
+      return []
     }
   }
 }
