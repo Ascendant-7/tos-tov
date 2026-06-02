@@ -169,16 +169,14 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios'
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { supabase } from '../../services/supabase'
 
 const router = useRouter()
 
 const loading = ref(false)
-
 const errorMessage = ref('')
-
 const successMessage = ref('')
 
 const form = reactive({
@@ -190,35 +188,30 @@ const form = reactive({
 const handleSubmit = async () => {
   try {
     loading.value = true
-
     errorMessage.value = ''
-
     successMessage.value = ''
 
-    const response = await axios.post('http://localhost:3000/auth/login', {
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: form.email,
       password: form.password,
     })
 
-    const data = response.data
+    if (error) {
+      errorMessage.value = error.message
+      return
+    }
 
-    // save token
-    localStorage.setItem('access_token', data.session.access_token)
-
-    // save user
-    localStorage.setItem('user', JSON.stringify(data.user))
+    // Supabase automatically stores session (NO localStorage needed)
+    console.log('LOGIN SUCCESS:', data)
 
     successMessage.value = 'Login successful!'
 
     setTimeout(() => {
       router.push('/home')
     }, 1000)
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      errorMessage.value = error.response?.data?.message || 'Invalid email or password'
-    } else {
-      errorMessage.value = 'Something went wrong'
-    }
+  } catch (err) {
+    console.error(err)
+    errorMessage.value = 'Something went wrong'
   } finally {
     loading.value = false
   }

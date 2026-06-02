@@ -3,7 +3,17 @@
  * Communicates with the NestJS backend at /destinations
  */
 
+import { supabase } from '../../../services/supabase'
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000'
+
+async function getAuthHeaders() {
+  const { data: { session } } = await supabase.auth.getSession()
+  return {
+    'Content-Type': 'application/json',
+    ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+  }
+}
 
 /**
  * Raw shape returned by the backend (matches Supabase destinations table)
@@ -43,7 +53,9 @@ export interface CreateDestinationPayload {
 }
 
 export async function fetchDestinations(): Promise<DestinationApiResponse[]> {
-  const response = await fetch(`${API_BASE_URL}/destinations`)
+  const response = await fetch(`${API_BASE_URL}/destinations`, {
+    headers: await getAuthHeaders(),
+  })
 
   if (!response.ok) {
     throw new Error(`Failed to fetch destinations: ${response.status} ${response.statusText}`)
@@ -58,7 +70,7 @@ export async function createDestination(
 ): Promise<DestinationApiResponse> {
   const response = await fetch(`${API_BASE_URL}/destinations`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: await getAuthHeaders(),
     body: JSON.stringify(payload),
   })
 

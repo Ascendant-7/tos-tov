@@ -9,5 +9,7 @@ export class ProfileEntity {
 
   avatar_url?: string
 
+  bio?: string
+
   created_at!: string
 }

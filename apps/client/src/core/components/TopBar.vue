@@ -124,13 +124,22 @@
         ></span>
       </button>
 
-      <!-- Login Button -->
+      <!-- Login/Logout Button -->
       <router-link
-        to="/login"
+        v-if="!isAuthed"
+        to="/login?force=1"
         class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-sky-700 to-cyan-500 text-white text-sm font-semibold shadow-[0_10px_20px_rgba(14,116,144,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_24px_rgba(14,116,144,0.35)]"
       >
         <span>Login</span>
       </router-link>
+      <button
+        v-else
+        type="button"
+        @click="logout"
+        class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-sky-700 to-cyan-500 text-white text-sm font-semibold shadow-[0_10px_20px_rgba(14,116,144,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_24px_rgba(14,116,144,0.35)]"
+      >
+        <span>Logout</span>
+      </button>
 
       <!-- User Avatar -->
       <div
@@ -143,36 +152,47 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useHomepageStore } from '../../modules/home/stores/homepage'
 import { useExploreStore } from '../../modules/explore/store/explore'
+import { supabase } from '../../services/supabase'
 
 defineEmits<{ 'toggle-sidebar': [] }>()
 
 const route = useRoute()
+const router = useRouter()
 const homepageStore = useHomepageStore()
 const exploreStore = useExploreStore()
 const { searchQuery } = storeToRefs(homepageStore)
 
-const pageTitles: Record<string, string> = {
-  home: 'Dashboard',
-  explore: 'Explore',
-  'trip-planner': 'Trip Planner',
-  'my-trips': 'My Trips',
-  'shared-trips': 'Shared Trips',
-  'trip-itinerary': 'Itinerary',
-  'route-intel': 'Route Intel',
-  social: 'Social Travel',
-  community: 'Community',
-  profile: 'Profile',
-}
+const isAuthed = ref(false)
 
-const pageTitle = computed(() => {
-  const name = route.name as string
-  return pageTitles[name] || 'Dashboard'
+let authUnsubscribe: (() => void) | null = null
+
+onMounted(async () => {
+  const { data } = await supabase.auth.getSession()
+  isAuthed.value = !!data.session
+
+  const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+    isAuthed.value = !!session
+  })
+
+  authUnsubscribe = () => {
+    authListener.subscription.unsubscribe()
+  }
 })
+
+onUnmounted(() => {
+  authUnsubscribe?.()
+  authUnsubscribe = null
+})
+
+async function logout() {
+  await supabase.auth.signOut()
+  await router.push('/login?force=1')
+}
 
 // Clear search and reset filters when navigating to explore page
 watch(
