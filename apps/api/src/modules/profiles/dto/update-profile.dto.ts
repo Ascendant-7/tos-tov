@@ -4,4 +4,6 @@ export class UpdateProfileDto {
   last_name?: string
 
   avatar_url?: string
+
+  bio?: string
 }

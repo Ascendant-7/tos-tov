@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { Database, SupabaseClient, createSupabaseClient } from '@repo/supabase'
 
 @Injectable()
@@ -6,10 +7,10 @@ export class SupabaseService {
   public anonClient: SupabaseClient<Database>
   public adminClient: SupabaseClient<Database>
 
-  constructor() {
-    const url = process.env.SUPABASE_URL
-    const anonKey = process.env.SUPABASE_ANON_KEY
-    const adminKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  constructor(private configService: ConfigService) {
+    const url = this.configService.get<string>('SUPABASE_URL')
+    const anonKey = this.configService.get<string>('SUPABASE_ANON_KEY')
+    const adminKey = this.configService.get<string>('SUPABASE_SERVICE_ROLE_KEY')
 
     if (!url || !anonKey || !adminKey) {
       throw new Error(
@@ -22,8 +23,8 @@ export class SupabaseService {
   }
 
   createUserClient(userJwt: string) {
-    const url = process.env.SUPABASE_URL
-    const anonKey = process.env.SUPABASE_ANON_KEY
+    const url = this.configService.get<string>('SUPABASE_URL')
+    const anonKey = this.configService.get<string>('SUPABASE_ANON_KEY')
 
     if (!url || !anonKey) {
       throw new Error(
@@ -32,8 +33,10 @@ export class SupabaseService {
     }
 
     return createSupabaseClient(url, anonKey, {
-      headers: `Bearer ${userJwt}`,
-    } as Record<string, string>)
+      headers: {
+        Authorization: `Bearer ${userJwt}`,
+      },
+    })
   }
 
   async testConnection() {

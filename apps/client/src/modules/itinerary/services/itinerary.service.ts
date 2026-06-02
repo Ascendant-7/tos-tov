@@ -51,8 +51,11 @@ interface TripApiResponse {
 
 export type Trip = TripApiResponse
 
-const authHeaders = () => {
-  const token = localStorage.getItem('access_token')
+import { supabase } from '../../../services/supabase'
+
+const authHeaders = async () => {
+  const { data: { session } } = await supabase.auth.getSession()
+  const token = session?.access_token
 
   return {
     'Content-Type': 'application/json',
@@ -66,7 +69,7 @@ export const createTrip = async (trip: {
 }): Promise<TripApiResponse> => {
   const response = await fetch(`${API_BASE_URL}/itinerary/trips`, {
     method: 'POST',
-    headers: authHeaders(),
+    headers: await authHeaders(),
     body: JSON.stringify({
       title: trip.title,
       description: trip.description || null,
@@ -82,7 +85,7 @@ export const createTrip = async (trip: {
 
 export const getTrips = async (): Promise<Trip[]> => {
   const response = await fetch(`${API_BASE_URL}/itinerary/trips`, {
-    headers: authHeaders(),
+    headers: await authHeaders(),
   })
 
   if (!response.ok) {
@@ -94,7 +97,7 @@ export const getTrips = async (): Promise<Trip[]> => {
 
 export const getSharedTrips = async (): Promise<Trip[]> => {
   const response = await fetch(`${API_BASE_URL}/itinerary/shared-trips`, {
-    headers: authHeaders(),
+    headers: await authHeaders(),
   })
 
   if (!response.ok) {
@@ -110,7 +113,7 @@ export const updateTrip = async (
 ): Promise<TripApiResponse> => {
   const response = await fetch(`${API_BASE_URL}/itinerary/trips/${encodeURIComponent(tripId)}`, {
     method: 'PATCH',
-    headers: authHeaders(),
+    headers: await authHeaders(),
     body: JSON.stringify(trip),
   })
 
@@ -123,7 +126,7 @@ export const updateTrip = async (
 
 export const getItinerary = async (tripId: string): Promise<ItineraryResponse> => {
   const response = await fetch(`${API_BASE_URL}/itinerary/${encodeURIComponent(tripId)}`, {
-    headers: authHeaders(),
+    headers: await authHeaders(),
   })
 
   if (!response.ok) {
@@ -164,7 +167,7 @@ export const getItinerary = async (tripId: string): Promise<ItineraryResponse> =
 export const createDay = async (tripId: string, title?: string) => {
   const response = await fetch(`${API_BASE_URL}/itinerary/${encodeURIComponent(tripId)}/days`, {
     method: 'POST',
-    headers: authHeaders(),
+    headers: await authHeaders(),
     body: JSON.stringify({ title }),
   })
 
@@ -180,7 +183,7 @@ export const createItem = async (dayId: string, item: any) => {
     `${API_BASE_URL}/itinerary/days/${encodeURIComponent(dayId)}/items`,
     {
       method: 'POST',
-      headers: authHeaders(),
+      headers: await authHeaders(),
       body: JSON.stringify({
         title: item.title,
         destination_id: item.destination_id || null,
@@ -204,7 +207,7 @@ export const createItem = async (dayId: string, item: any) => {
 export const updateItem = async (itemId: string, item: any) => {
   const response = await fetch(`${API_BASE_URL}/itinerary/items/${encodeURIComponent(itemId)}`, {
     method: 'PATCH',
-    headers: authHeaders(),
+    headers: await authHeaders(),
     body: JSON.stringify({
       title: item.title,
       destination_id: item.destination_id || null,
@@ -227,7 +230,7 @@ export const updateItem = async (itemId: string, item: any) => {
 export const deleteItem = async (itemId: string) => {
   const response = await fetch(`${API_BASE_URL}/itinerary/items/${encodeURIComponent(itemId)}`, {
     method: 'DELETE',
-    headers: authHeaders(),
+    headers: await authHeaders(),
   })
 
   if (!response.ok) {
