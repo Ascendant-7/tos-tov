@@ -567,6 +567,8 @@ const {
 const { isLoading: isLoadingDestinations } = storeToRefs(exploreStore)
 
 onMounted(async () => {
+  homepageStore.loadWeather()
+
   // Load destinations from API if not already loaded
   if (exploreStore.destinations.length === 0) {
     await exploreStore.loadDestinations()
