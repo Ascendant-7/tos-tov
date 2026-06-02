@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { createDay, createItem, getItinerary } from '../services/itinerary.service'
 import { getDestinations } from '../services/destination.service'
@@ -16,6 +16,7 @@ const isCreatingDay = ref(false)
 const isAddingDestination = ref(false)
 const isEditingPlan = ref(false)
 const tripId = route.params.tripId as string
+const canEditItinerary = computed(() => itinerary.value?.trip?.can_edit === true)
 
 onMounted(async () => {
   try {
@@ -30,6 +31,11 @@ onMounted(async () => {
 const addDestinationFromQuery = async () => {
   const destinationId = route.query.addDestination
   if (!tripId || !itinerary.value || typeof destinationId !== 'string') return
+
+  if (!canEditItinerary.value) {
+    await router.replace({ name: 'trip-itinerary', params: { tripId } })
+    return
+  }
 
   isAddingDestination.value = true
   errorMessage.value = ''
@@ -70,7 +76,7 @@ const addDestinationFromQuery = async () => {
 }
 
 const handleAddDay = async () => {
-  if (!tripId || !itinerary.value) return
+  if (!tripId || !itinerary.value || !canEditItinerary.value) return
 
   isCreatingDay.value = true
   errorMessage.value = ''
@@ -87,6 +93,8 @@ const handleAddDay = async () => {
 }
 
 const toggleEditPlan = () => {
+  if (!canEditItinerary.value) return
+
   isEditingPlan.value = !isEditingPlan.value
 }
 </script>
@@ -98,14 +106,28 @@ const toggleEditPlan = () => {
         <h1 class="text-2xl font-bold">Itinerary</h1>
         <p class="mt-1 text-sm text-slate-500">
           {{
-            isEditingPlan ? 'Edit trip days and activities.' : 'Review the planned trip schedule.'
+            canEditItinerary
+              ? isEditingPlan
+                ? 'Edit trip days and activities.'
+                : 'Review the planned trip schedule.'
+              : 'Viewing a shared itinerary.'
           }}
         </p>
       </div>
 
       <div class="flex items-center gap-2">
         <button
+          v-if="!isEditingPlan"
+          type="button"
+          class="rounded-full border border-gray-200 bg-gray-500 px-4 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-red-600"
+          @click="router.back()"
+        >
+          Back
+        </button>
+
+        <button
           v-if="isEditingPlan"
+          v-show="canEditItinerary"
           class="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-blue-700 disabled:opacity-50"
           :disabled="isCreatingDay || isAddingDestination || !itinerary"
           @click="handleAddDay"
@@ -114,6 +136,7 @@ const toggleEditPlan = () => {
         </button>
 
         <button
+          v-if="canEditItinerary"
           class="rounded-full px-4 py-2 text-sm font-semibold transition duration-200"
           :class="
             isEditingPlan
@@ -147,7 +170,7 @@ const toggleEditPlan = () => {
         v-for="day in itinerary.days"
         :key="day.id"
         :day="day"
-        :is-editing="isEditingPlan"
+        :is-editing="canEditItinerary && isEditingPlan"
       />
     </div>
   </div>

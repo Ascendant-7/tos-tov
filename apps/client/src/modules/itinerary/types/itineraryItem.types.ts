@@ -26,5 +26,13 @@ export interface ItineraryDay {
 }
 
 export interface ItineraryResponse {
+  trip?: {
+    id: string
+    title?: string
+    description?: string | null
+    user_id?: string | null
+    visibility?: string | null
+    can_edit?: boolean
+  }
   days: ItineraryDay[]
 }

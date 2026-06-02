@@ -29,6 +29,14 @@ interface ItineraryApiDay {
 }
 
 interface ItineraryApiResponse {
+  trip?: {
+    id: string
+    title?: string
+    description?: string | null
+    user_id?: string | null
+    visibility?: string | null
+    can_edit?: boolean
+  }
   days: ItineraryApiDay[]
 }
 
@@ -125,6 +133,7 @@ export const getItinerary = async (tripId: string): Promise<ItineraryResponse> =
   const data = (await response.json()) as ItineraryApiResponse
 
   return {
+    trip: data.trip,
     days: (data.days || []).map((day) => ({
       id: day.id,
       day_number: day.day_number,
