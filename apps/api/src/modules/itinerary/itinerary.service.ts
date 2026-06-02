@@ -39,7 +39,7 @@ export class ItineraryService {
     return data as { id: string; user_id: string | null; visibility: string | null }
   }
 
-  private async ensureTripViewable(tripId: string, userId: string) {
+  private async ensureTripViewable(tripId: string, userId?: string) {
     const trip = await this.getTripForAccess(tripId)
 
     if (trip.user_id !== userId && trip.visibility !== 'public') {
@@ -145,8 +145,8 @@ export class ItineraryService {
     return data
   }
 
-  async getItinerary(tripId: string, userId: string) {
-    await this.ensureTripViewable(tripId, userId)
+  async getItinerary(tripId: string, userId?: string) {
+    const trip = await this.ensureTripViewable(tripId, userId)
 
     const { data: tripDays, error: daysError } = await this.supabaseService.adminClient
       .from('itinerary_days')
@@ -179,7 +179,15 @@ export class ItineraryService {
       })
     }
 
-    return { days: result }
+    return {
+      trip: {
+        id: trip.id,
+        user_id: trip.user_id,
+        visibility: trip.visibility,
+        can_edit: trip.user_id === userId,
+      },
+      days: result,
+    }
   }
 
   async createDay(tripId: string, dto: CreateItineraryDayDto, userId: string) {
