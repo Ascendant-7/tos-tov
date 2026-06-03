@@ -26,16 +26,34 @@
       <!-- Action Buttons -->
       <div class="absolute top-6 right-6 z-20 flex items-center gap-3">
         <button
-          @click="isFavorited = !isFavorited"
+          @click="toggleFavorite"
+          :disabled="favoriteLoading"
           :class="[
-            'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-sm',
+            'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-sm',
             isFavorited
-              ? 'bg-red-500 text-white shadow-lg'
+              ? 'bg-red-500 text-white shadow-lg scale-110'
               : 'bg-white/90 text-slate-400 hover:text-red-500 shadow-lg',
+            favoriteLoading ? 'opacity-60 cursor-wait' : 'hover:scale-105',
           ]"
           aria-label="Add to favorites"
         >
+          <!-- Spinner while loading -->
           <svg
+            v-if="favoriteLoading"
+            class="animate-spin"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+          </svg>
+          <!-- Heart icon -->
+          <svg
+            v-else
             xmlns="http://www.w3.org/2000/svg"
             width="20"
             height="20"
@@ -109,6 +127,16 @@
       <div
         class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"
       ></div>
+
+      <!-- Toast Notification -->
+      <transition name="toast">
+        <div
+          v-if="toastMessage"
+          class="absolute top-20 left-1/2 -translate-x-1/2 z-30 px-5 py-2.5 rounded-xl bg-black/80 backdrop-blur-md text-white text-sm font-medium shadow-xl"
+        >
+          {{ toastMessage }}
+        </div>
+      </transition>
 
       <!-- Title Overlay -->
       <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
@@ -305,6 +333,7 @@ import { useRoute, useRouter } from 'vue-router'
 import type { ExploreDestination } from '@/modules/explore/components/DestinationCard.vue'
 import { useExploreStore } from '@/modules/explore/store/explore'
 import AddToTripModal from '@/modules/itinerary/components/AddToTripModal.vue'
+import { addFavorite, removeFavorite, checkFavorite } from '@/modules/explore/services/favoritesApi'
 
 const route = useRoute()
 const router = useRouter()
@@ -313,6 +342,9 @@ const showAddToTripModal = ref(false)
 
 const destination = ref<ExploreDestination | null>(null)
 const isFavorited = ref(false)
+const favoriteLoading = ref(false)
+const toastMessage = ref('')
+let toastTimer: ReturnType<typeof setTimeout> | null = null
 
 onMounted(async () => {
   const destinationId = route.params.id as string
@@ -327,8 +359,47 @@ onMounted(async () => {
     destination.value = found
   } else {
     router.push('/explore')
+    return
+  }
+
+  // Check if the destination is favorited by the current user
+  try {
+    const result = await checkFavorite(destinationId)
+    isFavorited.value = result.isFavorited
+  } catch {
+    // User might not be authenticated — silently ignore
   }
 })
+
+function showToast(message: string) {
+  if (toastTimer) clearTimeout(toastTimer)
+  toastMessage.value = message
+  toastTimer = setTimeout(() => {
+    toastMessage.value = ''
+  }, 2000)
+}
+
+async function toggleFavorite() {
+  if (!destination.value?.id || favoriteLoading.value) return
+
+  favoriteLoading.value = true
+  try {
+    if (isFavorited.value) {
+      await removeFavorite(destination.value.id)
+      isFavorited.value = false
+      showToast('Removed from favorites')
+    } else {
+      await addFavorite(destination.value.id)
+      isFavorited.value = true
+      showToast('Added to favorites ❤️')
+    }
+  } catch (err) {
+    showToast('Please sign in to save favorites')
+    console.error('[Favorite] Error:', err)
+  } finally {
+    favoriteLoading.value = false
+  }
+}
 
 const durationLabel = computed(() => {
   if (!destination.value) return null
@@ -380,5 +451,33 @@ function addToTrip() {
 
 main {
   animation: fadeIn 0.5s ease-out;
+}
+
+/* Toast transition */
+.toast-enter-active {
+  animation: toastIn 0.3s ease-out;
+}
+.toast-leave-active {
+  animation: toastOut 0.3s ease-in;
+}
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@keyframes toastOut {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
 }
 </style>
