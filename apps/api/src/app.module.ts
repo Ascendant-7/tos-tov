@@ -11,6 +11,7 @@ import { ItineraryModule } from './modules/itinerary/itinerary.module'
 import { BudgetModule } from './modules/budget/budget.module'
 import { ProfilesModule } from './modules/profiles/profiles.module'
 import { WeatherModule } from './modules/weather/weather.module'
+import { FavoritesModule } from './modules/favorites/favorites.module'
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { WeatherModule } from './modules/weather/weather.module'
     ItineraryModule,
     ProfilesModule,
     WeatherModule,
+    FavoritesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
