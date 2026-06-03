@@ -5,11 +5,13 @@
   "main": "index.js",
   "scripts": {
     "dev:light": "pnpm -r --parallel --filter \"./apps/*\" run \"/^dev|start:dev$/\"",
-    "dev": "pnpm -F @repo/supabase gen-types && pnpm -w dev:light",
+    "dev": "pnpm -F @repo/supabase build && pnpm -w dev:light",
     "dev:strict": "pnpm -w format && pnpm -w lint && pnpm -w dev",
     "db:new": "pnpm -F @repo/supabase exec supabase migration new",
     "lint": "pnpm -r --no-bail lint",
-    "format": "pnpm -r format"
+    "format": "pnpm -r format",
+    "build:client": "pnpm -F @repo/supabase build && pnpm -F client build",
+    "build:api": "pnpm -F @repo/supabase build && pnpm -F api build"
   },
   "keywords": [],
   "author": "",
