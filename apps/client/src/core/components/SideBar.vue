@@ -195,22 +195,6 @@ const ExploreIcon: FunctionalComponent = () =>
     ],
   )
 
-const RouteIntelIcon: FunctionalComponent = () =>
-  h(
-    'svg',
-    {
-      xmlns: 'http://www.w3.org/2000/svg',
-      viewBox: '0 0 24 24',
-      fill: 'none',
-      stroke: 'currentColor',
-      'stroke-width': '2',
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      class: 'w-[18px] h-[18px]',
-    },
-    [h('polygon', { points: '3 11 22 2 13 21 11 13 3 11' })],
-  )
-
 const SocialIcon: FunctionalComponent = () =>
   h(
     'svg',
@@ -309,6 +293,7 @@ const navItems = [
   { to: '/explore', label: 'Explore', icon: ExploreIcon },
   { to: '/trips', label: 'My Trips', icon: SavedIcon },
   { to: '/social', label: 'Social Travel', icon: SocialIcon },
+  { to: '/route-intel', label: 'Route Intel', icon: ExploreIcon },
   { to: '/community', label: 'Community', icon: CommunityIcon },
   { to: '/profile', label: 'Profile', icon: ProfileIcon },
 ]

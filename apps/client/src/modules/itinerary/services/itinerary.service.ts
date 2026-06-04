@@ -17,7 +17,10 @@ interface ItineraryApiItem {
     name: string
     cover_image_url?: string | null
     province?: string | null
+    location_name?: string | null
     category?: string | null
+    latitude?: number | string | null
+    longitude?: number | string | null
   } | null
 }
 
@@ -156,7 +159,12 @@ export const getItinerary = async (tripId: string): Promise<ItineraryResponse> =
               name: item.destination.name,
               cover_image_url: item.destination.cover_image_url || undefined,
               province: item.destination.province || undefined,
+              location_name: item.destination.location_name || undefined,
               category: item.destination.category || undefined,
+              latitude:
+                item.destination.latitude == null ? null : Number(item.destination.latitude),
+              longitude:
+                item.destination.longitude == null ? null : Number(item.destination.longitude),
             }
           : undefined,
       })),
