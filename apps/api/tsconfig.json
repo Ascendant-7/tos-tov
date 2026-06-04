@@ -15,8 +15,7 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "paths": {
-      "@/*": ["./src/*"],
-      "@repo/supabase": ["../../packages/supabase/src/index.ts"]
+      "@/*": ["./src/*"]
     },
     "incremental": true,
     "tsBuildInfoFile": "./dist/tsconfig.build.tsbuildinfo",
