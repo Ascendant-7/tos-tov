@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { ExploreDestination } from '@/modules/explore/components/DestinationCard.vue'
 import { useItineraryStore } from '../stores/itineraryStore'
@@ -12,8 +12,6 @@ const tripName = ref('')
 const tripDescription = ref('')
 const isCreatingTrip = ref(false)
 const plannerErrorMessage = ref('')
-
-const hasSelectedTrip = computed(() => !!itineraryStore.currentTripId)
 
 async function createAndNavigateToTrip() {
   if (!tripName.value.trim()) return
@@ -49,9 +47,6 @@ function handleAddDestinationToDay(destination: ExploreDestination) {
   }
 }
 
-function clearTrip() {
-  itineraryStore.setCurrentTripId(undefined)
-}
 </script>
 
 <template>
@@ -100,9 +95,7 @@ function clearTrip() {
       </div>
     </section>
 
-    <section
-      v-if="!hasSelectedTrip"
-      class="rounded-2xl border border-weather-border bg-white p-6 shadow-sm"
+    <section class="rounded-2xl border border-weather-border bg-white p-6 shadow-sm"
     >
       <h2 class="mb-4 text-[20px] font-bold text-slate-800">Create New Trip</h2>
       <div class="space-y-3">
@@ -129,23 +122,5 @@ function clearTrip() {
       </div>
     </section>
 
-    <section v-else class="rounded-2xl border border-weather-border bg-white p-6 shadow-sm">
-      <div class="mb-4 flex items-center justify-between gap-3">
-        <h2 class="text-[20px] font-bold text-slate-800">Current Trip</h2>
-        <button
-          type="button"
-          class="text-[13px] font-medium text-slate-500 hover:text-slate-700"
-          @click="clearTrip"
-        >
-          Change Trip
-        </button>
-      </div>
-      <div class="rounded-xl border border-weather-border bg-slate-50 p-4">
-        <p class="text-[15px] font-bold text-slate-800">
-          {{ itineraryStore.currentTripId }}
-        </p>
-        <p class="mt-1 text-[13px] text-slate-500">Ready to add destinations to this trip</p>
-      </div>
-    </section>
   </section>
 </template>
