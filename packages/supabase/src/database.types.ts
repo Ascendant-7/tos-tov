@@ -82,7 +82,9 @@ export type Database = {
           id: string
           is_hidden_gem: boolean | null
           is_trending: boolean | null
+          latitude: number | null
           location_name: string | null
+          longitude: number | null
           name: string
           province: string
           user_id: string | null
@@ -100,7 +102,9 @@ export type Database = {
           id?: string
           is_hidden_gem?: boolean | null
           is_trending?: boolean | null
+          latitude?: number | null
           location_name?: string | null
+          longitude?: number | null
           name: string
           province: string
           user_id?: string | null
@@ -118,7 +122,9 @@ export type Database = {
           id?: string
           is_hidden_gem?: boolean | null
           is_trending?: boolean | null
+          latitude?: number | null
           location_name?: string | null
+          longitude?: number | null
           name?: string
           province?: string
           user_id?: string | null
