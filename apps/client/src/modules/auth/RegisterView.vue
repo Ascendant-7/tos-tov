@@ -181,16 +181,13 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios'
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
 const loading = ref(false)
-
 const errorMessage = ref('')
-
 const successMessage = ref('')
 
 const form = reactive({
@@ -205,51 +202,44 @@ const form = reactive({
 const handleSubmit = async () => {
   try {
     errorMessage.value = ''
-
     successMessage.value = ''
 
-    // validate password
+    // 1. validate password
     if (form.password !== form.confirmPassword) {
       errorMessage.value = 'Passwords do not match'
-
       return
     }
 
     loading.value = true
 
-    const response = await axios.post('http://localhost:3000/auth/register', {
-      firstName: form.firstName,
-      lastName: form.lastName,
-      email: form.email,
-      password: form.password,
+    // 2. REGISTER VIA BACKEND
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: form.email,
+        password: form.password,
+        firstName: form.firstName,
+        lastName: form.lastName,
+      }),
     })
 
-    const data = response.data
+    const result = await response.json()
 
-    if (data?.session?.access_token) {
-      localStorage.setItem('access_token', data.session.access_token)
+    if (!response.ok) {
+      errorMessage.value = result.message || 'Registration failed'
+      return
     }
 
-    if (data?.user) {
-      localStorage.setItem('user', JSON.stringify(data.user))
-    }
+    successMessage.value = 'Account created successfully! Please check your email if confirmation is required.'
 
-    if (data?.profile) {
-      localStorage.setItem('profile', JSON.stringify(data.profile))
-    }
-
-    successMessage.value = 'Account created successfully!'
-
-    // redirect to home
     setTimeout(() => {
-      router.push('/home')
-    }, 1500)
-  } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      errorMessage.value = error.response?.data?.message || 'Registration failed'
-    } else {
-      errorMessage.value = 'Something went wrong'
-    }
+      router.push('/login')
+    }, 2000)
+
+  } catch (err) {
+    console.error(err)
+    errorMessage.value = 'Something went wrong'
   } finally {
     loading.value = false
   }

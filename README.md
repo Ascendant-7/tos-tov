@@ -20,6 +20,10 @@ then you must check if pnpm works by just checking the version.
 
 then install the pnpm dependencies.
 
+## Workflow & Contributing
+
+Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for rules on branching, commit frequency (min 1 commit per 3 days), and merging.
+
 ### SUPABASE
 
 the supabase package needs you to log in to let you access the database. Before running commands, go to supabase.com and login, then get invited into the team's database. After all that, run:
