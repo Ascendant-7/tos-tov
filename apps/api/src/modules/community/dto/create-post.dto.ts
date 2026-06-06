@@ -39,6 +39,10 @@ export class CreatePostDto {
   destinationId?: string;
 
   @IsOptional()
+  @IsUUID()
+  tripId?: string;
+
+  @IsOptional()
   @IsString()
   destinationName?: string;
 

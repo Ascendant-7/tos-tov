@@ -29,6 +29,9 @@ export interface Post {
   bookmarked: boolean
   visibility: PostVisibility
   sharedPost: SharedPost | null
+  destinationId?: string | null
+  tripId?: string | null
+  tripTitle?: string | null
 }
 
 export type PostVisibility = 'public' | 'friends' | 'private'
@@ -86,6 +89,8 @@ interface CommentRow {
 interface CommunityPostRow {
   id: string
   user_id?: string | null
+  destination_id?: string | null
+  trip_id?: string | null
   title?: string | null
   content?: string | null
   created_at?: string | null
@@ -135,6 +140,7 @@ export interface CreatePostInput {
   province?: string
   isVisited?: boolean
   visibility?: PostVisibility
+  tripId?: string
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api'
@@ -258,6 +264,7 @@ const mapPost = (row: CommunityPostRow): Post => {
 
   const location =
     [destination?.name, destination?.province].filter(Boolean).join(', ') || 'Cambodia'
+  const trip = firstRelation((row as any).trips) as { id: string; title: string } | undefined
 
   return {
     id: row.feed_id ?? row.id,
@@ -297,6 +304,9 @@ const mapPost = (row: CommunityPostRow): Post => {
           description: content,
         }
       : null,
+    destinationId: row.destination_id ?? null,
+    tripId: (row as any).trip_id ?? null,
+    tripTitle: trip?.title ?? null,
   }
 }
 
@@ -348,6 +358,7 @@ export const useCommunityStore = defineStore('community', () => {
   const isSearchingDestinations = ref(false)
   const feedbackMessage = ref('')
   const feedbackType = ref<FeedbackType>('info')
+  const showCreatePostModal = ref(false)
 
   const clearMessages = () => {
     feedbackMessage.value = ''
@@ -615,6 +626,7 @@ export const useCommunityStore = defineStore('community', () => {
           province: input.province,
           isVisited: input.isVisited ?? true,
           visibility: input.visibility ?? 'public',
+          tripId: input.tripId,
         },
         { headers: requireAuthHeaders() },
       )
@@ -778,6 +790,7 @@ export const useCommunityStore = defineStore('community', () => {
     feedbackType,
     destinationResults,
     filteredPosts,
+    showCreatePostModal,
     loadCommunity,
     loadPosts,
     searchDestinations,

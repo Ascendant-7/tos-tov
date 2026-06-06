@@ -19,11 +19,32 @@
             <span class="flex min-w-0 items-center gap-1.5">
               <FontAwesomeIcon :icon="faLocationDot" class="h-3 w-3 shrink-0" />
               <span class="truncate">
-                <span v-for="(part, index) in highlightParts(post.location)" :key="`${part.text}-${index}`"
-                  :class="part.match ? highlightClass : ''">{{ part.text }}</span>
+                <router-link
+                  v-if="post.destinationId"
+                  :to="`/explore/${post.destinationId}`"
+                  class="hover:underline text-sidebar-active font-semibold"
+                >
+                  <span v-for="(part, index) in highlightParts(post.location)" :key="`${part.text}-${index}`"
+                    :class="part.match ? highlightClass : ''">{{ part.text }}</span>
+                </router-link>
+                <span v-else>
+                  <span v-for="(part, index) in highlightParts(post.location)" :key="`${part.text}-${index}`"
+                    :class="part.match ? highlightClass : ''">{{ part.text }}</span>
+                </span>
               </span>
             </span>
+            <span v-if="post.tripId" class="flex min-w-0 items-center gap-1">
+              <span class="text-slate-400">•</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-accent-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+              </svg>
+              <router-link :to="`/trips/${post.tripId}`" class="hover:underline text-accent-gold font-semibold truncate max-w-[120px]">
+                {{ post.tripTitle || 'Trip' }}
+              </router-link>
+            </span>
+            <span class="text-slate-400">•</span>
             <span class="text-slate-400">{{ post.timeAgo }}</span>
+            <span class="text-slate-400">•</span>
             <span
               class="inline-flex items-center gap-1 rounded-full bg-cream px-2 py-0.5 text-[10px] font-semibold text-slate-600">
               <FontAwesomeIcon :icon="visibilityIcon" class="h-2.5 w-2.5" />

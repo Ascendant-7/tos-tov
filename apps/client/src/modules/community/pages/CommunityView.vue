@@ -5,8 +5,24 @@
       <h1 class="text-[24px] sm:text-[28px] font-bold text-slate-800 m-0">Community</h1>
     </section>
 
-    <!-- Stories Section -->
+    <!-- Search -->
     <section class="mb-6 sm:mb-8 animate-fade-in-up delay-1">
+      <div class="relative">
+        <FontAwesomeIcon :icon="faMagnifyingGlass"
+          class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <input :value="communityStore.searchQuery" type="search" placeholder="Search posts..."
+          class="w-full rounded-xl border border-weather-border bg-white py-3 pl-10 pr-11 text-[13px] text-slate-800 outline-none transition-colors placeholder:text-slate-400 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20 sm:text-[14px]"
+          @input="communityStore.setSearchQuery(($event.target as HTMLInputElement).value)" />
+        <button v-if="communityStore.searchQuery" aria-label="Clear search"
+          class="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg border-none bg-transparent text-slate-400 transition-colors hover:bg-cream hover:text-slate-700"
+          @click="communityStore.setSearchQuery('')">
+          <FontAwesomeIcon :icon="faXmark" class="h-4 w-4" />
+        </button>
+      </div>
+    </section>
+
+    <!-- Stories Section -->
+    <section class="mb-6 sm:mb-8 animate-fade-in-up delay-2">
       <div
         class="flex gap-3 sm:gap-4 overflow-x-auto pb-3 -mx-4 px-4 sm:-mx-6 sm:px-6 md:-mx-8 md:px-8 snap-x snap-mandatory scrollbar-hide"
       >
@@ -54,7 +70,7 @@
     </section>
 
     <!-- Trending Hashtags -->
-    <section class="mb-6 sm:mb-8 animate-fade-in-up delay-2">
+    <section class="mb-6 sm:mb-8 animate-fade-in-up delay-3">
       <div class="flex items-center gap-2 mb-3 sm:mb-4">
         <FontAwesomeIcon :icon="faArrowTrendUp" class="h-4 w-4 text-sidebar-active" />
         <h2 class="text-[13px] sm:text-[14px] font-bold text-slate-800 m-0">Trending</h2>
@@ -72,22 +88,6 @@
           ]"
         >
           {{ tag }}
-        </button>
-      </div>
-    </section>
-
-    <!-- Search -->
-    <section class="mb-6 sm:mb-8 animate-fade-in-up delay-3">
-      <div class="relative">
-        <FontAwesomeIcon :icon="faMagnifyingGlass"
-          class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-        <input :value="communityStore.searchQuery" type="search" placeholder="Search posts..."
-          class="w-full rounded-xl border border-weather-border bg-white py-3 pl-10 pr-11 text-[13px] text-slate-800 outline-none transition-colors placeholder:text-slate-400 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20 sm:text-[14px]"
-          @input="communityStore.setSearchQuery(($event.target as HTMLInputElement).value)" />
-        <button v-if="communityStore.searchQuery" aria-label="Clear search"
-          class="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg border-none bg-transparent text-slate-400 transition-colors hover:bg-cream hover:text-slate-700"
-          @click="communityStore.setSearchQuery('')">
-          <FontAwesomeIcon :icon="faXmark" class="h-4 w-4" />
         </button>
       </div>
     </section>

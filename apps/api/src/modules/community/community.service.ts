@@ -28,6 +28,7 @@ type CommunityPostRow = {
   id: string;
   user_id: string;
   destination_id?: string | null;
+  trip_id?: string | null;
   title?: string | null;
   content?: string | null;
   visit_status?: string | null;
@@ -100,6 +101,7 @@ export class CommunityService {
       .insert({
         user_id: userId,
         destination_id: destinationId,
+        trip_id: dto.tripId || null,
         title: dto.title?.trim() || null,
         content: dto.content,
         visit_status: visitStatus,
@@ -664,6 +666,12 @@ export class CommunityService {
           province,
           cover_image_url
         ),
+        trips:trip_id (
+          id,
+          title,
+          description,
+          created_at
+        ),
         post_media (
           id,
           bucket_name,
@@ -1003,6 +1011,12 @@ export class CommunityService {
         province,
         location_name,
         cover_image_url
+      ),
+      trips:trip_id (
+        id,
+        title,
+        description,
+        created_at
       ),
       post_media (
         id,
