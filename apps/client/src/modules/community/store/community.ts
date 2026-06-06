@@ -1,6 +1,8 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { supabase } from '../../../services/supabase'
+
 
 export interface Comment {
   id: string
@@ -28,6 +30,7 @@ export interface Post {
   liked: boolean
   bookmarked: boolean
   visibility: PostVisibility
+  shares: number
   sharedPost: SharedPost | null
   destinationId?: string | null
   tripId?: string | null
@@ -96,10 +99,12 @@ interface CommunityPostRow {
   created_at?: string | null
   profiles?: ProfileRow | ProfileRow[] | null
   destinations?: DestinationRow | DestinationRow[] | null
+  trips?: { id: string; title: string } | { id: string; title: string }[] | null
   post_media?: MediaRow[] | null
   post_comments?: CommentRow[] | null
   post_likes?: { user_id?: string | null }[] | null
   saved_posts?: { user_id?: string | null }[] | null
+  shared_posts?: { id: string }[] | null
   liked_by_viewer?: boolean
   saved_by_viewer?: boolean
   visibility?: PostVisibility | null
@@ -152,11 +157,10 @@ const api = axios.create({
 })
 
 let messageTimer: ReturnType<typeof window.setTimeout> | null = null
+let cachedToken: string | null = null
 
 const authHeaders = () => {
-  const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken')
-
-  return token ? { Authorization: `Bearer ${token}` } : undefined
+  return cachedToken ? { Authorization: `Bearer ${cachedToken}` } : undefined
 }
 
 const requireAuthHeaders = () => {
@@ -178,27 +182,23 @@ const isAuthFailure = (error: unknown) => {
     return false
   }
 
+  const status = error.response?.status
+  if (status === 401) {
+    return true
+  }
+
   const responseMessage = String(error.response?.data?.message ?? '').toLowerCase()
 
-  return (
-    error.response?.status === 401 ||
-    error.response?.status === 403 ||
-    responseMessage.includes('forbidden resource')
-  )
+  if (status === 403 && responseMessage.includes('forbidden resource')) {
+    return true
+  }
+
+  return false
 }
 
 const authActionMessage = (action: 'like' | 'comment') =>
   action === 'like' ? 'Please log in to like posts.' : 'Please log in to comment.'
 
-const getCurrentUserId = () => {
-  try {
-    const user = JSON.parse(localStorage.getItem('user') || 'null') as { id?: string } | null
-
-    return user?.id ?? ''
-  } catch {
-    return ''
-  }
-}
 
 const firstRelation = <T>(relation?: T | T[] | null): T | undefined => {
   if (Array.isArray(relation)) {
@@ -264,7 +264,7 @@ const mapPost = (row: CommunityPostRow): Post => {
 
   const location =
     [destination?.name, destination?.province].filter(Boolean).join(', ') || 'Cambodia'
-  const trip = firstRelation((row as any).trips) as { id: string; title: string } | undefined
+  const trip = firstRelation(row.trips)
 
   return {
     id: row.feed_id ?? row.id,
@@ -278,8 +278,9 @@ const mapPost = (row: CommunityPostRow): Post => {
     images: images.length > 0 ? images : [destination?.cover_image_url ?? FALLBACK_IMAGE],
     media: media.length > 0 ? media : [fallbackMedia],
     title: row.title?.trim() ?? '',
-    description: content,
+    description: row.shared_by_user_id ? (row.share_caption ?? '') : content,
     likes: row.post_likes?.length ?? 0,
+    shares: row.shared_posts?.length ?? 0,
     comments:
       row.post_comments?.map((comment) => {
         const commentProfile = firstRelation(comment.profiles)
@@ -292,7 +293,7 @@ const mapPost = (row: CommunityPostRow): Post => {
           text: comment.content ?? '',
         }
       }) ?? [],
-    hashtags: extractHashtags(content),
+    hashtags: extractHashtags(row.shared_by_user_id ? (row.share_caption ?? '') : content),
     liked: row.liked_by_viewer ?? false,
     bookmarked: row.saved_by_viewer ?? false,
     visibility: row.visibility ?? 'public',
@@ -305,7 +306,7 @@ const mapPost = (row: CommunityPostRow): Post => {
         }
       : null,
     destinationId: row.destination_id ?? null,
-    tripId: (row as any).trip_id ?? null,
+    tripId: row.trip_id ?? null,
     tripTitle: trip?.title ?? null,
   }
 }
@@ -338,10 +339,11 @@ const mapComment = (row: CommentRow): Comment => {
 }
 
 const mapCommunityUser = (friend: FriendOverviewRow): CommunityUser => {
-  const name = displayNameFor(friend.profile)
+  const profile = firstRelation(friend.profile)
+  const name = displayNameFor(profile)
 
   return {
-    id: friend.profile.id ?? friend.friendshipId,
+    id: profile?.id ?? friend.friendshipId,
     name,
     initials: initialsFor(name),
     hasStory: false,
@@ -352,13 +354,38 @@ export const useCommunityStore = defineStore('community', () => {
   const activeFilter = ref('All')
   const selectedTag = ref<string | null>(null)
   const searchQuery = ref('')
-  const currentUserId = ref(getCurrentUserId())
+  const currentUserId = ref('')
+  const currentUserProfile = ref<{ first_name?: string | null; last_name?: string | null; email?: string | null; avatar_url?: string | null } | null>(null)
+
+  const initAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      cachedToken = session.access_token
+      currentUserId.value = session.user?.id ?? ''
+    } else {
+      cachedToken = null
+      currentUserId.value = ''
+    }
+  }
+  void initAuth()
+
+  supabase.auth.onAuthStateChange((_event, session) => {
+    if (session) {
+      cachedToken = session.access_token
+      currentUserId.value = session.user?.id ?? ''
+    } else {
+      cachedToken = null
+      currentUserId.value = ''
+    }
+  })
+
   const isLoading = ref(false)
   const isSubmitting = ref(false)
   const isSearchingDestinations = ref(false)
   const feedbackMessage = ref('')
   const feedbackType = ref<FeedbackType>('info')
   const showCreatePostModal = ref(false)
+
 
   const clearMessages = () => {
     feedbackMessage.value = ''
@@ -429,7 +456,7 @@ export const useCommunityStore = defineStore('community', () => {
   const apiFilter = () => activeFilter.value.toLowerCase()
 
   const loadPosts = async () => {
-    currentUserId.value = getCurrentUserId()
+    await initAuth()
     isLoading.value = true
     clearMessages()
 
@@ -483,8 +510,32 @@ export const useCommunityStore = defineStore('community', () => {
     }
   }
 
+  const loadCurrentUserProfile = async () => {
+    const headers = authHeaders()
+    if (!headers || !currentUserId.value) {
+      currentUserProfile.value = null
+      return
+    }
+    try {
+      const response = await api.get(`/profiles/${currentUserId.value}`, {
+        headers,
+      })
+      currentUserProfile.value = response.data
+    } catch {
+      // fallback to session info
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        currentUserProfile.value = {
+          first_name: session.user.user_metadata?.first_name || '',
+          last_name: session.user.user_metadata?.last_name || '',
+          email: session.user.email || '',
+        }
+      }
+    }
+  }
+
   const loadCommunity = async () => {
-    await Promise.all([loadPosts(), loadTrendingTags(), loadCommunityUsers()])
+    await Promise.all([loadPosts(), loadTrendingTags(), loadCommunityUsers(), loadCurrentUserProfile()])
   }
 
   const setActiveFilter = (filter: string) => {
@@ -500,19 +551,13 @@ export const useCommunityStore = defineStore('community', () => {
     searchQuery.value = query
   }
 
-  const searchDestinations = async (query: string) => {
+  const searchDestinations = async (query: string = '') => {
     const trimmedQuery = query.trim()
-
-    if (trimmedQuery.length < 2) {
-      destinationResults.value = []
-      return
-    }
-
     isSearchingDestinations.value = true
 
     try {
       const response = await api.get<DestinationRow[]>('/community/destinations/search', {
-        params: { q: trimmedQuery },
+        params: trimmedQuery ? { q: trimmedQuery } : {},
       })
 
       destinationResults.value = response.data
@@ -654,7 +699,7 @@ export const useCommunityStore = defineStore('community', () => {
     }
   }
 
-  const sharePost = async (postId: string) => {
+  const sharePost = async (postId: string, caption?: string) => {
     if (!authHeaders()) {
       showError('Please log in to share posts.')
       return
@@ -665,7 +710,7 @@ export const useCommunityStore = defineStore('community', () => {
 
       const response = await api.post<CommunityPostRow>(
         `/community/posts/${postId}/share`,
-        undefined,
+        { caption },
         { headers: requireAuthHeaders() },
       )
 
@@ -773,12 +818,44 @@ export const useCommunityStore = defineStore('community', () => {
     }
   }
 
+  const updatePost = async (
+    postId: string,
+    data: { title?: string; content?: string; caption?: string },
+  ) => {
+    try {
+      clearMessages()
+      const response = await api.patch<CommunityPostRow>(
+        `/community/posts/${postId}`,
+        data,
+        { headers: requireAuthHeaders() },
+      )
+      const updatedPost = mapPost(response.data)
+      const index = posts.value.findIndex((item) => item.id === postId)
+
+      if (index >= 0) {
+        posts.value[index] = updatedPost
+      }
+
+      showFeedback('Post updated successfully.', 'success')
+      return updatedPost
+    } catch (error) {
+      showError(
+        axios.isAxiosError(error)
+          ? error.response?.data?.message || 'Failed to update post.'
+          : 'Failed to update post.',
+      )
+
+      throw error
+    }
+  }
+
   return {
     activeFilter,
     selectedTag,
     searchQuery,
     normalizedSearchQuery,
     currentUserId,
+    currentUserProfile,
     filterTabs,
     trendingTags,
     communityUsers,
@@ -793,6 +870,7 @@ export const useCommunityStore = defineStore('community', () => {
     showCreatePostModal,
     loadCommunity,
     loadPosts,
+    loadCurrentUserProfile,
     searchDestinations,
     toggleLike,
     toggleBookmark,
@@ -801,9 +879,11 @@ export const useCommunityStore = defineStore('community', () => {
     addComment,
     deletePost,
     updatePostVisibility,
+    updatePost,
     setActiveFilter,
     setSelectedTag,
     setSearchQuery,
     showFeedback,
+    showError,
   }
 })

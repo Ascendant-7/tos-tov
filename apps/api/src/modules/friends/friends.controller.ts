@@ -8,21 +8,21 @@ import {
   Patch,
   Post,
   Query,
-} from '@nestjs/common';
-import { FriendService } from './friends.service';
+} from '@nestjs/common'
+import { FriendService } from './friends.service'
 
 function requireAccessToken(authHeader?: string) {
   if (!authHeader) {
-    throw new BadRequestException('Missing Authorization header');
+    throw new BadRequestException('Missing Authorization header')
   }
 
-  const [type, token] = authHeader.split(' ');
+  const [type, token] = authHeader.split(' ')
 
   if (type !== 'Bearer' || !token) {
-    throw new BadRequestException('Invalid Authorization header');
+    throw new BadRequestException('Invalid Authorization header')
   }
 
-  return token;
+  return token
 }
 
 @Controller('friends')
@@ -31,18 +31,12 @@ export class FriendController {
 
   @Get('overview')
   getOverview(@Headers('authorization') authHeader: string) {
-    return this.friendService.getOverview(requireAccessToken(authHeader));
+    return this.friendService.getOverview(requireAccessToken(authHeader))
   }
 
   @Get('travelers/search')
-  searchTravelers(
-    @Headers('authorization') authHeader: string,
-    @Query('q') q?: string,
-  ) {
-    return this.friendService.searchTravelers(
-      requireAccessToken(authHeader),
-      q,
-    );
+  searchTravelers(@Headers('authorization') authHeader: string, @Query('q') q?: string) {
+    return this.friendService.searchTravelers(requireAccessToken(authHeader), q)
   }
 
   @Post('requests/:targetUserId')
@@ -50,10 +44,7 @@ export class FriendController {
     @Headers('authorization') authHeader: string,
     @Param('targetUserId') targetUserId: string,
   ) {
-    return this.friendService.sendFriendRequest(
-      requireAccessToken(authHeader),
-      targetUserId,
-    );
+    return this.friendService.sendFriendRequest(requireAccessToken(authHeader), targetUserId)
   }
 
   @Patch('requests/:requestId/accept')
@@ -61,10 +52,7 @@ export class FriendController {
     @Headers('authorization') authHeader: string,
     @Param('requestId') requestId: string,
   ) {
-    return this.friendService.acceptFriendRequest(
-      requireAccessToken(authHeader),
-      requestId,
-    );
+    return this.friendService.acceptFriendRequest(requireAccessToken(authHeader), requestId)
   }
 
   @Patch('requests/:requestId/reject')
@@ -72,10 +60,7 @@ export class FriendController {
     @Headers('authorization') authHeader: string,
     @Param('requestId') requestId: string,
   ) {
-    return this.friendService.rejectFriendRequest(
-      requireAccessToken(authHeader),
-      requestId,
-    );
+    return this.friendService.rejectFriendRequest(requireAccessToken(authHeader), requestId)
   }
 
   @Delete('requests/:requestId/cancel')
@@ -83,10 +68,7 @@ export class FriendController {
     @Headers('authorization') authHeader: string,
     @Param('requestId') requestId: string,
   ) {
-    return this.friendService.cancelFriendRequest(
-      requireAccessToken(authHeader),
-      requestId,
-    );
+    return this.friendService.cancelFriendRequest(requireAccessToken(authHeader), requestId)
   }
 
   @Delete(':friendshipId')
@@ -94,9 +76,6 @@ export class FriendController {
     @Headers('authorization') authHeader: string,
     @Param('friendshipId') friendshipId: string,
   ) {
-    return this.friendService.removeFriend(
-      requireAccessToken(authHeader),
-      friendshipId,
-    );
+    return this.friendService.removeFriend(requireAccessToken(authHeader), friendshipId)
   }
 }

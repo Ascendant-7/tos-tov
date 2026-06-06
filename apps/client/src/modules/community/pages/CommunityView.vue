@@ -128,8 +128,10 @@
         <div v-for="(post, i) in communityStore.filteredPosts" :id="`community-post-${post.id}`" :key="post.id">
           <CommunityPostCard :post="post" :expanded="activeCommentPostId === post.id"
             :comment-draft="activeCommentPostId === post.id ? commentDraft : ''"
-            :can-delete="post.userId === communityStore.currentUserId && !post.sharedPost"
+            :can-delete="post.userId === communityStore.currentUserId"
             :search-query="communityStore.normalizedSearchQuery"
+            :current-user-initials="currentUserInitials"
+            :current-user-avatar-url="currentUserAvatarUrl"
             @like="communityStore.toggleLike(post.postId)" @bookmark="communityStore.toggleBookmark(post.postId)"
             @share="emit('share-post', post)" @comment="emit('toggle-comments', post)"
             @delete="emit('request-delete', post)"
@@ -172,6 +174,19 @@ const props = defineProps<{
   activeCommentPostId: string | null
   newComment: string
 }>()
+
+const currentUserInitials = computed(() => {
+  if (!communityStore.currentUserProfile) return 'YO'
+  const profile = communityStore.currentUserProfile
+  const first = profile.first_name?.[0] || ''
+  const last = profile.last_name?.[0] || ''
+  const initial = `${first}${last}`.toUpperCase()
+  return initial || profile.email?.[0]?.toUpperCase() || 'YO'
+})
+
+const currentUserAvatarUrl = computed(() => {
+  return communityStore.currentUserProfile?.avatar_url || null
+})
 
 const emit = defineEmits<{
   'create-post': []

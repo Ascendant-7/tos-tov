@@ -1,23 +1,23 @@
-import { IsIn, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsIn, IsOptional, IsString, IsUUID } from 'class-validator'
 
 export class UpdateDraftPostDto {
   @IsOptional()
   @IsUUID()
-  destinationId?: string;
+  destinationId?: string
 
   @IsOptional()
   @IsString()
-  title?: string;
+  title?: string
 
   @IsOptional()
   @IsString()
-  content?: string;
+  content?: string
 
   @IsOptional()
   @IsIn(['visited', 'want_to_go', 'planned'])
-  visitStatus?: 'visited' | 'want_to_go' | 'planned';
+  visitStatus?: 'visited' | 'want_to_go' | 'planned'
 
   @IsOptional()
   @IsIn(['public', 'friends', 'private'])
-  visibility?: 'public' | 'friends' | 'private';
+  visibility?: 'public' | 'friends' | 'private'
 }

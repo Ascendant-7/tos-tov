@@ -1,10 +1,18 @@
 import { defineStore } from 'pinia';
+import { supabase } from '../../../services/supabase';
 
 export type Profile = {
   id: string;
   first_name: string | null;
   last_name: string | null;
   email: string | null;
+};
+
+const getSingleProfile = (profile?: Profile | Profile[] | null): Profile | undefined => {
+  if (Array.isArray(profile)) {
+    return profile[0];
+  }
+  return profile ?? undefined;
 };
 
 export type IncomingRequest = {
@@ -44,6 +52,7 @@ export const useFriendStore = defineStore('friend', {
     activeTab: 'friends' as FriendTab,
     searchQuery: '',
     currentUserId: '',
+    accessToken: '',
 
     loading: false,
     searching: false,
@@ -71,15 +80,7 @@ export const useFriendStore = defineStore('friend', {
     },
 
     getStoredUserId() {
-      try {
-        const user = JSON.parse(localStorage.getItem('user') || 'null') as {
-          id?: string;
-        } | null;
-
-        return user?.id || '';
-      } catch {
-        return '';
-      }
+      return this.currentUserId;
     },
 
     resetFriendState() {
@@ -95,17 +96,20 @@ export const useFriendStore = defineStore('friend', {
       this.actionLoadingId = '';
     },
 
-    syncCurrentUser() {
-      const storedUserId = this.getStoredUserId();
+    async syncCurrentUser() {
+      const { data: { session } } = await supabase.auth.getSession();
+      const storedUserId = session?.user?.id || '';
+      const token = session?.access_token || '';
 
-      if (this.currentUserId !== storedUserId) {
+      if (this.currentUserId !== storedUserId || this.accessToken !== token) {
         this.currentUserId = storedUserId;
+        this.accessToken = token;
         this.resetFriendState();
       }
     },
 
     getAccessToken() {
-      return localStorage.getItem('access_token') || localStorage.getItem('accessToken') || '';
+      return this.accessToken;
     },
 
     authHeaders() {
@@ -128,7 +132,7 @@ export const useFriendStore = defineStore('friend', {
     },
 
     async fetchOverview() {
-      this.syncCurrentUser();
+      await this.syncCurrentUser();
 
       if (!this.ensureLoggedIn()) return;
 
@@ -147,9 +151,24 @@ export const useFriendStore = defineStore('friend', {
           return;
         }
 
-        this.incomingRequests = data.incomingRequests || [];
-        this.outgoingRequests = data.outgoingRequests || [];
-        this.friends = data.friends || [];
+        this.incomingRequests = (data.incomingRequests || []).map(
+          (req: Omit<IncomingRequest, 'requester'> & { requester: Profile | Profile[] }) => ({
+            ...req,
+            requester: getSingleProfile(req.requester) as Profile,
+          })
+        );
+        this.outgoingRequests = (data.outgoingRequests || []).map(
+          (req: Omit<OutgoingRequest, 'receiver'> & { receiver: Profile | Profile[] }) => ({
+            ...req,
+            receiver: getSingleProfile(req.receiver) as Profile,
+          })
+        );
+        this.friends = (data.friends || []).map(
+          (friend: { friendshipId: string; profile: Profile | Profile[] }) => ({
+            ...friend,
+            profile: getSingleProfile(friend.profile) as Profile,
+          })
+        );
         this.suggestions = data.suggestions || [];
       } catch {
         this.error = 'Cannot connect to friend API';
@@ -474,3 +493,25 @@ export const useFriendStore = defineStore('friend', {
     },
   },
 });
+
+supabase.auth.onAuthStateChange((_event, session) => {
+  try {
+    const store = useFriendStore();
+    if (session) {
+      if (store.currentUserId !== session.user?.id || store.accessToken !== session.access_token) {
+        store.currentUserId = session.user?.id ?? '';
+        store.accessToken = session.access_token;
+        store.resetFriendState();
+      }
+    } else {
+      if (store.currentUserId !== '' || store.accessToken !== '') {
+        store.currentUserId = '';
+        store.accessToken = '';
+        store.resetFriendState();
+      }
+    }
+  } catch {
+    // Pinia not initialized yet
+  }
+});
+

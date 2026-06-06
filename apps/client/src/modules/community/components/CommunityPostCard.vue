@@ -76,6 +76,12 @@
             </div>
           </div>
           <button
+            class="flex w-full items-center gap-2 border-none bg-white px-3 py-2 text-left text-[12px] font-semibold text-slate-600 hover:bg-cream"
+            @click="startEditing">
+            <FontAwesomeIcon :icon="faPen" class="h-3.5 w-3.5" />
+            {{ post.sharedPost ? 'Edit Share' : 'Edit Post' }}
+          </button>
+          <button
             class="flex w-full items-center gap-2 border-none bg-white px-3 py-2 text-left text-[12px] font-semibold text-red-500 hover:bg-red-50"
             @click="handleDelete">
             <FontAwesomeIcon :icon="faTrash" class="h-3.5 w-3.5" />
@@ -86,7 +92,7 @@
     </div>
 
     <!-- Post Media Gallery -->
-    <div class="relative w-full bg-cream-dark overflow-hidden">
+    <div v-if="post.media.length > 0 && !post.sharedPost" class="relative w-full bg-cream-dark overflow-hidden">
       <video v-if="currentMedia?.type === 'video'" :src="currentMedia.url"
         class="w-full aspect-square sm:aspect-video object-cover bg-black"
         controls
@@ -133,27 +139,157 @@
 
     <!-- Post Content -->
     <div class="p-4 sm:p-5">
-      <div v-if="post.sharedPost"
-        class="mb-3 rounded-lg border border-weather-border bg-cream/60 px-3 py-2 text-[12px] text-slate-600">
-        <p class="m-0 font-semibold text-slate-700">
-          Shared from
-          <span v-for="(part, index) in highlightParts(post.sharedPost.userName)" :key="`${part.text}-${index}`"
-            :class="part.match ? highlightClass : ''">{{ part.text }}</span>
-        </p>
-        <p v-if="post.sharedPost.title || post.sharedPost.description" class="m-0 mt-1 line-clamp-2 leading-relaxed">
-          <span v-for="(part, index) in highlightParts(sharedPostPreview)" :key="`${part.text}-${index}`"
+      <!-- Shared Caption (displayed first if it's a shared post) -->
+      <div v-if="post.sharedPost" class="mb-3">
+        <!-- Edit view for Shared Caption -->
+        <div v-if="isEditing" class="space-y-3 bg-slate-50/50 p-4 rounded-xl border border-slate-200">
+          <div class="space-y-1">
+            <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Shared Caption</label>
+            <textarea
+              v-model="editDescription"
+              rows="3"
+              placeholder="Write caption..."
+              class="w-full resize-none rounded-lg border border-weather-border bg-white p-3 text-[13px] text-slate-800 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20"
+              @keydown.esc="cancelEditing"
+              @keydown.ctrl.enter="submitEdit"
+            />
+          </div>
+          <div class="flex justify-end gap-2 pt-1">
+            <button
+              class="px-3.5 py-2 rounded-lg border border-weather-border bg-white text-[12px] font-bold text-slate-600 hover:bg-cream transition-colors cursor-pointer"
+              :disabled="isSubmitting"
+              @click="cancelEditing"
+            >
+              Cancel
+            </button>
+            <button
+              class="px-3.5 py-2 rounded-lg border-none bg-sidebar-active text-[12px] font-bold text-white hover:bg-sidebar-active/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              :disabled="isSubmitting"
+              @click="submitEdit"
+            >
+              {{ isSubmitting ? 'Saving...' : 'Save' }}
+            </button>
+          </div>
+        </div>
+        <!-- Display view for Shared Caption -->
+        <p v-else class="text-[12px] sm:text-[13px] text-slate-700 m-0 leading-relaxed font-semibold">
+          <span v-for="(part, index) in highlightParts(post.description)" :key="`${part.text}-${index}`"
             :class="part.match ? highlightClass : ''">{{ part.text }}</span>
         </p>
       </div>
 
-      <h4 v-if="post.title" class="text-[14px] sm:text-[15px] font-bold text-slate-800 m-0 mb-2">
-        <span v-for="(part, index) in highlightParts(post.title)" :key="`${part.text}-${index}`"
-          :class="part.match ? highlightClass : ''">{{ part.text }}</span>
-      </h4>
-      <p class="text-[12px] sm:text-[13px] text-slate-700 m-0 mb-3 leading-relaxed">
-        <span v-for="(part, index) in highlightParts(post.description)" :key="`${part.text}-${index}`"
-          :class="part.match ? highlightClass : ''">{{ part.text }}</span>
-      </p>
+      <!-- Shared Post Wrapper (Facebook style) -->
+      <div v-if="post.sharedPost"
+        class="mb-4 rounded-xl border border-slate-200 bg-slate-50/30 p-4 transition-all duration-200 hover:bg-slate-50/75 hover:border-slate-300">
+        <!-- Original Post Header -->
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-slate-500 to-slate-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+            {{ initialsFor(post.sharedPost.userName) }}
+          </div>
+          <div class="min-w-0">
+            <h5 class="text-[13px] font-semibold text-slate-800 m-0">
+              <span v-for="(part, index) in highlightParts(post.sharedPost.userName)" :key="`${part.text}-${index}`"
+                :class="part.match ? highlightClass : ''">{{ part.text }}</span>
+            </h5>
+            <span class="text-[10px] text-slate-500 font-medium">Original Post</span>
+          </div>
+        </div>
+        
+        <!-- Original Post Content -->
+        <div class="pl-1 mb-3">
+          <h6 v-if="post.sharedPost.title" class="text-[13px] font-bold text-slate-800 m-0 mb-1.5">
+            <span v-for="(part, index) in highlightParts(post.sharedPost.title)" :key="`${part.text}-${index}`"
+              :class="part.match ? highlightClass : ''">{{ part.text }}</span>
+          </h6>
+          
+          <p v-if="post.sharedPost.description" class="text-[12px] sm:text-[13px] text-slate-600 m-0 leading-relaxed italic border-l-2 border-slate-300 pl-3">
+            <span v-for="(part, index) in highlightParts(post.sharedPost.description)" :key="`${part.text}-${index}`"
+              :class="part.match ? highlightClass : ''">{{ part.text }}</span>
+          </p>
+        </div>
+
+        <!-- Original Post Media inside Shared Post Wrapper -->
+        <div v-if="post.media.length > 0" class="relative w-full rounded-lg overflow-hidden bg-slate-100 mt-3 border border-slate-200">
+          <video v-if="currentMedia?.type === 'video'" :src="currentMedia.url"
+            class="w-full aspect-square sm:aspect-video object-cover bg-black"
+            controls
+            playsinline />
+          <img v-else :src="currentMedia?.url" :alt="post.sharedPost.title"
+            class="w-full aspect-square sm:aspect-video object-cover" />
+          
+          <!-- Navigation Arrows inside Shared Post Media -->
+          <div v-if="post.media.length > 1" class="pointer-events-none absolute inset-0 flex items-center justify-between px-2">
+            <button @click.stop="currentMediaIndex = currentMediaIndex > 0 ? currentMediaIndex - 1 : post.media.length - 1"
+              class="pointer-events-auto rounded-full bg-black/40 p-1.5 text-white transition-all hover:bg-black/60 border-none cursor-pointer">
+              <FontAwesomeIcon :icon="faChevronLeft" class="h-3 w-3" />
+            </button>
+            <button @click.stop="currentMediaIndex = currentMediaIndex < post.media.length - 1 ? currentMediaIndex + 1 : 0"
+              class="pointer-events-auto ml-auto rounded-full bg-black/40 p-1.5 text-white transition-all hover:bg-black/60 border-none cursor-pointer">
+              <FontAwesomeIcon :icon="faChevronRight" class="h-3 w-3" />
+            </button>
+          </div>
+          <!-- Image Counter -->
+          <div v-if="post.media.length > 1" class="absolute top-2 right-2 bg-black/40 backdrop-blur-sm text-white text-[9px] font-semibold px-2 py-1 rounded-full">
+            {{ currentMediaIndex + 1 }} / {{ post.media.length }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Regular Post title & content -->
+      <template v-else>
+        <!-- Edit view for Regular Post -->
+        <div v-if="isEditing" class="space-y-3 mb-4 bg-slate-50/50 p-4 rounded-xl border border-slate-200">
+          <div class="space-y-1">
+            <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Title</label>
+            <input
+              v-model="editTitle"
+              type="text"
+              placeholder="Edit title..."
+              class="w-full rounded-lg border border-weather-border bg-white px-3 py-2 text-[13px] text-slate-800 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20"
+              @keydown.esc="cancelEditing"
+              @keydown.ctrl.enter="submitEdit"
+            />
+          </div>
+          <div class="space-y-1">
+            <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Content</label>
+            <textarea
+              v-model="editDescription"
+              rows="3"
+              placeholder="Write content..."
+              class="w-full resize-none rounded-lg border border-weather-border bg-white p-3 text-[13px] text-slate-800 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20"
+              @keydown.esc="cancelEditing"
+              @keydown.ctrl.enter="submitEdit"
+            />
+          </div>
+          <div class="flex justify-end gap-2 pt-1">
+            <button
+              class="px-3.5 py-2 rounded-lg border border-weather-border bg-white text-[12px] font-bold text-slate-600 hover:bg-cream transition-colors cursor-pointer"
+              :disabled="isSubmitting"
+              @click="cancelEditing"
+            >
+              Cancel
+            </button>
+            <button
+              class="px-3.5 py-2 rounded-lg border-none bg-sidebar-active text-[12px] font-bold text-white hover:bg-sidebar-active/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              :disabled="isSubmitting || !editDescription.trim()"
+              @click="submitEdit"
+            >
+              {{ isSubmitting ? 'Saving...' : 'Save' }}
+            </button>
+          </div>
+        </div>
+        <!-- Display view for Regular Post -->
+        <template v-else>
+          <h4 v-if="post.title" class="text-[14px] sm:text-[15px] font-bold text-slate-800 m-0 mb-2">
+            <span v-for="(part, index) in highlightParts(post.title)" :key="`${part.text}-${index}`"
+              :class="part.match ? highlightClass : ''">{{ part.text }}</span>
+          </h4>
+          <p class="text-[12px] sm:text-[13px] text-slate-700 m-0 mb-3 leading-relaxed">
+            <span v-for="(part, index) in highlightParts(post.description)" :key="`${part.text}-${index}`"
+              :class="part.match ? highlightClass : ''">{{ part.text }}</span>
+          </p>
+        </template>
+      </template>
 
       <!-- Hashtags -->
       <div class="flex flex-wrap gap-2 mb-4">
@@ -188,8 +324,9 @@
 
         <div v-if="expanded" class="flex items-center gap-2.5">
           <div
-            class="w-7 h-7 rounded-full bg-cream-dark text-sidebar-active flex items-center justify-center text-[10px] font-bold shrink-0">
-            YO
+            class="w-7 h-7 rounded-full bg-cream-dark text-sidebar-active flex items-center justify-center text-[10px] font-bold shrink-0 overflow-hidden">
+            <img v-if="currentUserAvatarUrl" :src="currentUserAvatarUrl" alt="Your Avatar" class="w-full h-full object-cover" />
+            <span v-else>{{ currentUserInitials || 'YO' }}</span>
           </div>
           <input :value="commentDraft" type="text" placeholder="Add a comment..."
             class="flex-1 px-3 py-2.5 border border-weather-border rounded-full text-[13px] text-slate-800 placeholder:text-slate-400 outline-none focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20"
@@ -275,7 +412,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faBookmark, faCircleCheck, faCommentDots, faEllipsis, faHeart, faLocationDot, faShareNodes, faChevronLeft, faChevronRight, faTrash, faGlobe, faLock, faUserGroup } from '@fortawesome/free-solid-svg-icons'
+import { faBookmark, faCircleCheck, faCommentDots, faEllipsis, faHeart, faLocationDot, faShareNodes, faChevronLeft, faChevronRight, faTrash, faGlobe, faLock, faUserGroup, faPen } from '@fortawesome/free-solid-svg-icons'
+import { useCommunityStore } from '../store/community'
 import type { Post, PostVisibility } from '../store/community'
 
 const props = defineProps<{
@@ -284,10 +422,70 @@ const props = defineProps<{
   commentDraft?: string
   canDelete?: boolean
   searchQuery?: string
+  currentUserInitials?: string
+  currentUserAvatarUrl?: string | null
 }>()
 
 const currentMediaIndex = ref(0)
 const showMenu = ref(false)
+
+const communityStore = useCommunityStore()
+const isEditing = ref(false)
+const editTitle = ref('')
+const editDescription = ref('')
+const isSubmitting = ref(false)
+
+const startEditing = () => {
+  showMenu.value = false
+  isEditing.value = true
+  editTitle.value = props.post.title
+  editDescription.value = props.post.description
+}
+
+const cancelEditing = () => {
+  isEditing.value = false
+}
+
+const submitEdit = async () => {
+  if (props.post.sharedPost) {
+    isSubmitting.value = true
+    try {
+      await communityStore.updatePost(props.post.id, {
+        caption: editDescription.value.trim() || undefined,
+      })
+      isEditing.value = false
+    } catch {
+      // Handled
+    } finally {
+      isSubmitting.value = false
+    }
+  } else {
+    if (!editDescription.value.trim()) {
+      return
+    }
+    isSubmitting.value = true
+    try {
+      await communityStore.updatePost(props.post.id, {
+        title: editTitle.value.trim() || undefined,
+        content: editDescription.value.trim()
+      })
+      isEditing.value = false
+    } catch {
+      // Handled
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+}
+
+const initialsFor = (name: string) =>
+  name
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() || 'TT'
 type VisibilityOption = {
   value: PostVisibility
   label: string
@@ -308,13 +506,6 @@ const visibilityIcon = computed(() => visibilityOption.value.icon)
 const visibilityLabel = computed(() => visibilityOption.value.label)
 const highlightClass =
   'rounded bg-amber-200/80 px-0.5 font-semibold text-slate-900 ring-1 ring-amber-300/60'
-const sharedPostPreview = computed(() => {
-  if (!props.post.sharedPost) {
-    return ''
-  }
-
-  return props.post.sharedPost.title || props.post.sharedPost.description
-})
 
 const visibleComments = computed(() => {
   return props.expanded ? props.post.comments : props.post.comments.slice(0, 2)

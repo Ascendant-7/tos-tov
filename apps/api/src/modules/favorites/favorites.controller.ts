@@ -25,10 +25,7 @@ export class FavoritesController {
    * GET /favorites/check/:destinationId — check if a destination is favorited
    */
   @Get('check/:destinationId')
-  checkFavorite(
-    @Param('destinationId') destinationId: string,
-    @Req() req: AuthenticatedRequest,
-  ) {
+  checkFavorite(@Param('destinationId') destinationId: string, @Req() req: AuthenticatedRequest) {
     return this.favoritesService.isFavorited(req.user.id, destinationId)
   }
 
@@ -37,10 +34,7 @@ export class FavoritesController {
    * Body: { destination_id: string }
    */
   @Post()
-  addFavorite(
-    @Body('destination_id') destinationId: string,
-    @Req() req: AuthenticatedRequest,
-  ) {
+  addFavorite(@Body('destination_id') destinationId: string, @Req() req: AuthenticatedRequest) {
     return this.favoritesService.addFavorite(req.user.id, destinationId)
   }
 
@@ -48,10 +42,7 @@ export class FavoritesController {
    * DELETE /favorites/:destinationId — remove a destination from favorites
    */
   @Delete(':destinationId')
-  removeFavorite(
-    @Param('destinationId') destinationId: string,
-    @Req() req: AuthenticatedRequest,
-  ) {
+  removeFavorite(@Param('destinationId') destinationId: string, @Req() req: AuthenticatedRequest) {
     return this.favoritesService.removeFavorite(req.user.id, destinationId)
   }
 }

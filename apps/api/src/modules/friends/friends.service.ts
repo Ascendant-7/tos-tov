@@ -3,122 +3,120 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
-} from '@nestjs/common';
-import { SupabaseService } from '../../supabase/supabase.service';
-import type { Database, SupabaseClient } from '@repo/supabase';
+} from '@nestjs/common'
+import { SupabaseService } from '../../supabase/supabase.service'
+import type { Database, SupabaseClient } from '@repo/supabase'
 
 @Injectable()
 export class FriendService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
   private get db(): SupabaseClient<Database> {
-    return this.supabaseService.adminClient;
+    return this.supabaseService.adminClient
   }
 
   private async getUserIdFromToken(accessToken: string) {
-    const { data, error } =
-      await this.supabaseService.anonClient.auth.getUser(accessToken);
+    const { data, error } = await this.supabaseService.anonClient.auth.getUser(accessToken)
 
     if (error || !data.user) {
-      throw new UnauthorizedException('Invalid or expired access token');
+      throw new UnauthorizedException('Invalid or expired access token')
     }
 
-    return data.user.id;
+    return data.user.id
   }
 
   async getOverview(accessToken: string) {
-    const userId = await this.getUserIdFromToken(accessToken);
+    const userId = await this.getUserIdFromToken(accessToken)
 
-    const [incomingRequests, outgoingRequests, friends, suggestions] =
-      await Promise.all([
-        this.getIncomingRequests(userId),
-        this.getOutgoingRequests(userId),
-        this.getFriends(userId),
-        this.getSuggestedTravelers(userId),
-      ]);
+    const [incomingRequests, outgoingRequests, friends, suggestions] = await Promise.all([
+      this.getIncomingRequests(userId),
+      this.getOutgoingRequests(userId),
+      this.getFriends(userId),
+      this.getSuggestedTravelers(userId),
+    ])
 
     return {
       incomingRequests,
       outgoingRequests,
       friends,
       suggestions,
-    };
+    }
   }
 
   async searchTravelers(accessToken: string, q?: string) {
-    const userId = await this.getUserIdFromToken(accessToken);
-    const query = q?.trim();
+    const userId = await this.getUserIdFromToken(accessToken)
+    const query = q?.trim()
 
     let request = this.db
       .from('profiles')
       .select('id, first_name, last_name, email')
       .neq('id', userId)
-      .limit(10);
+      .limit(10)
 
     if (query) {
       const safeQuery = query
         .replace(/[,%()]/g, ' ')
         .replace(/\s+/g, ' ')
-        .trim();
-      const [firstName, ...restNames] = safeQuery.split(' ');
-      const lastName = restNames.join(' ');
+        .trim()
+      const [firstName, ...restNames] = safeQuery.split(' ')
+      const lastName = restNames.join(' ')
       const filters = [
         `first_name.ilike.%${safeQuery}%`,
         `last_name.ilike.%${safeQuery}%`,
         `email.ilike.%${safeQuery}%`,
-      ];
+      ]
 
       if (firstName && lastName) {
         filters.push(
           `and(first_name.ilike.%${firstName}%,last_name.ilike.%${lastName}%)`,
           `and(first_name.ilike.%${lastName}%,last_name.ilike.%${firstName}%)`,
-        );
+        )
       }
 
-      request = request.or(filters.join(','));
+      request = request.or(filters.join(','))
     }
 
-    const { data, error } = await request;
+    const { data, error } = await request
 
     if (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(error.message)
     }
 
-    const relationships = await this.getRelationshipMap(userId);
+    const relationships = await this.getRelationshipMap(userId)
 
     return (data || []).map((profile) => {
-      const relation = relationships.get(profile.id);
+      const relation = relationships.get(profile.id)
 
       return {
         ...profile,
         relationshipStatus: relation?.status ?? 'none',
         friendshipId: relation?.id ?? null,
-      };
-    });
+      }
+    })
   }
 
   async sendFriendRequest(accessToken: string, targetUserId: string) {
-    const userId = await this.getUserIdFromToken(accessToken);
+    const userId = await this.getUserIdFromToken(accessToken)
 
     if (userId === targetUserId) {
-      throw new BadRequestException('You cannot add yourself as a friend');
+      throw new BadRequestException('You cannot add yourself as a friend')
     }
 
-    const targetExists = await this.profileExists(targetUserId);
+    const targetExists = await this.profileExists(targetUserId)
 
     if (!targetExists) {
-      throw new NotFoundException('Target user not found');
+      throw new NotFoundException('Target user not found')
     }
 
-    const existing = await this.findExistingRelationship(userId, targetUserId);
+    const existing = await this.findExistingRelationship(userId, targetUserId)
 
     if (existing) {
       if (existing.status === 'accepted') {
-        throw new BadRequestException('You are already friends');
+        throw new BadRequestException('You are already friends')
       }
 
       if (existing.status === 'pending') {
-        throw new BadRequestException('Friend request already exists');
+        throw new BadRequestException('Friend request already exists')
       }
 
       const { data, error } = await this.db
@@ -131,13 +129,13 @@ export class FriendService {
         })
         .eq('id', existing.id)
         .select()
-        .single();
+        .single()
 
       if (error) {
-        throw new BadRequestException(error.message);
+        throw new BadRequestException(error.message)
       }
 
-      return data;
+      return data
     }
 
     const { data, error } = await this.db
@@ -148,17 +146,17 @@ export class FriendService {
         status: 'pending',
       })
       .select()
-      .single();
+      .single()
 
     if (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(error.message)
     }
 
-    return data;
+    return data
   }
 
   async acceptFriendRequest(accessToken: string, requestId: string) {
-    const userId = await this.getUserIdFromToken(accessToken);
+    const userId = await this.getUserIdFromToken(accessToken)
 
     const { data, error } = await this.db
       .from('friendships')
@@ -170,17 +168,17 @@ export class FriendService {
       .eq('receiver_id', userId)
       .eq('status', 'pending')
       .select()
-      .single();
+      .single()
 
     if (error || !data) {
-      throw new NotFoundException('Friend request not found');
+      throw new NotFoundException('Friend request not found')
     }
 
-    return data;
+    return data
   }
 
   async rejectFriendRequest(accessToken: string, requestId: string) {
-    const userId = await this.getUserIdFromToken(accessToken);
+    const userId = await this.getUserIdFromToken(accessToken)
 
     const { data, error } = await this.db
       .from('friendships')
@@ -192,51 +190,51 @@ export class FriendService {
       .eq('receiver_id', userId)
       .eq('status', 'pending')
       .select()
-      .single();
+      .single()
 
     if (error || !data) {
-      throw new NotFoundException('Friend request not found');
+      throw new NotFoundException('Friend request not found')
     }
 
-    return data;
+    return data
   }
 
   async cancelFriendRequest(accessToken: string, requestId: string) {
-    const userId = await this.getUserIdFromToken(accessToken);
+    const userId = await this.getUserIdFromToken(accessToken)
 
     const { error } = await this.db
       .from('friendships')
       .delete()
       .eq('id', requestId)
       .eq('requester_id', userId)
-      .eq('status', 'pending');
+      .eq('status', 'pending')
 
     if (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(error.message)
     }
 
     return {
       message: 'Friend request cancelled',
-    };
+    }
   }
 
   async removeFriend(accessToken: string, friendshipId: string) {
-    const userId = await this.getUserIdFromToken(accessToken);
+    const userId = await this.getUserIdFromToken(accessToken)
 
     const { error } = await this.db
       .from('friendships')
       .delete()
       .eq('id', friendshipId)
       .or(`requester_id.eq.${userId},receiver_id.eq.${userId}`)
-      .eq('status', 'accepted');
+      .eq('status', 'accepted')
 
     if (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(error.message)
     }
 
     return {
       message: 'Friend removed',
-    };
+    }
   }
 
   private async getIncomingRequests(userId: string) {
@@ -257,13 +255,13 @@ export class FriendService {
       )
       .eq('receiver_id', userId)
       .eq('status', 'pending')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
 
     if (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(error.message)
     }
 
-    return data || [];
+    return data || []
   }
 
   private async getOutgoingRequests(userId: string) {
@@ -284,13 +282,13 @@ export class FriendService {
       )
       .eq('requester_id', userId)
       .eq('status', 'pending')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
 
     if (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(error.message)
     }
 
-    return data || [];
+    return data || []
   }
 
   private async getFriends(userId: string) {
@@ -318,33 +316,33 @@ export class FriendService {
       )
       .or(`requester_id.eq.${userId},receiver_id.eq.${userId}`)
       .eq('status', 'accepted')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
 
     if (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(error.message)
     }
 
     return (data || []).map((row) => {
-      const friend = row.requester_id === userId ? row.receiver : row.requester;
+      const friend = row.requester_id === userId ? row.receiver : row.requester
 
       return {
         friendshipId: row.id,
         profile: friend,
-      };
-    });
+      }
+    })
   }
 
   private async getSuggestedTravelers(userId: string) {
-    const relationships = await this.getRelationshipMap(userId);
-    const excludedIds = [userId, ...relationships.keys()];
+    const relationships = await this.getRelationshipMap(userId)
+    const excludedIds = [userId, ...relationships.keys()]
 
     const { data, error } = await this.db
       .from('profiles')
       .select('id, first_name, last_name, email')
-      .limit(20);
+      .limit(20)
 
     if (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(error.message)
     }
 
     return (data || [])
@@ -354,38 +352,37 @@ export class FriendService {
         ...profile,
         relationshipStatus: 'none',
         friendshipId: null,
-      }));
+      }))
   }
 
   private async getRelationshipMap(userId: string) {
     const { data, error } = await this.db
       .from('friendships')
       .select('id, requester_id, receiver_id, status')
-      .or(`requester_id.eq.${userId},receiver_id.eq.${userId}`);
+      .or(`requester_id.eq.${userId},receiver_id.eq.${userId}`)
 
     if (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(error.message)
     }
 
     const map = new Map<
       string,
       {
-        id: string;
-        status: string;
+        id: string
+        status: string
       }
-    >();
+    >()
 
     for (const row of data || []) {
-      const otherUserId =
-        row.requester_id === userId ? row.receiver_id : row.requester_id;
+      const otherUserId = row.requester_id === userId ? row.receiver_id : row.requester_id
 
       map.set(otherUserId, {
         id: row.id,
         status: row.status,
-      });
+      })
     }
 
-    return map;
+    return map
   }
 
   private async findExistingRelationship(userId: string, targetUserId: string) {
@@ -395,13 +392,13 @@ export class FriendService {
       .or(
         `and(requester_id.eq.${userId},receiver_id.eq.${targetUserId}),and(requester_id.eq.${targetUserId},receiver_id.eq.${userId})`,
       )
-      .maybeSingle();
+      .maybeSingle()
 
     if (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(error.message)
     }
 
-    return data;
+    return data
   }
 
   private async profileExists(userId: string) {
@@ -409,12 +406,12 @@ export class FriendService {
       .from('profiles')
       .select('id')
       .eq('id', userId)
-      .maybeSingle();
+      .maybeSingle()
 
     if (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(error.message)
     }
 
-    return !!data;
+    return !!data
   }
 }

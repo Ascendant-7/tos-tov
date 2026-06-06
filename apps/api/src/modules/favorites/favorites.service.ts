@@ -3,7 +3,7 @@ import { SupabaseService } from '../../supabase/supabase.service'
 
 @Injectable()
 export class FavoritesService {
-  constructor(private readonly supabaseService: SupabaseService) { }
+  constructor(private readonly supabaseService: SupabaseService) {}
 
   /**
    * Get all favorited destinations for a user, with full destination data.

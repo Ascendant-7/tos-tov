@@ -8,64 +8,64 @@ import {
   IsUUID,
   IsUrl,
   ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
+} from 'class-validator'
+import { Type } from 'class-transformer'
 
 class CreatePostMediaDto {
   @IsString()
   @IsNotEmpty()
   @IsUrl({ require_tld: false })
-  mediaUrl: string;
+  mediaUrl: string
 
   @IsIn(['image', 'video'])
-  mediaType: 'image' | 'video';
+  mediaType: 'image' | 'video'
 
   @IsOptional()
   @IsString()
-  storagePath?: string;
+  storagePath?: string
 }
 
 export class CreatePostDto {
   @IsOptional()
   @IsString()
-  title?: string;
+  title?: string
 
   @IsString()
   @IsNotEmpty()
-  content: string;
+  content: string
 
   @IsOptional()
   @IsUUID()
-  destinationId?: string;
+  destinationId?: string
 
   @IsOptional()
   @IsUUID()
-  tripId?: string;
+  tripId?: string
 
   @IsOptional()
   @IsString()
-  destinationName?: string;
+  destinationName?: string
 
   @IsOptional()
   @IsString()
-  province?: string;
+  province?: string
 
   @IsOptional()
   @IsBoolean()
-  isVisited?: boolean;
+  isVisited?: boolean
 
   @IsOptional()
   @IsIn(['public', 'friends', 'private'])
-  visibility?: 'public' | 'friends' | 'private';
+  visibility?: 'public' | 'friends' | 'private'
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  hashtags?: string[];
+  hashtags?: string[]
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreatePostMediaDto)
-  media?: CreatePostMediaDto[];
+  media?: CreatePostMediaDto[]
 }
