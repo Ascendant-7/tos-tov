@@ -15,6 +15,7 @@ interface AuthenticatedRequest extends Request {
 }
 
 @Controller('itinerary')
+@UseGuards(AuthGuard)
 export class ItineraryController {
   constructor(
     private readonly itineraryService: ItineraryService,

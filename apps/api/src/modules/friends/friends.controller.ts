@@ -1,52 +1,81 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'
-import { FriendsService } from './friends.service'
-import { SendFriendRequestDto } from './dto/send-friend-request.dto'
+import {
+  BadRequestException,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common'
+import { FriendService } from './friends.service'
+
+function requireAccessToken(authHeader?: string) {
+  if (!authHeader) {
+    throw new BadRequestException('Missing Authorization header')
+  }
+
+  const [type, token] = authHeader.split(' ')
+
+  if (type !== 'Bearer' || !token) {
+    throw new BadRequestException('Invalid Authorization header')
+  }
+
+  return token
+}
 
 @Controller('friends')
-export class FriendsController {
-  constructor(private readonly friendsService: FriendsService) {}
+export class FriendController {
+  constructor(private readonly friendService: FriendService) {}
 
-  // Temporary mock login user.
-  // Later, when authentication is ready, replace this with req.user.id.
-  private readonly mockCurrentUserId = '11111111-1111-1111-1111-111111111111'
-
-  @Post('request')
-  sendFriendRequest(@Body() dto: SendFriendRequestDto) {
-    return this.friendsService.sendFriendRequest(this.mockCurrentUserId, dto.friendId)
+  @Get('overview')
+  getOverview(@Headers('authorization') authHeader: string) {
+    return this.friendService.getOverview(requireAccessToken(authHeader))
   }
 
-  @Post('accept/:requesterId')
-  acceptFriendRequest(@Param('requesterId') requesterId: string) {
-    return this.friendsService.acceptFriendRequest(this.mockCurrentUserId, requesterId)
+  @Get('travelers/search')
+  searchTravelers(@Headers('authorization') authHeader: string, @Query('q') q?: string) {
+    return this.friendService.searchTravelers(requireAccessToken(authHeader), q)
   }
 
-  @Post('reject/:requesterId')
-  rejectFriendRequest(@Param('requesterId') requesterId: string) {
-    return this.friendsService.rejectFriendRequest(this.mockCurrentUserId, requesterId)
+  @Post('requests/:targetUserId')
+  sendFriendRequest(
+    @Headers('authorization') authHeader: string,
+    @Param('targetUserId') targetUserId: string,
+  ) {
+    return this.friendService.sendFriendRequest(requireAccessToken(authHeader), targetUserId)
   }
 
-  @Delete(':friendId')
-  removeFriend(@Param('friendId') friendId: string) {
-    return this.friendsService.removeFriend(this.mockCurrentUserId, friendId)
+  @Patch('requests/:requestId/accept')
+  acceptFriendRequest(
+    @Headers('authorization') authHeader: string,
+    @Param('requestId') requestId: string,
+  ) {
+    return this.friendService.acceptFriendRequest(requireAccessToken(authHeader), requestId)
   }
 
-  @Get()
-  getFriends() {
-    return this.friendsService.getFriends(this.mockCurrentUserId)
+  @Patch('requests/:requestId/reject')
+  rejectFriendRequest(
+    @Headers('authorization') authHeader: string,
+    @Param('requestId') requestId: string,
+  ) {
+    return this.friendService.rejectFriendRequest(requireAccessToken(authHeader), requestId)
   }
 
-  @Get('requests/incoming')
-  getIncomingRequests() {
-    return this.friendsService.getIncomingRequests(this.mockCurrentUserId)
+  @Delete('requests/:requestId/cancel')
+  cancelFriendRequest(
+    @Headers('authorization') authHeader: string,
+    @Param('requestId') requestId: string,
+  ) {
+    return this.friendService.cancelFriendRequest(requireAccessToken(authHeader), requestId)
   }
 
-  @Get('requests/outgoing')
-  getOutgoingRequests() {
-    return this.friendsService.getOutgoingRequests(this.mockCurrentUserId)
-  }
-
-  @Get('status/:userId')
-  getFriendshipStatus(@Param('userId') userId: string) {
-    return this.friendsService.getFriendshipStatus(this.mockCurrentUserId, userId)
+  @Delete(':friendshipId')
+  removeFriend(
+    @Headers('authorization') authHeader: string,
+    @Param('friendshipId') friendshipId: string,
+  ) {
+    return this.friendService.removeFriend(requireAccessToken(authHeader), friendshipId)
   }
 }

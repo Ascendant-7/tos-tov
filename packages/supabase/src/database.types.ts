@@ -22,6 +22,7 @@ export type Database = {
           id: string
           status: string
           title: string | null
+          trip_id: string | null
           updated_at: string
           user_id: string
           visibility: string
@@ -34,6 +35,7 @@ export type Database = {
           id?: string
           status?: string
           title?: string | null
+          trip_id?: string | null
           updated_at?: string
           user_id: string
           visibility?: string
@@ -46,6 +48,7 @@ export type Database = {
           id?: string
           status?: string
           title?: string | null
+          trip_id?: string | null
           updated_at?: string
           user_id?: string
           visibility?: string
@@ -60,6 +63,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "community_posts_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "community_posts_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -70,6 +80,7 @@ export type Database = {
       }
       destinations: {
         Row: {
+          address: string | null
           avg_rating: number | null
           budget_max: number | null
           budget_min: number | null
@@ -86,10 +97,12 @@ export type Database = {
           location_name: string | null
           longitude: number | null
           name: string
+          place_id: string | null
           province: string
           user_id: string | null
         }
         Insert: {
+          address?: string | null
           avg_rating?: number | null
           budget_max?: number | null
           budget_min?: number | null
@@ -106,10 +119,12 @@ export type Database = {
           location_name?: string | null
           longitude?: number | null
           name: string
+          place_id?: string | null
           province: string
           user_id?: string | null
         }
         Update: {
+          address?: string | null
           avg_rating?: number | null
           budget_max?: number | null
           budget_min?: number | null
@@ -126,6 +141,7 @@ export type Database = {
           location_name?: string | null
           longitude?: number | null
           name?: string
+          place_id?: string | null
           province?: string
           user_id?: string | null
         }
