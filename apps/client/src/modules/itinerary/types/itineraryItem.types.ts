@@ -14,7 +14,10 @@ export interface ItineraryItem {
     name: string
     cover_image_url?: string
     province?: string
+    location_name?: string
     category?: string
+    latitude?: number | null
+    longitude?: number | null
   } | null
 }
 

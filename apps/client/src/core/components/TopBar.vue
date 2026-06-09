@@ -282,7 +282,6 @@ const pageTitles: Record<string, string> = {
   'my-trips': 'My Trips',
   'shared-trips': 'Shared Trips',
   'trip-itinerary': 'Itinerary',
-  'route-intel': 'Route Intel',
   social: 'Social Travel',
   community: 'Community',
   profile: 'Profile',

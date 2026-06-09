@@ -25,6 +25,8 @@ export interface DestinationApiResponse {
   description?: string
   province: string
   location_name?: string
+  latitude?: number | string | null
+  longitude?: number | string | null
   category: string
   cover_image_url?: string
   duration_min?: number
@@ -44,6 +46,8 @@ export interface CreateDestinationPayload {
   description?: string
   province: string
   location_name?: string
+  latitude?: number
+  longitude?: number
   category: string
   cover_image_url?: string
   duration_min?: number
