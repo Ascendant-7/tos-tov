@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ItineraryService } from './itinerary.service'
 import { ItineraryController } from './itinerary.controller'
-import { SupabaseModule } from '../../common/supabase/supabase.module'
+import { SupabaseModule } from '../../supabase/supabase.module'
 
 @Module({
   imports: [SupabaseModule],

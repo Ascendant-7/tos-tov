@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
-import { SupabaseService } from '../../common/supabase/supabase.service'
+import { SupabaseService } from '../../supabase/supabase.service'
 import { CreateTripDto } from './dto/create-trip.dto'
 import { CreateItineraryDayDto } from './dto/create-itinerary-day.dto'
 import { CreateItineraryItemDto } from './dto/create-itinerary-item.dto'

@@ -4,7 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common'
-import { SupabaseService } from '../../common/supabase/supabase.service'
+import { SupabaseService } from '../../supabase/supabase.service'
 import type { Database, SupabaseClient } from '@repo/supabase'
 
 @Injectable()

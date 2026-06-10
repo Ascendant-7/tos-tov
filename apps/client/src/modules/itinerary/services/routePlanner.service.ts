@@ -1,4 +1,4 @@
-import type { DayRouteStats, MapDestination, RouteSummary } from '@/modules/map/types/maps'
+import type { DayRouteStats, MapDestination, RouteSummary } from '@/types/maps'
 import { getDestinations } from './destination.service'
 
 export interface RoutePlannerItemLike {

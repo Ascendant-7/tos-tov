@@ -13,24 +13,15 @@ export class WeatherService {
   async getWeather() {
     const weatherData = await Promise.all(
       this.cities.map(async (city) => {
-        try {
-          const response = await axios.get(
-            `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current=temperature_2m,weather_code`,
-            { timeout: 5000 },
-          )
+        const response = await axios.get(
+          `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current=temperature_2m,weather_code`,
+          { timeout: 5000 },
+        )
 
-          return {
-            city: city.name,
-            temperature: response.data.current.temperature_2m,
-            weatherCode: response.data.current.weather_code,
-          }
-        } catch (error) {
-          // Fallback data if the weather API fails or times out
-          return {
-            city: city.name,
-            temperature: 30, // Default fallback
-            weatherCode: 1, // Default fallback (Sunny)
-          }
+        return {
+          city: city.name,
+          temperature: response.data.current.temperature_2m,
+          weatherCode: response.data.current.weather_code,
         }
       }),
     )
@@ -44,34 +35,29 @@ export class WeatherService {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ')
 
-    try {
-      const geoResponse = await axios.get(
-        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(formattedCity)}&count=1`,
-        { timeout: 5000 },
-      )
+    const geoResponse = await axios.get(
+      `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(formattedCity)}&count=1`,
+      { timeout: 5000 },
+    )
 
-      if (!geoResponse.data.results?.length) {
-        throw new NotFoundException('City not found')
-      }
+    if (!geoResponse.data.results?.length) {
+      throw new NotFoundException('City not found')
+    }
 
-      const city = geoResponse.data.results[0]
+    const city = geoResponse.data.results[0]
 
-      const weatherResponse = await axios.get(
-        `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current=temperature_2m,weather_code`,
-        { timeout: 5000 },
-      )
+    const weatherResponse = await axios.get(
+      `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current=temperature_2m,weather_code`,
+      { timeout: 5000 },
+    )
 
-      return {
-        city: city.name,
-        country: city.country,
-        latitude: city.latitude,
-        longitude: city.longitude,
-        temperature: weatherResponse.data.current.temperature_2m,
-        weatherCode: weatherResponse.data.current.weather_code,
-      }
-    } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      throw new NotFoundException(`Weather data temporarily unavailable for ${formattedCity}`)
+    return {
+      city: city.name,
+      country: city.country,
+      latitude: city.latitude,
+      longitude: city.longitude,
+      temperature: weatherResponse.data.current.temperature_2m,
+      weatherCode: weatherResponse.data.current.weather_code,
     }
   }
 }
