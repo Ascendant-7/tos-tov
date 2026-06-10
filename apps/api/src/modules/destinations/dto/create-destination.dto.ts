@@ -15,6 +15,14 @@ export class CreateDestinationDto {
   @IsString()
   location_name?: string
 
+  @IsOptional()
+  @IsNumber()
+  latitude?: number
+
+  @IsOptional()
+  @IsNumber()
+  longitude?: number
+
   @IsString()
   category: string
 

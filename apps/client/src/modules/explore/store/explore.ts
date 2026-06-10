@@ -19,6 +19,8 @@ function mapDestination(raw: DestinationApiResponse): ExploreDestination {
     description: raw.description,
     province: raw.province,
     location_name: raw.location_name,
+    latitude: raw.latitude == null ? null : Number(raw.latitude),
+    longitude: raw.longitude == null ? null : Number(raw.longitude),
     category: raw.category,
     cover_image_url: raw.cover_image_url,
     duration_min: raw.duration_min,

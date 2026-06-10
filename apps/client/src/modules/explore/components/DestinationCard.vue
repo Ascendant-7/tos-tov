@@ -201,6 +201,8 @@ export interface ExploreDestination {
   location?: string
   /** City / locality from backend field `location_name` */
   location_name?: string
+  latitude?: number | null
+  longitude?: number | null
   category: string
   /** Legacy sample-data field. Prefer backend field `cover_image_url` in new code. */
   image?: string

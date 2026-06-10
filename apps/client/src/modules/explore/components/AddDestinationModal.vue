@@ -231,6 +231,42 @@
                 </div>
               </div>
 
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div class="field-group">
+                  <label class="field-label">
+                    <span class="inline-flex items-center gap-2">Latitude</span>
+                  </label>
+                  <input
+                    v-model.number="form.latitude"
+                    type="number"
+                    step="any"
+                    min="-90"
+                    max="90"
+                    placeholder="e.g. 11.5633"
+                    class="field-input"
+                    :class="{ 'field-input--error': errors.latitude }"
+                  />
+                  <p v-if="errors.latitude" class="field-error">{{ errors.latitude }}</p>
+                </div>
+
+                <div class="field-group">
+                  <label class="field-label">
+                    <span class="inline-flex items-center gap-2">Longitude</span>
+                  </label>
+                  <input
+                    v-model.number="form.longitude"
+                    type="number"
+                    step="any"
+                    min="-180"
+                    max="180"
+                    placeholder="e.g. 104.9336"
+                    class="field-input"
+                    :class="{ 'field-input--error': errors.longitude }"
+                  />
+                  <p v-if="errors.longitude" class="field-error">{{ errors.longitude }}</p>
+                </div>
+              </div>
+
               <!-- Row 3: Category -->
               <div class="field-group field-animate-3">
                 <label class="field-label">
@@ -712,6 +748,8 @@ const defaultForm = (): CreateDestinationPayload => ({
   description: '',
   province: '',
   location_name: '',
+  latitude: undefined,
+  longitude: undefined,
   category: '',
   cover_image_url: '',
   duration_min: undefined,
@@ -793,6 +831,14 @@ function validate(): boolean {
   if (!form.name.trim()) errors.name = 'Name is required'
   if (!form.province) errors.province = 'Province is required'
   if (!form.category) errors.category = 'Please select a category'
+
+  if (form.latitude != null && (form.latitude < -90 || form.latitude > 90)) {
+    errors.latitude = 'Latitude must be between -90 and 90'
+  }
+
+  if (form.longitude != null && (form.longitude < -180 || form.longitude > 180)) {
+    errors.longitude = 'Longitude must be between -180 and 180'
+  }
 
   if (form.cover_image_url && imageInputMode.value === 'url') {
     // Only validate URL format when user is entering a URL
@@ -884,6 +930,8 @@ async function submit() {
       category: form.category,
       ...(form.description?.trim() && { description: form.description.trim() }),
       ...(form.location_name?.trim() && { location_name: form.location_name.trim() }),
+      ...(form.latitude != null && { latitude: form.latitude }),
+      ...(form.longitude != null && { longitude: form.longitude }),
       ...(form.cover_image_url?.trim() && { cover_image_url: form.cover_image_url.trim() }),
       ...(form.duration_min != null && { duration_min: form.duration_min }),
       ...(form.duration_max != null && { duration_max: form.duration_max }),
