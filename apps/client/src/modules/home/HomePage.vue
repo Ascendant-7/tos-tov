@@ -28,29 +28,7 @@
           >
             Where will your next<br />adventure take you?
           </h1>
-          <div class="relative max-w-[320px] sm:max-w-[380px]">
-            <svg
-              class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-white/50"
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Search destinations, places, experiences..."
-              class="w-full py-2.5 sm:py-3 pl-9 sm:pl-10 pr-4 rounded-xl bg-white/20 backdrop-blur-md border border-white/25 text-xs sm:text-sm text-white placeholder:text-white/60 outline-none transition-all duration-200 focus:bg-white/30 focus:border-white/40"
-            />
-          </div>
+
         </div>
       </section>
 
@@ -387,10 +365,18 @@
           >
             <div class="w-[110px] sm:w-[130px] shrink-0 overflow-hidden">
               <img
-                :src="gem.image"
+                v-if="gem.cover_image_url"
+                :src="gem.cover_image_url"
                 :alt="gem.name"
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
+              <div v-else class="w-full h-full bg-slate-100 flex items-center justify-center">
+                <svg class="text-slate-300 w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                  <circle cx="9" cy="9" r="2" />
+                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                </svg>
+              </div>
             </div>
             <div class="p-3 sm:p-4 flex flex-col justify-center min-w-0">
               <h4 class="text-[13px] sm:text-[14px] font-semibold text-slate-800 m-0 mb-0.5">
