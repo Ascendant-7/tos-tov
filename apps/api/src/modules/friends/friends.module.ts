@@ -1,18 +1,11 @@
+import { SupabaseModule } from '@/supabase/supabase.module'
+import { FriendService } from './friends.service'
 import { Module } from '@nestjs/common'
-import { FriendsController } from './friends.controller'
-import { FriendsService } from './friends.service'
-import { FRIENDS_REPOSITORY } from './repositories/friends.repository.interface'
-import { MockFriendsRepository } from './repositories/mock-friends.repository'
+import { FriendController } from './friends.controller'
 
 @Module({
-  controllers: [FriendsController],
-  providers: [
-    FriendsService,
-    {
-      provide: FRIENDS_REPOSITORY,
-      useClass: MockFriendsRepository,
-    },
-  ],
-  exports: [FriendsService],
+  imports: [SupabaseModule],
+  providers: [FriendService],
+  controllers: [FriendController],
 })
 export class FriendsModule {}

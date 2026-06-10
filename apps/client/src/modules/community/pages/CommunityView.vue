@@ -5,8 +5,24 @@
       <h1 class="text-[24px] sm:text-[28px] font-bold text-slate-800 m-0">Community</h1>
     </section>
 
-    <!-- Stories Section -->
+    <!-- Search -->
     <section class="mb-6 sm:mb-8 animate-fade-in-up delay-1">
+      <div class="relative">
+        <FontAwesomeIcon :icon="faMagnifyingGlass"
+          class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <input :value="communityStore.searchQuery" type="search" placeholder="Search posts..."
+          class="w-full rounded-xl border border-weather-border bg-white py-3 pl-10 pr-11 text-[13px] text-slate-800 outline-none transition-colors placeholder:text-slate-400 focus:border-sidebar-active focus:ring-1 focus:ring-sidebar-active/20 sm:text-[14px]"
+          @input="communityStore.setSearchQuery(($event.target as HTMLInputElement).value)" />
+        <button v-if="communityStore.searchQuery" aria-label="Clear search"
+          class="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg border-none bg-transparent text-slate-400 transition-colors hover:bg-cream hover:text-slate-700"
+          @click="communityStore.setSearchQuery('')">
+          <FontAwesomeIcon :icon="faXmark" class="h-4 w-4" />
+        </button>
+      </div>
+    </section>
+
+    <!-- Stories Section -->
+    <section class="mb-6 sm:mb-8 animate-fade-in-up delay-2">
       <div
         class="flex gap-3 sm:gap-4 overflow-x-auto pb-3 -mx-4 px-4 sm:-mx-6 sm:px-6 md:-mx-8 md:px-8 snap-x snap-mandatory scrollbar-hide"
       >
@@ -54,7 +70,7 @@
     </section>
 
     <!-- Trending Hashtags -->
-    <section class="mb-6 sm:mb-8 animate-fade-in-up delay-2">
+    <section class="mb-6 sm:mb-8 animate-fade-in-up delay-3">
       <div class="flex items-center gap-2 mb-3 sm:mb-4">
         <FontAwesomeIcon :icon="faArrowTrendUp" class="h-4 w-4 text-sidebar-active" />
         <h2 class="text-[13px] sm:text-[14px] font-bold text-slate-800 m-0">Trending</h2>
@@ -77,7 +93,7 @@
     </section>
 
     <!-- Filter Tabs -->
-    <section class="mb-6 sm:mb-8 animate-fade-in-up delay-3">
+    <section class="mb-6 sm:mb-8 animate-fade-in-up delay-4">
       <div class="flex gap-2 sm:gap-3">
         <button
           v-for="tab in communityStore.filterTabs"
@@ -96,48 +112,47 @@
     </section>
 
     <!-- Posts Feed -->
-    <section class="animate-fade-in-up delay-4">
-      <div v-if="communityStore.filteredPosts.length > 0" class="space-y-4 sm:space-y-6">
-        <div v-for="(post, i) in communityStore.filteredPosts" :key="post.id">
-          <CommunityPostCard
-            :post="post"
-            :expanded="activeCommentPostId === post.id"
+    <section class="animate-fade-in-up delay-5">
+      <div v-if="communityStore.feedbackMessage" :class="[
+        'mb-4 rounded-xl border px-4 py-3 text-[13px] font-medium',
+        feedbackClass
+      ]">
+        {{ communityStore.feedbackMessage }}
+      </div>
+
+      <div v-if="communityStore.isLoading" class="flex flex-col items-center justify-center py-12 text-center">
+        <p class="m-0 text-[14px] font-semibold text-slate-600">Loading posts...</p>
+      </div>
+
+      <div v-else-if="communityStore.filteredPosts.length > 0" class="space-y-4 sm:space-y-6">
+        <div v-for="(post, i) in communityStore.filteredPosts" :id="`community-post-${post.id}`" :key="post.id">
+          <CommunityPostCard :post="post" :expanded="activeCommentPostId === post.id"
             :comment-draft="activeCommentPostId === post.id ? commentDraft : ''"
-            @like="communityStore.toggleLike(post.id)"
-            @bookmark="communityStore.toggleBookmark(post.id)"
-            @share="emit('share-post', post)"
-            @comment="emit('toggle-comments', post)"
-            @update:comment-draft="emit('update:new-comment', $event)"
-            @submit-comment="emit('submit-comment')"
-            :style="{ animationDelay: `${0.1 + i * 0.05}s` }"
-            class="animate-fade-in-up"
-          />
+            :can-delete="post.userId === communityStore.currentUserId"
+            :search-query="communityStore.normalizedSearchQuery"
+            :current-user-initials="currentUserInitials"
+            :current-user-avatar-url="currentUserAvatarUrl"
+            @like="communityStore.toggleLike(post.postId)" @bookmark="communityStore.toggleBookmark(post.postId)"
+            @share="emit('share-post', post)" @comment="emit('toggle-comments', post)"
+            @delete="emit('request-delete', post)"
+            @update-privacy="communityStore.updatePostVisibility(post.postId, $event)"
+            @update:comment-draft="emit('update:new-comment', $event)" @submit-comment="emit('submit-comment')"
+            :style="{ animationDelay: `${0.1 + i * 0.05}s` }" class="animate-fade-in-up" />
         </div>
       </div>
 
       <!-- Empty State -->
-      <div
-        v-else
-        class="flex flex-col items-center justify-center py-12 text-center animate-fade-in"
-      >
-        <div
-          class="w-16 h-16 rounded-2xl bg-cream-dark flex items-center justify-center text-3xl mb-4"
-        >
-          📝
-        </div>
-        <p class="text-[14px] font-semibold text-slate-600 m-0 mb-1">No posts yet</p>
-        <p class="text-[12px] text-slate-400 m-0">
-          Be the first to share your Cambodia experience!
-        </p>
+      <div v-else class="flex flex-col items-center justify-center py-12 text-center animate-fade-in">
+        <div class="w-16 h-16 rounded-2xl bg-cream-dark flex items-center justify-center text-3xl mb-4">📝</div>
+        <p class="text-[14px] font-semibold text-slate-600 m-0 mb-1">{{ emptyStateTitle }}</p>
+        <p class="text-[12px] text-slate-400 m-0">{{ emptyStateMessage }}</p>
       </div>
     </section>
 
     <!-- Share CTA -->
-    <section class="mt-8 sm:mt-12 mb-8 sm:mb-12 animate-fade-in-up delay-5">
-      <button
-        @click="emit('create-post')"
-        class="w-full py-4 px-5 rounded-2xl border-2 border-dashed border-sidebar-active text-sidebar-active font-semibold text-[13px] sm:text-[14px] cursor-pointer hover:bg-sidebar-active hover:text-white transition-all duration-200 flex items-center justify-center gap-2"
-      >
+    <section class="mt-8 sm:mt-12 mb-8 sm:mb-12 animate-fade-in-up delay-6">
+      <button @click="emit('create-post')"
+        class="w-full py-4 px-5 rounded-2xl border-2 border-dashed border-sidebar-active text-sidebar-active font-semibold text-[13px] sm:text-[14px] cursor-pointer hover:bg-sidebar-active hover:text-white transition-all duration-200 flex items-center justify-center gap-2">
         <FontAwesomeIcon :icon="faCamera" class="h-4 w-4" />
         Share Your Cambodia Experience
       </button>
@@ -146,9 +161,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, nextTick, onMounted } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faArrowTrendUp, faCamera, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faArrowTrendUp, faCamera, faMagnifyingGlass, faPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useCommunityStore } from '../store/community'
 import CommunityPostCard from '../components/CommunityPostCard.vue'
 import type { Post } from '../store/community'
@@ -160,15 +175,70 @@ const props = defineProps<{
   newComment: string
 }>()
 
+const currentUserInitials = computed(() => {
+  if (!communityStore.currentUserProfile) return 'YO'
+  const profile = communityStore.currentUserProfile
+  const first = profile.first_name?.[0] || ''
+  const last = profile.last_name?.[0] || ''
+  const initial = `${first}${last}`.toUpperCase()
+  return initial || profile.email?.[0]?.toUpperCase() || 'YO'
+})
+
+const currentUserAvatarUrl = computed(() => {
+  return communityStore.currentUserProfile?.avatar_url || null
+})
+
 const emit = defineEmits<{
   'create-post': []
   'share-post': [post: Post]
   'toggle-comments': [post: Post]
+  'request-delete': [post: Post]
   'update:new-comment': [value: string]
   'submit-comment': []
 }>()
 
 const commentDraft = computed(() => props.newComment)
+const emptyStateTitle = computed(() =>
+  communityStore.normalizedSearchQuery ? 'No matching posts' : 'No posts yet',
+)
+const emptyStateMessage = computed(() =>
+  communityStore.normalizedSearchQuery
+    ? 'Try a different search term or clear the search.'
+    : 'Be the first to share your Cambodia experience!',
+)
+const feedbackClass = computed(() => {
+  const classes = {
+    success: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+    info: 'border-sky-200 bg-sky-50 text-sky-700',
+    warning: 'border-amber-200 bg-amber-50 text-amber-800',
+    error: 'border-red-200 bg-red-50 text-red-700',
+  }
+
+  return classes[communityStore.feedbackType]
+})
+
+const scrollToSharedPost = async () => {
+  const postIdFromQuery = new URLSearchParams(window.location.search).get('post')
+  const postIdFromHash = window.location.hash.startsWith('#community-post-')
+    ? window.location.hash.replace('#community-post-', '')
+    : ''
+  const postId = postIdFromQuery || postIdFromHash
+
+  if (!postId) {
+    return
+  }
+
+  await nextTick()
+  document.getElementById(`community-post-${postId}`)?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start',
+  })
+}
+
+onMounted(async () => {
+  await communityStore.loadCommunity()
+  await scrollToSharedPost()
+})
 </script>
 
 <style scoped>

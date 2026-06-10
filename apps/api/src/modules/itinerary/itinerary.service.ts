@@ -21,7 +21,10 @@ export class ItineraryService {
       name,
       cover_image_url,
       province,
-      category
+      location_name,
+      category,
+      latitude,
+      longitude
     )
   `
 

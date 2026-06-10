@@ -87,7 +87,7 @@
         v-for="item in bottomItems"
         :key="item.label"
         href="#"
-        @click.prevent
+        @click.prevent="handleBottomItemClick(item)"
         :class="[
           'group flex items-center gap-3.5 py-2.5 rounded-xl no-underline font-medium text-[14px] transition-all duration-200 text-white/65 hover:bg-sidebar-hover hover:text-white/90',
           isOpen || isMobile ? 'px-3.5' : 'px-0 justify-center',
@@ -143,10 +143,12 @@
 <script setup lang="ts">
 import { ref, h, type FunctionalComponent, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useCommunityStore } from '@/modules/community/store/community'
 
 const props = defineProps<{ mobileOpen: boolean }>()
 const emit = defineEmits<{ 'close-mobile': [] }>()
 const router = useRouter()
+const communityStore = useCommunityStore()
 
 const isOpen = ref(true)
 
@@ -155,6 +157,13 @@ const isMobile = computed(() => props.mobileOpen)
 function navigate(to: string) {
   router.push(to)
   emit('close-mobile')
+}
+
+function handleBottomItemClick(item: { label: string }) {
+  if (item.label === 'Create Post') {
+    router.push('/community')
+    communityStore.showCreatePostModal = true
+  }
 }
 
 const DashboardIcon: FunctionalComponent = () =>
@@ -193,22 +202,6 @@ const ExploreIcon: FunctionalComponent = () =>
       h('circle', { cx: '12', cy: '12', r: '10' }),
       h('polygon', { points: '16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76' }),
     ],
-  )
-
-const RouteIntelIcon: FunctionalComponent = () =>
-  h(
-    'svg',
-    {
-      xmlns: 'http://www.w3.org/2000/svg',
-      viewBox: '0 0 24 24',
-      fill: 'none',
-      stroke: 'currentColor',
-      'stroke-width': '2',
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      class: 'w-[18px] h-[18px]',
-    },
-    [h('polygon', { points: '3 11 22 2 13 21 11 13 3 11' })],
   )
 
 const SocialIcon: FunctionalComponent = () =>
@@ -309,6 +302,7 @@ const navItems = [
   { to: '/explore', label: 'Explore', icon: ExploreIcon },
   { to: '/trips', label: 'My Trips', icon: SavedIcon },
   { to: '/social', label: 'Social Travel', icon: SocialIcon },
+  { to: '/route-intel', label: 'Route Intel', icon: ExploreIcon },
   { to: '/community', label: 'Community', icon: CommunityIcon },
   { to: '/profile', label: 'Profile', icon: ProfileIcon },
 ]

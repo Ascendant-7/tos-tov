@@ -10,6 +10,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module'
 import { ItineraryModule } from './modules/itinerary/itinerary.module'
 import { BudgetModule } from './modules/budget/budget.module'
 import { ProfilesModule } from './modules/profiles/profiles.module'
+import { CommunityModule } from './modules/community/community.module'
 import { WeatherModule } from './modules/weather/weather.module'
 import { FavoritesModule } from './modules/favorites/favorites.module'
 
@@ -27,6 +28,7 @@ import { FavoritesModule } from './modules/favorites/favorites.module'
     ReviewsModule,
     ItineraryModule,
     ProfilesModule,
+    CommunityModule,
     WeatherModule,
     FavoritesModule,
   ],
