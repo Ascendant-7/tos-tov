@@ -1,4 +1,4 @@
-import { SupabaseModule } from '@/supabase/supabase.module'
+import { SupabaseModule } from '@/common/supabase/supabase.module'
 import { FriendService } from './friends.service'
 import { Module } from '@nestjs/common'
 import { FriendController } from './friends.controller'

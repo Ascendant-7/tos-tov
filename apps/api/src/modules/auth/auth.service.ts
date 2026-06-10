@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common'
-import { SupabaseService } from '../../supabase/supabase.service'
+import { SupabaseService } from '../../common/supabase/supabase.service'
 import type { Database, SupabaseClient, AuthResponse } from '@repo/supabase'
 
 @Injectable()

@@ -2,8 +2,8 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import maplibregl, { type GeoJSONSource, type LngLatBoundsLike, type Map } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { getMultiStopRoute } from '@/services/openRouteService'
-import type { DayRouteStats, MapDestination, RouteSummary, TravelProfile } from '@/types/maps'
+import { getMultiStopRoute } from '@/modules/map/services/openRouteService'
+import type { DayRouteStats, MapDestination, RouteSummary, TravelProfile } from '@/modules/map/types/maps'
 import {
   calculateDayRouteStats,
   optimizeRouteOrder,

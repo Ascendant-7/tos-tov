@@ -1,4 +1,4 @@
-import type { RouteLeg, RouteSummary, TravelProfile } from '@/types/maps'
+import type { RouteLeg, RouteSummary, TravelProfile } from '@/modules/map/types/maps'
 
 interface OpenRouteServiceFeature {
   geometry?: GeoJSON.LineString

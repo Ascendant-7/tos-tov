@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common'
 import { randomUUID } from 'crypto'
 import 'multer'
-import { SupabaseService } from '../../supabase/supabase.service'
+import { SupabaseService } from '../../common/supabase/supabase.service'
 import { CreateCommentDto } from './dto/create-comment.dto'
 import { CreatePostDto } from './dto/create-post.dto'
 import { UpdatePostDto } from './dto/update-post.dto'
