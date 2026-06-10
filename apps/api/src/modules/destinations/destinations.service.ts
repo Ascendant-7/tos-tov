@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common'
-import { SupabaseService } from '../../common/supabase/supabase.service'
+import { SupabaseService } from '../../supabase/supabase.service'
 import { CreateDestinationDto } from './dto/create-destination.dto'
 import { UpdateDestinationDto } from './dto/update-destination.dto'
 

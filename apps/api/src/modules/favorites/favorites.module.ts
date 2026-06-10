@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { SupabaseModule } from '../../common/supabase/supabase.module'
+import { SupabaseModule } from '../../supabase/supabase.module'
 import { FavoritesController } from './favorites.controller'
 import { FavoritesService } from './favorites.service'
 

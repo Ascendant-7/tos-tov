@@ -8,7 +8,7 @@ import { UpdateTripDto } from './dto/update-trip.dto'
 import { UpdateItineraryItemDto } from './dto/update-itinerary-item.dto'
 import { ItineraryService } from './itinerary.service'
 import { AuthGuard } from '../../common/guards/auth.guard'
-import { SupabaseService } from '../../common/supabase/supabase.service'
+import { SupabaseService } from '../../supabase/supabase.service'
 
 interface AuthenticatedRequest extends Request {
   user: User

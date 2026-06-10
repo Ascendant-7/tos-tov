@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common'
-import { SupabaseService } from '../../common/supabase/supabase.service'
+import { SupabaseService } from '../../supabase/supabase.service'
 
 @Injectable()
 export class FavoritesService {

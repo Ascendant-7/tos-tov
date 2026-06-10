@@ -2,9 +2,9 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import maplibregl, { type GeoJSONSource, type LngLatBoundsLike, type Map } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { getMultiStopRoute } from '@/modules/map/services/openRouteService'
-import type { MapDestination, RouteSummary, TravelProfile } from '@/modules/map/types/maps'
-import { useUserLocation } from '@/modules/map/composables/useUserLocation'
+import { getMultiStopRoute } from '@/services/openRouteService'
+import type { MapDestination, RouteSummary, TravelProfile } from '@/types/maps'
+import { useUserLocation } from '@/composables/useUserLocation'
 
 const props = withDefaults(
   defineProps<{
@@ -80,25 +80,25 @@ const mapStyle: maplibregl.StyleSpecification = {
 }
 
 
-// const logMapDiagnostics = (eventName: string, event?: Record<string, unknown>) => {
-//   if (!map) return
+const logMapDiagnostics = (eventName: string, event?: Record<string, unknown>) => {
+  if (!map) return
 
-//   const style = map.getStyle()
-//   const layerSummary = (style.layers ?? []).map((layer) => ({
-//     id: layer.id,
-//     type: layer.type,
-//     source: 'source' in layer ? layer.source : undefined,
-//   }))
+  const style = map.getStyle()
+  const layerSummary = (style.layers ?? []).map((layer) => ({
+    id: layer.id,
+    type: layer.type,
+    source: 'source' in layer ? layer.source : undefined,
+  }))
 
-//   console.log(`[MapView] ${eventName}`, {
-//     event,
-//     isStyleLoaded: map.isStyleLoaded(),
-//     hasOsmSource: Boolean(map.getSource('osm')),
-//     style,
-//     layerSummary,
-//     backgroundLayers: layerSummary.filter((layer) => layer.type === 'background'),
-//   })
-// }
+  console.log(`[MapView] ${eventName}`, {
+    event,
+    isStyleLoaded: map.isStyleLoaded(),
+    hasOsmSource: Boolean(map.getSource('osm')),
+    style,
+    layerSummary,
+    backgroundLayers: layerSummary.filter((layer) => layer.type === 'background'),
+  })
+}
 
 
 const categoryColors: Record<string, string> = {
@@ -160,43 +160,42 @@ const initializeMap = async () => {
   map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left')
 
   map.on('load', () => {
-    // logMapDiagnostics('load')
+    logMapDiagnostics('load')
     ensureDestinationLayers()
     ensureRouteLayer()
     bindMapEvents()
     refreshMap()
   })
 
-  // map.on('error', (event) => {
-  //   console.error('[MapView] error', event)
-  //   logMapDiagnostics('error', {
-  //     message: 'map error event fired',
-  //   })
-  // })
+  map.on('error', (event) => {
+    console.error('[MapView] error', event)
+    logMapDiagnostics('error', {
+      message: 'map error event fired',
+    })
+  })
 
-  // map.on('styledata', (event) => {
-  //   logMapDiagnostics('styledata', {
-  //     styleType: event.dataType,
-  //   })
-  // })
+  map.on('styledata', (event) => {
+    logMapDiagnostics('styledata', {
+      styleType: event.dataType,
+    })
+  })
 
-//   map.on('sourcedata', (event) => {
-//     console.log('[MapView] sourcedata', {
-//       sourceId: event.sourceId,
-//       sourceDataType: event.sourceDataType,
-//       isSourceLoaded: event.isSourceLoaded,
-//       sourceExists: event.sourceId ? Boolean(map?.getSource(event.sourceId)) : false,
-//     })
+  map.on('sourcedata', (event) => {
+    console.log('[MapView] sourcedata', {
+      sourceId: event.sourceId,
+      sourceDataType: event.sourceDataType,
+      isSourceLoaded: event.isSourceLoaded,
+      sourceExists: event.sourceId ? Boolean(map?.getSource(event.sourceId)) : false,
+    })
 
-//     if (event.sourceId === 'osm') {
-//       logMapDiagnostics('osm sourcedata', {
-//         sourceId: event.sourceId,
-//         isSourceLoaded: event.isSourceLoaded,
-//         sourceDataType: event.sourceDataType,
-//       })
-//     }
-//   })
-// }
+    if (event.sourceId === 'osm') {
+      logMapDiagnostics('osm sourcedata', {
+        sourceId: event.sourceId,
+        isSourceLoaded: event.isSourceLoaded,
+        sourceDataType: event.sourceDataType,
+      })
+    }
+  })
 }
 
 const ensureDestinationLayers = () => {

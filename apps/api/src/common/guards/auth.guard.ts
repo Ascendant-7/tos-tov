@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
 import { User } from '@repo/supabase'
 import { Request } from 'express'
-import { SupabaseService } from '../supabase/supabase.service'
+import { SupabaseService } from '../../supabase/supabase.service'
 
 interface AuthenticatedRequest extends Request {
   user: User

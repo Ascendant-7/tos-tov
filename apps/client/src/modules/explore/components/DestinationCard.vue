@@ -126,7 +126,7 @@
     </div>
 
     <!-- Details Section -->
-    <div class="bg-white p-4 flex-1 flex flex-col justify-center">
+    <div class="bg-white p-4">
       <p class="text-[12px] sm:text-[13px] text-slate-500 m-0 mb-3 leading-relaxed line-clamp-2">
         {{ destination.description }}
       </p>
