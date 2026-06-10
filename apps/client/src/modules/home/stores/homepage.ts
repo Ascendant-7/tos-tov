@@ -11,19 +11,6 @@ export const useHomepageStore = defineStore('homepage', () => {
   const activeTab = ref('All')
   const tabs = ref(['All', 'Beach', 'Temple', 'Nature', 'City', 'Adventure'])
 
-  // --- Weather ---
-  // const weatherData = ref([
-  //   { city: 'Siem Reap', temp: 32, condition: 'Sunny', icon: '☀️', bgClass: 'bg-amber-50' },
-  //   {
-  //     city: 'Phnom Penh',
-  //     temp: 31,
-  //     condition: 'Partly Cloudy',
-  //     icon: '⛅',
-  //     bgClass: 'bg-slate-50',
-  //   },
-  //   { city: 'Koh Rong', temp: 29, condition: 'Humid', icon: '🌊', bgClass: 'bg-blue-50' },
-  //   { city: 'Kampot', temp: 28, condition: 'Breezy', icon: '🍃', bgClass: 'bg-green-50' },
-  // ])
   interface WeatherCard {
     city: string
     temp: number
@@ -32,7 +19,18 @@ export const useHomepageStore = defineStore('homepage', () => {
     bgClass: string
   }
 
-  const weatherData = ref<WeatherCard[]>([])
+  const weatherData = ref<WeatherCard[]>([
+    { city: 'Siem Reap', temp: 32, condition: 'Sunny', icon: '☀️', bgClass: 'bg-amber-50' },
+    {
+      city: 'Phnom Penh',
+      temp: 31,
+      condition: 'Partly Cloudy',
+      icon: '⛅',
+      bgClass: 'bg-slate-50',
+    },
+    { city: 'Koh Rong', temp: 29, condition: 'Humid', icon: '🌊', bgClass: 'bg-blue-50' },
+    { city: 'Kampot', temp: 28, condition: 'Breezy', icon: '🍃', bgClass: 'bg-green-50' },
+  ])
 
   async function loadWeather() {
     try {
@@ -97,22 +95,12 @@ export const useHomepageStore = defineStore('homepage', () => {
   )
 
   const filteredDestinations = computed(() => {
-    const q = searchQuery.value.toLowerCase().trim()
     let results = destinations.value
     if (activeTab.value !== 'All') {
       results = results.filter(
         (d) =>
           d.category === activeTab.value ||
           (d.tags ?? []).some((t) => t.toLowerCase() === activeTab.value.toLowerCase()),
-      )
-    }
-    if (q) {
-      results = results.filter(
-        (d) =>
-          d.name.toLowerCase().includes(q) ||
-          (d.location_name ?? '').toLowerCase().includes(q) ||
-          d.province.toLowerCase().includes(q) ||
-          (d.tags ?? []).some((t) => t.toLowerCase().includes(q)),
       )
     }
     return results
@@ -130,46 +118,12 @@ export const useHomepageStore = defineStore('homepage', () => {
   ])
 
   // --- Hidden Gems ---
-  const hiddenGems = ref([
-    {
-      name: 'Koh Kong',
-      province: 'Koh Kong',
-      description:
-        "Cambodia's eco-adventure capital, Koh Kong boasts pristine rainforests, waterfalls, and mangrove estuaries teeming with wildlife.",
-      image: 'https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=300&q=75',
-    },
-    {
-      name: 'Kampot',
-      province: 'Kampot',
-      description:
-        'Charming riverside town famous for Kampot pepper, French colonial architecture, and tranquil sunset cruises.',
-      image: 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=300&q=75',
-    },
-    {
-      name: 'Banlung',
-      province: 'Ratanakiri',
-      description:
-        "Gateway to volcanic crater lakes, indigenous villages, and lush jungle treks in Cambodia's wild northeast.",
-      image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=300&q=75',
-    },
-    {
-      name: 'Kep',
-      province: 'Kep',
-      description:
-        'A sleepy seaside town known for its famous crab market, abandoned French villas, and views of Rabbit Island.',
-      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&q=75',
-    },
-  ])
+  const hiddenGems = computed(() => {
+    return exploreStore.destinations.filter(d => d.is_hidden_gem)
+  })
 
   const filteredHiddenGems = computed(() => {
-    const q = searchQuery.value.toLowerCase().trim()
-    if (!q) return hiddenGems.value
-    return hiddenGems.value.filter(
-      (g) =>
-        g.name.toLowerCase().includes(q) ||
-        g.province.toLowerCase().includes(q) ||
-        g.description.toLowerCase().includes(q),
-    )
+    return hiddenGems.value
   })
 
   // --- Upcoming Events ---
@@ -204,14 +158,7 @@ export const useHomepageStore = defineStore('homepage', () => {
   ])
 
   const filteredUpcomingEvents = computed(() => {
-    const q = searchQuery.value.toLowerCase().trim()
-    if (!q) return upcomingEvents.value
-    return upcomingEvents.value.filter(
-      (e) =>
-        e.title.toLowerCase().includes(q) ||
-        e.location.toLowerCase().includes(q) ||
-        e.description.toLowerCase().includes(q),
-    )
+    return upcomingEvents.value
   })
 
   // --- Travel Tips ---
@@ -261,11 +208,7 @@ export const useHomepageStore = defineStore('homepage', () => {
   ])
 
   const filteredTravelTips = computed(() => {
-    const q = searchQuery.value.toLowerCase().trim()
-    if (!q) return travelTips.value
-    return travelTips.value.filter(
-      (t) => t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q),
-    )
+    return travelTips.value
   })
 
   return {

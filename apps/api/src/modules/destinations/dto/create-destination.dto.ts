@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsInt, IsNumber } from 'class-validator'
+import { IsString, IsOptional, IsInt, IsBoolean } from 'class-validator'
 
 export class CreateDestinationDto {
   @IsString()
@@ -45,4 +45,8 @@ export class CreateDestinationDto {
   @IsOptional()
   @IsInt()
   budget_max?: number
+
+  @IsOptional()
+  @IsBoolean()
+  is_hidden_gem?: boolean
 }
