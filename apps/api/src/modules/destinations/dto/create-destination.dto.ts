@@ -1,15 +1,15 @@
-import { IsString, IsOptional, IsInt, IsBoolean } from 'class-validator'
+import { IsString, IsOptional, IsInt, IsBoolean, IsNumber } from 'class-validator'
 
 export class CreateDestinationDto {
   @IsString()
-  name: string
+  name!: string
 
   @IsOptional()
   @IsString()
   description?: string
 
   @IsString()
-  province: string
+  province!: string
 
   @IsOptional()
   @IsString()
@@ -24,7 +24,7 @@ export class CreateDestinationDto {
   longitude?: number
 
   @IsString()
-  category: string
+  category!: string
 
   @IsOptional()
   @IsString()

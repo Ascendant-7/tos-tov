@@ -118,6 +118,7 @@
 import { ref, h, type FunctionalComponent, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import logoImg from '/images/Logo8.png'
+import { useCommunityStore } from '@/modules/community/store/community';
 
 const props = defineProps<{ mobileOpen: boolean }>()
 const emit = defineEmits<{ 'close-mobile': [] }>()
