@@ -7,6 +7,10 @@ import { useItineraryStore } from '../stores/itineraryStore'
 import DayColumn from '../components/DayColumn.vue'
 import type { ItineraryResponse } from '../types/itineraryItem.types'
 
+type DestinationLite = {
+  id: string
+}
+
 const route = useRoute()
 const router = useRouter()
 const itineraryStore = useItineraryStore()
@@ -42,7 +46,7 @@ const addDestinationFromQuery = async () => {
 
   try {
     const destinations = await getDestinations()
-    const destination = destinations.find((item: any) => item.id === destinationId)
+    const destination = destinations.find((item: DestinationLite) => item.id === destinationId)
 
     if (!destination) {
       throw new Error('Destination was not found.')
@@ -116,6 +120,15 @@ const toggleEditPlan = () => {
       </div>
 
       <div class="flex items-center gap-2">
+
+        <button
+          type="button"
+          class="rounded-full bg-green-600 px-4 py-2 text-sm font-semibold text-white transition duration-200 hover:bg-green-700"
+          @click="router.push({ name: 'budget', query: { tripId } })"
+        >
+          Budget
+        </button>
+
         <button
           v-if="!isEditingPlan"
           type="button"
