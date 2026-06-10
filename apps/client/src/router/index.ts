@@ -59,7 +59,7 @@ const router = createRouter({
     {
       path: '/route-intel',
       name: 'route-intel',
-      component: () => import('../core/pages/RoutesPage.vue'),
+      component: () => import('../modules/map/pages/RoutesPage.vue'),
       meta: { showLayout: true, requiresAuth: true },
     },
     {
