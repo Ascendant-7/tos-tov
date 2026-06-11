@@ -1,3 +1,5 @@
+import type { LineString } from 'geojson'
+
 export type TravelProfile = 'driving-car' | 'foot-walking' | 'cycling-regular'
 
 export interface MapDestination {
@@ -14,7 +16,7 @@ export interface RouteLeg {
 }
 
 export interface RouteSummary {
-  geometry: GeoJSON.LineString
+  geometry: LineString
   distance: number
   duration: number
   legs: RouteLeg[]

@@ -30,6 +30,7 @@ function mapDestination(raw: DestinationApiResponse): ExploreDestination {
     rating: raw.rating,
     badge: raw.badge,
     tags: raw.tags ?? [],
+    is_hidden_gem: raw.is_hidden_gem
   }
 }
 

@@ -8,6 +8,7 @@ import {
   calculateDayRouteStats,
   optimizeRouteOrder,
 } from '@/modules/itinerary/services/routePlanner.service'
+import type { LineString } from 'geojson'
 
 const props = withDefaults(
   defineProps<{
@@ -168,7 +169,7 @@ const fitToRoute = () => {
   map.fitBounds(bounds as LngLatBoundsLike, { padding: 64, maxZoom: 14 })
 }
 
-const setRouteGeometry = (geometry: GeoJSON.LineString | null) => {
+const setRouteGeometry = (geometry: LineString | null) => {
   const source = map?.getSource('day-route') as GeoJSONSource | undefined
   source?.setData({
     type: 'Feature',

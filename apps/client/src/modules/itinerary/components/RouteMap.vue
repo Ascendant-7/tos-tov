@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import maplibregl, { type GeoJSONSource, type LngLatBoundsLike, type Map } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import type { LineString } from 'geojson'
 
 export interface RouteMapStop {
   id: string
@@ -16,7 +17,7 @@ interface RouteLeg {
 
 interface OrsRouteResponse {
   features?: Array<{
-    geometry: GeoJSON.LineString
+    geometry: LineString
     properties?: {
       summary?: {
         distance?: number
@@ -145,7 +146,7 @@ const fitToStops = () => {
   map.fitBounds(bounds as LngLatBoundsLike, { padding: 70, maxZoom: 13 })
 }
 
-const setRouteGeometry = (geometry: GeoJSON.LineString | null) => {
+const setRouteGeometry = (geometry: LineString | null) => {
   if (!map) return
 
   const source = map.getSource('day-route') as GeoJSONSource | undefined
