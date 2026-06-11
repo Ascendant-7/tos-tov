@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import maplibregl, { type GeoJSONSource, type LngLatBoundsLike, type Map } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import type { LineString } from 'geojson'
 
 type TravelMode = 'driving-car' | 'foot-walking' | 'cycling-regular'
 
@@ -18,7 +19,7 @@ interface RouteLeg {
 
 interface OrsRouteResponse {
   features?: Array<{
-    geometry: GeoJSON.LineString
+    geometry: LineString
     properties?: {
       summary?: {
         distance?: number
@@ -33,7 +34,7 @@ const mapElement = ref<HTMLElement | null>(null)
 const selectedMode = ref<TravelMode>('driving-car')
 const isLoadingRoute = ref(false)
 const errorMessage = ref('')
-const routeGeometry = ref<GeoJSON.LineString | null>(null)
+const routeGeometry = ref<LineString | null>(null)
 const routeDistance = ref(0)
 const routeDuration = ref(0)
 const routeLegs = ref<RouteLeg[]>([])
