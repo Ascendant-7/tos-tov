@@ -185,7 +185,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+// import { useRouter } from 'vue-router'
 
 /**
  * Normalized destination shape used across the Explore UI.
@@ -216,6 +216,7 @@ export interface ExploreDestination {
   rating?: number | string
   badge?: string
   tags?: string[]
+  is_hidden_gem?: boolean
 }
 
 const props = defineProps<{

@@ -2,9 +2,10 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import maplibregl, { type GeoJSONSource, type LngLatBoundsLike, type Map } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { getMultiStopRoute } from '@/services/openRouteService'
-import type { MapDestination, RouteSummary, TravelProfile } from '@/types/maps'
-import { useUserLocation } from '@/composables/useUserLocation'
+import { getMultiStopRoute } from '@/modules/map/services/openRouteService'
+import type { MapDestination, RouteSummary, TravelProfile } from '@/modules/map/types/maps'
+import { useUserLocation } from '@/modules/map/composables/useUserLocation'
+import type { LineString } from 'geojson'
 
 const props = withDefaults(
   defineProps<{
@@ -338,12 +339,12 @@ const updateDestinationSource = () => {
   source?.setData(buildDestinationCollection())
 }
 
-const setRouteGeometry = (geometry: GeoJSON.LineString | null, animated = false) => {
+const setRouteGeometry = (geometry: LineString | null, animated = false) => {
   const source = map?.getSource('trip-route') as GeoJSONSource | undefined
   if (!source) return
 
   cancelAnimationFrame(animationFrameId)
-  const emptyGeometry: GeoJSON.LineString = { type: 'LineString', coordinates: [] }
+  const emptyGeometry: LineString = { type: 'LineString', coordinates: [] }
 
   if (!geometry || !animated) {
     source.setData({ type: 'Feature', properties: {}, geometry: geometry || emptyGeometry })
@@ -389,7 +390,7 @@ const fitToCoordinates = (coordinates: [number, number][], maxZoom = 13) => {
   map.fitBounds(bounds as LngLatBoundsLike, { padding: 72, maxZoom })
 }
 
-const fitToRoute = (geometry: GeoJSON.LineString) => {
+const fitToRoute = (geometry: LineString) => {
   fitToCoordinates(geometry.coordinates as [number, number][], 14)
 }
 
