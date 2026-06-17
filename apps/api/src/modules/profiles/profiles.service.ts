@@ -29,11 +29,9 @@ export class ProfilesService {
 
     const { data, error } = await this.supabaseService.adminClient
       .from('profiles')
-      // NOTE: Supabase generated types may not include newly added columns (avatar_url/bio)
-      // until `pnpm -F @repo/supabase gen-types` is run.
       .update(payload as any)
       .eq('id', id)
-      .select('*')
+      .select('id, first_name, last_name, avatar_url, bio, created_at')
       .single()
 
     if (error) {
@@ -51,16 +49,13 @@ export class ProfilesService {
   async getById(id: string) {
     const { data, error } = await this.supabaseService.adminClient
       .from('profiles')
-      .select('*')
+      .select('id, first_name, last_name, avatar_url, bio, created_at')
       .eq('id', id)
       .single()
-
-    console.log(`[ProfilesService] Initial fetch for id ${id}`, { data, error })
 
     if (error && error.code === 'PGRST116') {
       console.log(`[ProfilesService] Profile not found for ${id}, attempting auto-creation`)
 
-      // Profile missing, try to create it from Auth data
       const { data: authData, error: authError } =
         await this.supabaseService.adminClient.auth.admin.getUserById(id)
 
@@ -85,8 +80,6 @@ export class ProfilesService {
             ? metadata.lastName
             : undefined
 
-      console.log(`[ProfilesService] Creating profile for ${email} with metadata:`, metadata)
-
       const { data: newProfile, error: createError } = await this.supabaseService.adminClient
         .from('profiles')
         .insert({
@@ -95,7 +88,7 @@ export class ProfilesService {
           first_name: metaFirstName || (email ? email.split('@')[0] : 'Traveler'),
           last_name: metaLastName || '',
         })
-        .select()
+        .select('id, first_name, last_name, avatar_url, bio, created_at')
         .single()
 
       if (createError) {
@@ -105,7 +98,6 @@ export class ProfilesService {
         )
       }
 
-      console.log(`[ProfilesService] Successfully auto-created profile for ${id}`)
       return newProfile
     }
 
@@ -114,13 +106,11 @@ export class ProfilesService {
       throw new InternalServerErrorException(error.message)
     }
 
-    // Backfill: if profile exists but has placeholder/missing fields, try to update from Auth metadata.
     if (data) {
       const firstNameMissing = !data.first_name || data.first_name === 'Traveler'
       const lastNameMissing = data.last_name == null
-      const emailMissing = !data.email
 
-      if (firstNameMissing || lastNameMissing || emailMissing) {
+      if (firstNameMissing || lastNameMissing) {
         const { data: authData, error: authError } =
           await this.supabaseService.adminClient.auth.admin.getUserById(id)
 
@@ -147,12 +137,9 @@ export class ProfilesService {
           const desiredFirstName =
             metaFirstName || existingFirstName || (email ? email.split('@')[0] : 'Traveler')
           const desiredLastName = metaLastName || data.last_name || ''
-          const desiredEmail = email || data.email || ''
 
           const shouldUpdate =
-            desiredFirstName !== data.first_name ||
-            desiredLastName !== data.last_name ||
-            desiredEmail !== data.email
+            desiredFirstName !== data.first_name || desiredLastName !== data.last_name
 
           if (shouldUpdate) {
             const { data: updated, error: updateError } = await this.supabaseService.adminClient
@@ -160,10 +147,9 @@ export class ProfilesService {
               .update({
                 first_name: desiredFirstName,
                 last_name: desiredLastName,
-                email: desiredEmail,
               })
               .eq('id', id)
-              .select('*')
+              .select('id, first_name, last_name, avatar_url, bio, created_at')
               .single()
 
             if (!updateError && updated) return updated
@@ -176,7 +162,6 @@ export class ProfilesService {
   }
 
   async getStats(userId: string) {
-    // 1. Get all trips for the user
     const { data: trips, error: tripsError } = await this.supabaseService.adminClient
       .from('trips')
       .select('id')
@@ -197,7 +182,6 @@ export class ProfilesService {
 
     const tripIds = trips.map((t) => t.id)
 
-    // 2. Get all itinerary days for these trips
     const { data: days, error: daysError } = await this.supabaseService.adminClient
       .from('itinerary_days')
       .select('id')
@@ -218,7 +202,6 @@ export class ProfilesService {
 
     const dayIds = days.map((d) => d.id)
 
-    // 3. Get all itinerary items for these days that have a destination
     const { data: items, error: itemsError } = await this.supabaseService.adminClient
       .from('itinerary_items')
       .select('destination_id')
@@ -231,14 +214,14 @@ export class ProfilesService {
 
     const uniqueDestinations = new Set(items?.map((i) => i.destination_id) || [])
 
-    // For now, countries count and distance are hardcoded or 0 as we don't have country/coord data yet
     return {
       tripsCount: trips.length,
       placesCount: uniqueDestinations.size,
-      countriesCount: 0, // Need country data in destinations table
+      countriesCount: 0,
       distanceKm: 0,
     }
-  } // Need coordinates data
+  }
+
   async search(query: string) {
     if (!query || !query.trim()) {
       return []
@@ -248,8 +231,8 @@ export class ProfilesService {
       const pattern = `%${query.trim()}%`
       const { data, error } = await this.supabaseService.anonClient
         .from('profiles')
-        .select('id, first_name, last_name, email')
-        .or(`first_name.ilike.${pattern},last_name.ilike.${pattern},email.ilike.${pattern}`)
+        .select('id, first_name, last_name, avatar_url')
+        .or(`first_name.ilike.${pattern},last_name.ilike.${pattern}`)
         .limit(10)
 
       if (error) {
