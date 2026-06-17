@@ -1,4 +1,4 @@
-import type { RouteSummary, TripStats } from '@/types/maps'
+import type { RouteSummary, TripStats } from '@/modules/map/types/maps'
 
 export function calculateTripStats(route: Pick<RouteSummary, 'distance' | 'duration'>): TripStats {
   return {
