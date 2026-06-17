@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import MapView from './MapView.vue'
-import { calculateTripStats } from '@/utils/tripStats'
-import type { MapDestination, RouteSummary, TripStats, TravelProfile } from '@/types/maps'
+import { calculateTripStats } from '@/modules/map/utils/tripStats'
+import type { MapDestination, RouteSummary, TripStats, TravelProfile } from '@/modules/map/types/maps'
 
 const props = withDefaults(
   defineProps<{

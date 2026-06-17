@@ -36,6 +36,7 @@ export interface DestinationApiResponse {
   rating?: number | string
   badge?: string
   tags?: string[]
+  is_hidden_gem: boolean
 }
 
 /**
