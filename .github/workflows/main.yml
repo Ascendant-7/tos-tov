@@ -1,0 +1,12 @@
+name: Auto Approve
+on: pull_request
+jobs:
+  approve:
+    runs-on: ubuntu-latest
+    if: github.actor == 'Ascendant-7'
+    steps:
+      - name: Approve
+        run: gh pr review "$PR_URL" --approve
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
