@@ -605,6 +605,31 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Row 8: Hidden Gem -->
+              <div class="field-group field-animate-8">
+                <label class="flex items-center gap-3 cursor-pointer p-4 rounded-xl border-2 border-slate-100 hover:border-sidebar-active/30 bg-slate-50/50 transition-all duration-200">
+                  <div class="relative flex items-center">
+                    <input 
+                      type="checkbox" 
+                      v-model="form.is_hidden_gem"
+                      class="peer sr-only"
+                    />
+                    <div class="w-6 h-6 rounded border-2 border-slate-300 peer-checked:bg-sidebar-active peer-checked:border-sidebar-active transition-all duration-200 flex items-center justify-center">
+                      <svg 
+                        class="w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-200 scale-50 peer-checked:scale-100" 
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+                      >
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="text-[15px] font-semibold text-slate-700">Mark as Hidden Gem</span>
+                    <span class="text-[13px] text-slate-500">Check this if it's a lesser-known destination that's off the beaten path</span>
+                  </div>
+                </label>
+              </div>
             </div>
 
             <!-- Footer -->
@@ -731,6 +756,7 @@ const defaultForm = (): CreateDestinationPayload => ({
   duration_max: undefined,
   budget_min: undefined,
   budget_max: undefined,
+  is_hidden_gem: false,
 })
 
 const form = reactive<CreateDestinationPayload>(defaultForm())

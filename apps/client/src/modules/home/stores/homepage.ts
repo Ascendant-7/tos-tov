@@ -126,7 +126,12 @@ export const useHomepageStore = defineStore('homepage', () => {
       progress: 65,
       image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=75',
     },
-    { title: 'Siem Reap Temple Circuit', duration: '4-day itinerary', progress: 30, image: '' },
+    {
+      title: 'Siem Reap Temple Circuit',
+      duration: '4-day itinerary',
+      progress: 30,
+      image: 'https://images.unsplash.com/photo-1642086598896-7837662c03d0?q=80&w=1092&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+    },
   ])
 
   // --- Hidden Gems ---
