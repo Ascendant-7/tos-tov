@@ -287,7 +287,7 @@ import { computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useExploreStore } from './store/explore'
-import SearchFilterBar from '../@/modules/home/components/SearchFilterBar.vue'
+import SearchFilterBar from '@/modules/home/components/SearchFilterBar.vue'
 import DestinationCard from './components/DestinationCard.vue'
 import AddDestinationModal from './components/AddDestinationModal.vue'
 

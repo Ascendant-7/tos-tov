@@ -457,7 +457,11 @@ export class CommunityService {
     }
   }
 
-  async sharePost(userId: string, postId: string, caption?: string): Promise<DecoratedCommunityPostRow> {
+  async sharePost(
+    userId: string,
+    postId: string,
+    caption?: string,
+  ): Promise<DecoratedCommunityPostRow> {
     const supabase = this.db()
     const originalPost = await this.ensurePostViewable(userId, postId)
 
