@@ -8,33 +8,15 @@
     ]"
   >
     <!-- Logo Section -->
-    <div class="flex items-center gap-3 mb-8 px-2 overflow-hidden animate-fade-in">
-      <div
-        class="w-10 h-10 bg-accent-gold rounded-xl flex items-center justify-center text-white shadow-[0_4px_12px_rgba(200,169,81,0.3)] shrink-0 transition-all duration-300 hover:shadow-[0_4px_16px_rgba(200,169,81,0.45)]"
-        style="animation: pulseGold 3s ease-in-out infinite"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="w-5 h-5"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
-        </svg>
-      </div>
-      <div
+    <div>
+      <img
+        :src="logoImg"
+        alt="តោះទៅ Cambodia!"
         :class="[
-          'transition-all duration-300 overflow-hidden whitespace-nowrap',
-          isOpen || isMobile ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0',
+          'transition-all duration-300',
+          isOpen || isMobile ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0'
         ]"
       >
-        <h1 class="text-[15px] font-bold text-white leading-tight m-0">TosDerLg</h1>
-      </div>
     </div>
 
     <!-- Navigation Menu -->
@@ -143,6 +125,7 @@
 <script setup lang="ts">
 import { ref, h, type FunctionalComponent, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import logoImg from '/images/tos-tov.png'
 import { useCommunityStore } from '@/modules/community/store/community'
 
 const props = defineProps<{ mobileOpen: boolean }>()

@@ -55,6 +55,7 @@ export interface CreateDestinationPayload {
   duration_max?: number
   budget_min?: number
   budget_max?: number
+  is_hidden_gem?: boolean
 }
 
 export async function fetchDestinations(): Promise<DestinationApiResponse[]> {
