@@ -110,7 +110,9 @@
               Remember me
             </label>
 
-            <a href="#" class="text-[#1476a5] font-semibold hover:underline"> Forgot password? </a>
+            <router-link to="/forgot-password" class="text-[#1476a5] font-semibold hover:underline">
+              Forgot password?
+            </router-link>
           </div>
 
           <!-- Button -->
@@ -122,38 +124,6 @@
             {{ loading ? 'Logging in...' : 'Login →' }}
           </button>
 
-          <!-- Divider -->
-          <div class="relative text-center text-sm text-gray-400">
-            <span class="bg-white px-2 relative z-10"> or continue with </span>
-
-            <div class="absolute inset-0 flex items-center">
-              <div class="w-full border-t border-gray-200"></div>
-            </div>
-          </div>
-
-          <!-- Social -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <button
-              type="button"
-              class="py-3 rounded-xl border bg-white font-semibold text-sm hover:border-blue-500 hover:-translate-y-0.5 transition"
-            >
-              Google
-            </button>
-
-            <button
-              type="button"
-              class="py-3 rounded-xl border bg-white font-semibold text-sm hover:border-blue-500 hover:-translate-y-0.5 transition"
-            >
-              Facebook
-            </button>
-
-            <button
-              type="button"
-              class="py-3 rounded-xl border bg-white font-semibold text-sm hover:border-blue-500 hover:-translate-y-0.5 transition"
-            >
-              Apple
-            </button>
-          </div>
         </form>
 
         <p class="text-sm text-center text-gray-600">
