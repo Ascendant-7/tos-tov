@@ -1,4 +1,4 @@
-import { supabase } from '@/services/supabase.ts'
+import { supabase } from '@/core/services/supabase'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -11,31 +11,31 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: () => import('../modules/auth/LoginView.vue'),
+      component: () => import('@/modules/auth/LoginView.vue'),
       meta: { showLayout: false, requiresAuth: false },
     },
     {
       path: '/signup',
       name: 'signup',
-      component: () => import('../modules/auth/RegisterView.vue'),
+      component: () => import('@/modules/auth/RegisterView.vue'),
       meta: { showLayout: false, requiresAuth: false },
     },
     {
       path: '/home',
       name: 'home',
-      component: () => import('../modules/home/HomePage.vue'),
+      component: () => import('@/modules/home/HomePage.vue'),
       meta: { showLayout: true, requiresAuth: true },
     },
     {
       path: '/explore',
       name: 'explore',
-      component: () => import('../modules/explore/ExplorePage.vue'),
+      component: () => import('@/modules/explore/ExplorePage.vue'),
       meta: { showLayout: true, requiresAuth: true },
     },
     {
       path: '/explore/:id',
       name: 'destination-detail',
-      component: () => import('../modules/explore/pages/DestinationDetailPage.vue'),
+      component: () => import('@/modules/explore/pages/DestinationDetailPage.vue'),
       meta: { showLayout: true, requiresAuth: true },
     },
     {
@@ -47,7 +47,7 @@ const router = createRouter({
     {
       path: '/trips',
       name: 'my-trips',
-      component: () => import('../modules/itinerary/pages/MyTripsPage.vue'),
+      component: () => import('@/modules/itinerary/pages/MyTripsPage.vue'),
       meta: { showLayout: true, requiresAuth: true },
     },
     {
@@ -59,43 +59,43 @@ const router = createRouter({
     {
       path: '/route-intel',
       name: 'route-intel',
-      component: () => import('../modules/map/pages/RoutesPage.vue'),
+      component: () => import('@/modules/map/pages/RoutesPage.vue'),
       meta: { showLayout: true, requiresAuth: true },
     },
     {
       path: '/social',
       name: 'social',
-      component: () => import('../core/pages/SocialPage.vue'),
+      component: () => import('@/core/pages/SocialPage.vue'),
       meta: { showLayout: true, requiresAuth: true },
     },
     {
       path: '/community',
       name: 'community',
-      component: () => import('../core/pages/CommunityPage.vue'),
+      component: () => import('@/core/pages/CommunityPage.vue'),
       meta: { showLayout: true, requiresAuth: true },
     },
     {
       path: '/profile',
       name: 'profile',
-      component: () => import('../modules/user/ProfileView.vue'),
+      component: () => import('@/modules/user/ProfileView.vue'),
       meta: { showLayout: true, requiresAuth: true },
     },
     {
       path: '/profile/edit',
       name: 'profile-edit',
-      component: () => import('../modules/user/EditProfileView.vue'),
+      component: () => import('@/modules/user/EditProfileView.vue'),
       meta: { showLayout: true, requiresAuth: true },
     },
     {
       path: '/trips/:tripId',
       name: 'trip-itinerary',
-      component: () => import('../modules/itinerary/pages/ItineraryPage.vue'),
+      component: () => import('@/modules/itinerary/pages/ItineraryPage.vue'),
       meta: { showLayout: true, requiresAuth: true },
     },
     {
       path: '/budget',
       name: 'budget',
-      component: () => import('../modules/budget/pages/BudgetPage.vue'),
+      component: () => import('@/modules/budget/pages/BudgetPage.vue'),
       meta: { showLayout: true, requiresAuth: true },
     },
   ],

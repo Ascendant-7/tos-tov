@@ -1,5 +1,5 @@
 import { API_BASE_URL } from './api'
-import { supabase } from '../../../services/supabase'
+import { supabase } from '@/core/services/supabase'
 
 export const getDestinations = async () => {
   const { data: { session } } = await supabase.auth.getSession()

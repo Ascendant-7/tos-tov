@@ -95,7 +95,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { supabase } from '../../services/supabase'
+import { supabase } from '@/core/services/supabase'
 import { API_BASE_URL } from '../itinerary/services/api'
 
 type ProfileUpdatePayload = {

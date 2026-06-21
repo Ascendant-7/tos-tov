@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { supabase } from '../../../services/supabase';
+import { supabase } from '@/core/services/supabase';
 
 export type Profile = {
   id: string;

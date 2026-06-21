@@ -171,7 +171,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { supabase } from '../../services/supabase'
+import { supabase } from '@/core/services/supabase'
 
 const router = useRouter()
 

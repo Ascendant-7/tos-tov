@@ -1,4 +1,4 @@
-// apps/client/src/services/supabase.ts
+// apps/client/src/services/supabase
 // This file initializes and exports the Supabase client for your frontend.
 
 import { createSupabaseClient } from '@repo/supabase'
