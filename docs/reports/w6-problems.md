@@ -56,7 +56,7 @@
   - `[CAUSE/FIXER-SA]` ExplorePage.vue - completely empty  
   - `[CAUSE/FIXER-HS]` CommunityPage.vue - completely empty
   - `[CAUSE/FIXER-BS]` TripPlannerPage.vue - completely empty
-- `[CAUSE/FIXER-**]` **Router path mismatch**: Router imports from `../pages/` and `../core/pages/` but some referenced files don't exist
+- `[CAUSE/FIXER-**]` **Router path mismatch**: Router imports from `../pages/` and `@/core/pages/` but some referenced files don't exist
 
 ### Module Structure
 

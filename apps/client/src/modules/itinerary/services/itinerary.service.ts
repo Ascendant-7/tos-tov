@@ -54,7 +54,7 @@ interface TripApiResponse {
 
 export type Trip = TripApiResponse
 
-import { supabase } from '../../../services/supabase'
+import { supabase } from '@/core/services/supabase'
 
 const authHeaders = async () => {
   const { data: { session } } = await supabase.auth.getSession()

@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { supabase } from '../../../services/supabase'
+import { supabase } from '@/core/services/supabase'
 
 
 export interface Comment {

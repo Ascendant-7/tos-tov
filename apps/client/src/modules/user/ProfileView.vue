@@ -66,17 +66,17 @@
                 <div v-if="uploadingAvatar" class="absolute inset-0 bg-black/40 backdrop-blur-sm z-30 grid place-items-center">
                   <div class="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
                 </div>
-                
+
                 <img v-if="profile.avatar_url" :src="profile.avatar_url" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" />
                 <template v-else>
                   <span class="text-4xl tracking-tighter">{{ initials }}</span>
                 </template>
-                
+
                 <!-- Hover Overlay -->
                 <div class="absolute inset-0 bg-black/0 group-hover/avatar:bg-black/20 transition-all duration-500 grid place-items-center opacity-0 group-hover/avatar:opacity-100">
                   <span class="text-white text-xs font-bold uppercase tracking-widest bg-[#0f4f3f]/80 px-3 py-1.5 rounded-full backdrop-blur-md">Change</span>
                 </div>
-                
+
                 <span
                   class="absolute bottom-3 right-3 w-5 h-5 bg-green-500 border-4 border-white rounded-full shadow-lg z-20"
                 ></span>
@@ -147,7 +147,7 @@
                 @click="activeTab = tab"
               >
                 {{ tab === 'trips' ? 'My Journeys' : tab }}
-                <span 
+                <span
                   class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0f4f3f] transition-all duration-500 rounded-full"
                   :class="activeTab === tab ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0 group-hover:opacity-30 group-hover:scale-x-50'"
                 ></span>
@@ -234,7 +234,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { supabase } from '../../services/supabase'
+import { supabase } from '@/core/services/supabase'
 import { getTrips, type Trip } from '../itinerary/services/itinerary.service'
 import { API_BASE_URL } from '../itinerary/services/api'
 import SaveTrip from './SaveTrip.vue'
@@ -355,9 +355,9 @@ const handleAvatarUpload = async (event: Event) => {
     // 1. Upload to Supabase Storage
     const { error: uploadError } = await supabase.storage
       .from('avatars')
-      .upload(filePath, file, { 
+      .upload(filePath, file, {
         upsert: true,
-        contentType: file.type 
+        contentType: file.type
       })
 
     if (uploadError) {

@@ -252,10 +252,10 @@
 import { onMounted, onUnmounted, onBeforeUnmount, ref, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { useHomepageStore } from '../../modules/home/stores/homepage'
-import { useExploreStore } from '../../modules/explore/store/explore'
-import { supabase } from '../../services/supabase'
-import { searchProfiles, type ProfileSearchResult } from '../../modules/explore/services/profilesApi'
+import { useHomepageStore } from '@/modules/home/stores/homepage'
+import { useExploreStore } from '@/modules/explore/store/explore'
+import { supabase } from '@/core/services/supabase'
+import { searchProfiles, type ProfileSearchResult } from '@/modules/explore/services/profilesApi'
 
 defineEmits<{ 'toggle-sidebar': [] }>()
 

@@ -3,7 +3,7 @@
  * Communicates with the NestJS backend at /destinations
  */
 
-import { supabase } from '../../../services/supabase'
+import { supabase } from '@/core/services/supabase'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000'
 
