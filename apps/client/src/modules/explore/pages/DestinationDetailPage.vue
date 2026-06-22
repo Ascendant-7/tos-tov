@@ -332,12 +332,14 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { ExploreDestination } from '@/modules/explore/components/DestinationCard.vue'
 import { useExploreStore } from '@/modules/explore/store/explore'
+import { useUserStore } from '@/modules/user/stores/userStore'
 import AddToTripModal from '@/modules/itinerary/components/AddToTripModal.vue'
 import { addFavorite, removeFavorite, checkFavorite } from '@/modules/explore/services/favoritesApi'
 
 const route = useRoute()
 const router = useRouter()
 const exploreStore = useExploreStore()
+const userStore = useUserStore()
 const showAddToTripModal = ref(false)
 
 const destination = ref<ExploreDestination | null>(null)
@@ -380,6 +382,10 @@ function showToast(message: string) {
 }
 
 async function toggleFavorite() {
+  if (!userStore.isAuthenticated) {
+    router.push('/login?force=1')
+    return
+  }
   if (!destination.value?.id || favoriteLoading.value) return
 
   favoriteLoading.value = true
@@ -432,8 +438,11 @@ function shareDestination() {
 }
 
 function addToTrip() {
+  if (!userStore.isAuthenticated) {
+    router.push('/login?force=1')
+    return
+  }
   showAddToTripModal.value = true
-  // console.log('Add to trip:', destination.value?.name)
 }
 </script>
 

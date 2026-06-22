@@ -21,22 +21,28 @@ const router = createRouter({
       meta: { showLayout: false, requiresAuth: false },
     },
     {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: () => import('../modules/auth/ForgotPasswordView.vue'),
+      meta: { showLayout: false, requiresAuth: false },
+    },
+    {
       path: '/home',
       name: 'home',
       component: () => import('../modules/home/HomePage.vue'),
-      meta: { showLayout: true, requiresAuth: true },
+      meta: { showLayout: true, requiresAuth: false },
     },
     {
       path: '/explore',
       name: 'explore',
       component: () => import('../modules/explore/ExplorePage.vue'),
-      meta: { showLayout: true, requiresAuth: true },
+      meta: { showLayout: true, requiresAuth: false },
     },
     {
       path: '/explore/:id',
       name: 'destination-detail',
       component: () => import('../modules/explore/pages/DestinationDetailPage.vue'),
-      meta: { showLayout: true, requiresAuth: true },
+      meta: { showLayout: true, requiresAuth: false },
     },
     {
       path: '/trip-planner',

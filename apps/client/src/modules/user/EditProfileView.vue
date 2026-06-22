@@ -95,7 +95,9 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import { supabase } from '../../services/supabase'
+import { useUserStore } from './stores/userStore'
 import { API_BASE_URL } from '../itinerary/services/api'
 
 type ProfileUpdatePayload = {
@@ -106,10 +108,10 @@ type ProfileUpdatePayload = {
 }
 
 const router = useRouter()
+const userStore = useUserStore()
+const { profile, loading, error: errorMessage } = storeToRefs(userStore)
 
-const loading = ref(false)
 const saving = ref(false)
-const errorMessage = ref('')
 const successMessage = ref('')
 
 const userId = ref<string | null>(null)
@@ -127,61 +129,32 @@ const cancel = () => {
 }
 
 const load = async () => {
-  loading.value = true
-  errorMessage.value = ''
   successMessage.value = ''
-
-  try {
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession()
-
-    if (sessionError) throw sessionError
-    if (!session?.user) throw new Error('User not authenticated')
-
-    userId.value = session.user.id
-    token.value = session.access_token
-
-    const res = await fetch(`${API_BASE_URL}/profiles/${userId.value}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token.value}`,
-      },
-    })
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}))
-      throw new Error(err.message || `Failed to load profile (${res.status})`)
+  
+  await userStore.fetchProfile()
+  
+  if (profile.value) {
+    form.first_name = profile.value.first_name || ''
+    form.last_name = profile.value.last_name || ''
+    form.avatar_url = profile.value.avatar_url || ''
+    form.bio = profile.value.bio || ''
+    
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      userId.value = session.user.id
+      token.value = session.access_token
     }
-
-    const profile = (await res.json()) as {
-      first_name?: string | null
-      last_name?: string | null
-      avatar_url?: string | null
-      bio?: string | null
-    }
-
-    form.first_name = profile.first_name || ''
-    form.last_name = profile.last_name || ''
-    form.avatar_url = profile.avatar_url || ''
-    form.bio = profile.bio || ''
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to load profile'
-    errorMessage.value = message
-  } finally {
-    loading.value = false
   }
 }
 
 const save = async () => {
   if (!userId.value || !token.value) {
-    errorMessage.value = 'User not authenticated'
+    userStore.error = 'User not authenticated'
     return
   }
 
   saving.value = true
-  errorMessage.value = ''
+  userStore.error = null
   successMessage.value = ''
 
   try {
@@ -207,14 +180,16 @@ const save = async () => {
       throw new Error(data.message || `Failed to save profile (${res.status})`)
     }
 
+    // Refresh global store
+    await userStore.fetchProfile()
+    
     successMessage.value = 'Profile updated successfully'
 
     setTimeout(() => {
       router.push('/profile')
     }, 600)
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Failed to save profile'
-    errorMessage.value = message
+    userStore.error = err instanceof Error ? err.message : 'Failed to save profile'
   } finally {
     saving.value = false
   }

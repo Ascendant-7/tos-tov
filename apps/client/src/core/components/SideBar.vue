@@ -143,10 +143,12 @@
 <script setup lang="ts">
 import { ref, h, type FunctionalComponent, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/modules/user/stores/userStore'
 
 const props = defineProps<{ mobileOpen: boolean }>()
 const emit = defineEmits<{ 'close-mobile': [] }>()
 const router = useRouter()
+const userStore = useUserStore()
 
 const isOpen = ref(true)
 
@@ -304,17 +306,27 @@ const CreatePostIcon: FunctionalComponent = () =>
     ],
   )
 
-const navItems = [
-  { to: '/home', label: 'Home', icon: DashboardIcon },
-  { to: '/explore', label: 'Explore', icon: ExploreIcon },
-  { to: '/trips', label: 'My Trips', icon: SavedIcon },
-  { to: '/social', label: 'Social Travel', icon: SocialIcon },
-  { to: '/community', label: 'Community', icon: CommunityIcon },
-  { to: '/profile', label: 'Profile', icon: ProfileIcon },
-]
+const navItems = computed(() => {
+  const items = [
+    { to: '/home', label: 'Home', icon: DashboardIcon },
+    { to: '/explore', label: 'Explore', icon: ExploreIcon },
+  ]
+  if (userStore.isAuthenticated) {
+    items.push(
+      { to: '/trips', label: 'My Trips', icon: SavedIcon },
+      { to: '/social', label: 'Social Travel', icon: SocialIcon },
+      { to: '/community', label: 'Community', icon: CommunityIcon },
+      { to: '/profile', label: 'Profile', icon: ProfileIcon },
+    )
+  }
+  return items
+})
 
-const bottomItems = [
-  { label: 'Saved Trips', icon: SavedIcon },
-  { label: 'Create Post', icon: CreatePostIcon },
-]
+const bottomItems = computed(() => {
+  if (!userStore.isAuthenticated) return []
+  return [
+    { label: 'Saved Trips', icon: SavedIcon },
+    { label: 'Create Post', icon: CreatePostIcon },
+  ]
+})
 </script>

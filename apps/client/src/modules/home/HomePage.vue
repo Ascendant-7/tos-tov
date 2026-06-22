@@ -98,6 +98,7 @@
             </div>
           </div>
           <button
+            @click="planIt"
             class="bg-white text-ai-teal-dark px-5 py-2 rounded-xl text-[13px] font-semibold border-none cursor-pointer transition-all duration-200 hover:bg-white/90 hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] shrink-0 w-full sm:w-auto text-center"
           >
             Plan it
@@ -303,7 +304,7 @@
       </section>
 
       <!-- Continue Planning -->
-      <section class="mt-8 sm:mt-10 animate-fade-in-up delay-7">
+      <section v-if="userStore.isAuthenticated" class="mt-8 sm:mt-10 animate-fade-in-up delay-7">
         <h2
           class="text-[14px] sm:text-[15px] font-bold text-slate-800 m-0 mb-4 sm:mb-5 flex items-center gap-2"
         >
@@ -544,13 +545,16 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useHomepageStore } from './stores/homepage'
 import { useExploreStore } from '@/modules/explore/store/explore'
+import { useUserStore } from '@/modules/user/stores/userStore'
 
+const router = useRouter()
 const homepageStore = useHomepageStore()
 const exploreStore = useExploreStore()
+const userStore = useUserStore()
 
 const {
   searchQuery,
@@ -574,4 +578,12 @@ onMounted(async () => {
     await exploreStore.loadDestinations()
   }
 })
+
+function planIt() {
+  if (!userStore.isAuthenticated) {
+    router.push('/login?force=1')
+    return
+  }
+  router.push('/trip-planner')
+}
 </script>

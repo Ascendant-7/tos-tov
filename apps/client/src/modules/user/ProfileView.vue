@@ -234,26 +234,19 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { supabase } from '../../services/supabase'
+import { useUserStore } from './stores/userStore'
 import { getTrips, type Trip } from '../itinerary/services/itinerary.service'
 import { API_BASE_URL } from '../itinerary/services/api'
 import SaveTrip from './SaveTrip.vue'
 import HistoryTrip from './HistoryTrip.vue'
 
-interface ProfileEntity {
-  id: string
-  email: string
-  first_name: string
-  last_name: string
-  avatar_url?: string
-  bio?: string
-  created_at: string
-}
+const userStore = useUserStore()
+const { profile, loading, error: errorMessage } = storeToRefs(userStore)
 
-const loading = ref(false)
 const uploadingAvatar = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
-const profile = ref<ProfileEntity | null>(null)
 const trips = ref<Trip[]>([])
 const stats = ref({
   tripsCount: 0,
@@ -261,32 +254,19 @@ const stats = ref({
   countriesCount: 0,
   distanceKm: 0
 })
-const errorMessage = ref('')
 const activeTab = ref('trips')
 
 const fetchProfileData = async () => {
-  loading.value = true
-  errorMessage.value = ''
-
+  await userStore.fetchProfile()
+  
   try {
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-    if (sessionError) throw sessionError
-    if (!session?.user) {
-      errorMessage.value = 'User not authenticated'
-      loading.value = false
-      return
-    }
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.user) return
 
     const userId = session.user.id
     const token = session.access_token
 
-    const [profileRes, tripsData, statsRes] = await Promise.allSettled([
-      fetch(`${API_BASE_URL}/profiles/${userId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      }),
+    const [tripsData, statsRes] = await Promise.allSettled([
       getTrips(),
       fetch(`${API_BASE_URL}/profiles/stats/${userId}`, {
         headers: {
@@ -296,16 +276,6 @@ const fetchProfileData = async () => {
       })
     ])
 
-    if (profileRes.status === 'fulfilled') {
-      const res = profileRes.value
-      if (res.ok) {
-        profile.value = await res.json()
-      } else {
-        const err = await res.json().catch(() => ({}))
-        errorMessage.value = err.message || `Failed to fetch profile (${res.status})`
-      }
-    }
-
     if (tripsData.status === 'fulfilled') {
       trips.value = tripsData.value
     }
@@ -313,23 +283,8 @@ const fetchProfileData = async () => {
     if (statsRes.status === 'fulfilled' && statsRes.value.ok) {
       stats.value = await statsRes.value.json()
     }
-
-    if (!profile.value && session?.user) {
-      const meta = session.user.user_metadata || {}
-      profile.value = {
-        id: session.user.id,
-        email: session.user.email || '',
-        first_name: meta.first_name,
-        last_name: meta.last_name,
-        avatar_url: meta.avatar_url,
-        bio: '',
-        created_at: session.user.created_at
-      }
-    }
   } catch (err: unknown) {
-    errorMessage.value = err instanceof Error ? err.message : 'Something went wrong while fetching profile'
-  } finally {
-    loading.value = false
+    console.error('Error fetching additional profile data:', err)
   }
 }
 
@@ -343,8 +298,8 @@ const handleAvatarUpload = async (event: Event) => {
   if (!file) return
 
   uploadingAvatar.value = true
-  errorMessage.value = ''
-
+  // We can't easily clear store error here, but we can manage local UI
+  
   try {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) throw new Error('Not authenticated')
@@ -386,10 +341,10 @@ const handleAvatarUpload = async (event: Event) => {
       throw new Error(err.message || 'Failed to update profile image in database')
     }
 
-    // 4. Success - Refresh local data
-    await fetchProfileData()
+    // 4. Success - Refresh global store data
+    await userStore.fetchProfile()
   } catch (err: unknown) {
-    errorMessage.value = err instanceof Error ? err.message : 'Upload failed'
+    userStore.error = err instanceof Error ? err.message : 'Upload failed'
   } finally {
     uploadingAvatar.value = false
     if (fileInput.value) fileInput.value.value = ''
@@ -398,19 +353,11 @@ const handleAvatarUpload = async (event: Event) => {
 
 onMounted(fetchProfileData)
 
-const displayName = computed(() => {
-  if (!profile.value) return 'Traveler'
-  const full = `${profile.value.first_name} ${profile.value.last_name}`.trim()
-  return full || profile.value.email.split('@')[0]
-})
+const displayName = computed(() => userStore.displayName)
 
 const emailText = computed(() => profile.value?.email || 'Email not set')
 
-const initials = computed(() => {
-  const first = profile.value?.first_name?.[0] || 'T'
-  const last = profile.value?.last_name?.[0] || 'R'
-  return `${first}${last}`.toUpperCase()
-})
+const initials = computed(() => userStore.initials)
 
 const getTripImage = (trip: Trip) => {
   const images = [

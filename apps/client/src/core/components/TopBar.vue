@@ -240,9 +240,17 @@
 
       <!-- User Avatar -->
       <div
-        class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-accent-gold flex items-center justify-center text-white text-xs sm:text-sm font-bold cursor-pointer transition-transform duration-200 hover:scale-105 shadow-[0_2px_8px_rgba(200,169,81,0.3)]"
+        v-if="isAuthed"
+        @click="router.push('/profile')"
+        class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-accent-gold flex items-center justify-center text-white text-xs sm:text-sm font-bold cursor-pointer transition-transform duration-200 hover:scale-105 shadow-[0_2px_8px_rgba(200,169,81,0.3)] overflow-hidden"
       >
-        YO
+        <img
+          v-if="avatarUrl"
+          :src="avatarUrl"
+          alt="Profile"
+          class="w-full h-full object-cover"
+        />
+        <span v-else>{{ initials }}</span>
       </div>
     </div>
   </header>
@@ -254,6 +262,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useHomepageStore } from '../../modules/home/stores/homepage'
 import { useExploreStore } from '../../modules/explore/store/explore'
+import { useUserStore } from '../../modules/user/stores/userStore'
 import { supabase } from '../../services/supabase'
 import { searchProfiles, type ProfileSearchResult } from '../../modules/explore/services/profilesApi'
 
@@ -263,7 +272,9 @@ const route = useRoute()
 const router = useRouter()
 const homepageStore = useHomepageStore()
 const exploreStore = useExploreStore()
+const userStore = useUserStore()
 const { searchQuery } = storeToRefs(homepageStore)
+const { profile, initials, avatarUrl } = storeToRefs(userStore)
 
 const isAuthed = ref(false)
 
@@ -292,8 +303,17 @@ onMounted(async () => {
   const { data } = await supabase.auth.getSession()
   isAuthed.value = !!data.session
 
+  if (isAuthed.value) {
+    userStore.fetchProfile()
+  }
+
   const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
     isAuthed.value = !!session
+    if (isAuthed.value) {
+      userStore.fetchProfile()
+    } else {
+      userStore.profile = null
+    }
   })
 
   authUnsubscribe = () => {

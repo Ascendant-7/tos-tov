@@ -31,7 +31,9 @@ export class AuthController {
 
   @Post('verify-otp')
   @HttpCode(HttpStatus.OK)
-  async verifyOtp(@Body() body: { email: string; token: string; type?: 'signup' | 'email' }): Promise<any> {
+  async verifyOtp(
+    @Body() body: { email: string; token: string; type?: 'signup' | 'email' },
+  ): Promise<any> {
     return this.authService.verifyOtp(body.email, body.token, body.type)
   }
 

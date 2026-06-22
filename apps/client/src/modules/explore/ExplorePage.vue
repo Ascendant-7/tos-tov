@@ -17,7 +17,7 @@
             <div class="flex items-center gap-2 shrink-0">
               <!-- Add Destination Button -->
               <button
-                @click="showAddModal = true"
+                @click="handleAdd"
                 class="flex items-center gap-2 px-4 py-3 rounded-2xl border border-sidebar-active bg-sidebar-active text-white text-[13px] font-medium cursor-pointer transition-all duration-200 hover:shadow-[0_4px_14px_rgba(42,90,66,0.3)] hover:-translate-y-0.5 shrink-0"
               >
                 <svg
@@ -284,15 +284,18 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useExploreStore } from './store/explore'
+import { useUserStore } from '@/modules/user/stores/userStore'
 import SearchFilterBar from '../../modules/home/components/SearchFilterBar.vue'
 import DestinationCard from './components/DestinationCard.vue'
 import AddDestinationModal from './components/AddDestinationModal.vue'
 
 const route = useRoute()
+const router = useRouter()
 const exploreStore = useExploreStore()
+const userStore = useUserStore()
 const {
   isLoading,
   error,
@@ -331,6 +334,14 @@ function clearFilters() {
   activeTab.value = 'All'
   selectedProvince.value = 'All'
   exploreStore.setTrendingFilter(false)
+}
+
+function handleAdd() {
+  if (!userStore.isAuthenticated) {
+    router.push('/login?force=1')
+    return
+  }
+  showAddModal.value = true
 }
 </script>
 
