@@ -187,26 +187,26 @@ const ExploreIcon: FunctionalComponent = () =>
     ],
   )
 
-const SocialIcon: FunctionalComponent = () =>
-  h(
-    'svg',
-    {
-      xmlns: 'http://www.w3.org/2000/svg',
-      viewBox: '0 0 24 24',
-      fill: 'none',
-      stroke: 'currentColor',
-      'stroke-width': '2',
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      class: 'w-[18px] h-[18px]',
-    },
-    [
-      h('path', { d: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' }),
-      h('circle', { cx: '9', cy: '7', r: '4' }),
-      h('path', { d: 'M22 21v-2a4 4 0 0 0-3-3.87' }),
-      h('path', { d: 'M16 3.13a4 4 0 0 1 0 7.75' }),
-    ],
-  )
+// const SocialIcon: FunctionalComponent = () =>
+//   h(
+//     'svg',
+//     {
+//       xmlns: 'http://www.w3.org/2000/svg',
+//       viewBox: '0 0 24 24',
+//       fill: 'none',
+//       stroke: 'currentColor',
+//       'stroke-width': '2',
+//       'stroke-linecap': 'round',
+//       'stroke-linejoin': 'round',
+//       class: 'w-[18px] h-[18px]',
+//     },
+//     [
+//       h('path', { d: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' }),
+//       h('circle', { cx: '9', cy: '7', r: '4' }),
+//       h('path', { d: 'M22 21v-2a4 4 0 0 0-3-3.87' }),
+//       h('path', { d: 'M16 3.13a4 4 0 0 1 0 7.75' }),
+//     ],
+//   )
 
 const CommunityIcon: FunctionalComponent = () =>
   h(
@@ -284,8 +284,8 @@ const navItems = [
   { to: '/home', label: 'Home', icon: DashboardIcon },
   { to: '/explore', label: 'Explore', icon: ExploreIcon },
   { to: '/trips', label: 'My Trips', icon: SavedIcon },
-  { to: '/social', label: 'Social Travel', icon: SocialIcon },
-  { to: '/route-intel', label: 'Route Intel', icon: ExploreIcon },
+  // { to: '/social', label: 'Social Travel', icon: SocialIcon },
+  // { to: '/route-intel', label: 'Route Intel', icon: ExploreIcon },
   { to: '/community', label: 'Community', icon: CommunityIcon },
   { to: '/profile', label: 'Profile', icon: ProfileIcon },
 ]
